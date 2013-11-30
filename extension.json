@@ -1,0 +1,86 @@
+{
+  "name":"Content",
+  "guid":"58EBDCF2-D193-4A06-8E86-027570AB6B46",
+  "category":"extension",
+  "group":"phpManufaktur",
+  "vendor":{
+      "name":"phpManufaktur",
+      "url":"https:\/\/phpmanufaktur.de",
+      "mail":"team@phpmanufaktur.de",
+      "address":{
+          "street":"Stockholmer Straße 31",
+          "zip":"13359",
+          "city":"Berlin",
+          "country":"Germany"
+      },
+      "phone":"+49 30 68813647"
+  },
+  "type":"application",
+  "path":"\/extension\/phpmanufaktur\/phpManufaktur\/Content",
+  "namespace":"phpManufaktur\\Content",
+  "link":{
+    "about":"\/content\/about"
+  },
+  "release":{
+    "number":"0.10",
+    "date":"2013-11-30",
+    "status":"alpha"
+  },
+  "description":{
+    "en":{
+      "title":"Flexible Content Management",
+      "short":"Manage different contents flexibel with the kitFramework",
+      "long":"Manage different contents flexibel with the kitFramework",
+      "url":"https:\/\/kit2.phpmanufaktur.de"
+    },
+    "de":{
+        "title":"Flexible Verwaltung von Inhalten",
+        "short":"Verwalten und organisieren sie beliebige Inhalte mit dem kitFramework",
+        "long":"Verwalten und organisieren sie beliebige Inhalte mit dem kitFramework",
+        "url":"https:\/\/kit2.phpmanufaktur.de"
+    }
+  },
+  "require":{
+    "framework":{
+      "release":"0.26"
+    },
+    "extension":{
+        "phpmanufaktur":{
+            "Basic":{
+                "release":"0.61"
+            },
+            "CKEditor":{
+                "release":"0.19",
+            },
+            "CommandCollection":{
+                "release":"0.28"
+            },
+            "MediaBrowser":{
+                "release":"0.22"
+            }
+        }
+    }
+  },
+  "setup": {
+      "install":"\/admin\/content\/setup",
+      "update":"\/admin\/content\/update",
+      "uninstall":"\/admin\/content\/uninstall",
+      "icon_path":{
+        "BlackCat":"\/extension\/phpmanufaktur\/phpManufaktur\/Content\/Data\/Setup\/Icon\/icon.png",
+        "WebsiteBaker":"\/extension\/phpmanufaktur\/phpManufaktur\/Content\/Data\/Setup\/Icon\/tool_icon.png"
+      }
+  },
+  "license": {
+    "name":"MIT License",
+    "url":"https:\/\/github.com\/phpManufaktur\/kfContent\/raw\/master\/LICENSE.md"
+  },
+  "download":{
+    "availability":"public",
+    "agreement":"free",
+    "github":{
+      "organization":"phpManufaktur",
+      "repository":"kfContent"
+    },
+    "url":"https:\/\/github.com\/phpManufaktur\/kfContent"
+  }
+}
