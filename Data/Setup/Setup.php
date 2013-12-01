@@ -1,18 +1,19 @@
 <?php
 
 /**
- * Content
+ * flexContent
  *
  * @author Team phpManufaktur <team@phpmanufaktur.de>
- * @link https://kit2.phpmanufaktur.de/Content
+ * @link https://kit2.phpmanufaktur.de/flexContent
  * @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
  * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 
-namespace phpManufaktur\Content\Data\Setup;
+namespace phpManufaktur\flexContent\Data\Setup;
 
 use Silex\Application;
 use phpManufaktur\Basic\Control\CMS\InstallAdminTool;
+use phpManufaktur\flexContent\Data\Content\Content;
 
 class Setup
 {
@@ -25,16 +26,19 @@ class Setup
      * @throws \Exception
      * @return string with result
      */
-    public function exec(Application $app)
+    public function Controller(Application $app)
     {
         try {
+            // create content table
+            $Content = new Content($app);
+            $Content->createTable();
 
-            // setup kit_framework_content as Add-on in the CMS
+            // setup kit_framework_flexcontent as Add-on in the CMS
             $admin_tool = new InstallAdminTool($app);
-            $admin_tool->exec(MANUFAKTUR_PATH.'/Content/extension.json', '/content/cms');
+            $admin_tool->exec(MANUFAKTUR_PATH.'/flexContent/extension.json', '/content/cms');
 
             return $app['translator']->trans('Successfull installed the extension %extension%.',
-                array('%extension%' => 'Content'));
+                array('%extension%' => 'flexContent'));
 
         } catch (\Exception $e) {
             throw new \Exception($e);

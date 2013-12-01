@@ -1,0 +1,73 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+{% if usage == 'framework' %}
+  {% set template_namespace = '@phpManufaktur/Basic/Template' %}
+  {% set template_file = 'framework/body.twig' %}
+{% else %}
+  {% set template_namespace = '@phpManufaktur/flexContent/Template' %}
+  {% set template_file = 'backend/body.twig' %}
+{% endif %}
+{% extends getTemplateFile(template_namespace, template_file) %}
+{% block title %}{{ 'flexContent - Create or Edit Content'|trans }}{% endblock %}
+{% block jquery %}
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/i18n/jquery-ui-i18n.min.js"></script>
+  <script src="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/jquery/jquery-ui-timepicker-addon.js"></script>
+  <script src="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/jquery/jquery-ui-timepicker-de.js"></script>
+  <script type="text/javascript" src="{{ MANUFAKTUR_URL }}/CKEditor/Source/ckeditor.js"></script>
+{% endblock jquery %}
+
+{% block stylesheet %}
+  {{ parent() }}
+  {% if usage == 'framework' %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/backend.css" media="screen, projection" />
+  {% endif %}
+  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/Basic/Template/default/pattern/css/edit.css" media="screen, projection" />
+  <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css" media="screen, projection" />
+  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/jquery-ui-timepicker-addon.css" media="screen, projection" />
+  
+{% endblock stylesheet %}
+
+{% block content %}
+  <div id="edit">
+    {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
+    <div class="content_form">
+      <form action="{{ FRAMEWORK_URL }}/admin/content/edit?usage={{ usage }}" method="post" {{ form_enctype(form) }}>
+        {{ form_widget(form) }}
+      </form>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block footer %}
+  {# add the height of CKE's to the iframe_add_height (default = 30) #}
+  {% set iframe_add_height = 380 %}
+  {{ parent() }}
+  <script type="text/javascript">
+    if (typeof 'jQuery' !== 'undefined') {
+      $(document).ready(function() {
+        $.datepicker.setDefaults($.datepicker.regional['{{ app.translator.locale }}']);
+        $.timepicker.setDefaults($.timepicker.regional['{{ app.translator.locale }}']);
+        $('.publish_from').datetimepicker({
+          timeFormat: "HH:mm",
+          stepHour: 1,
+          stepMinute: 5
+        });
+        $('.publish_to').datetimepicker({
+          timeFormat: "HH:mm",
+          stepHour: 1,
+          stepMinute: 5
+        });
+      });
+    }
+  </script>
+{% endblock footer %}
+  

@@ -1,0 +1,119 @@
+/**
+ * flexContent
+ *
+ * @author Team phpManufaktur <team@phpmanufaktur.de>
+ * @link https://addons.phpmanufaktur.de/event
+ * @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+ * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+ */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  font-size: 12px;
+  color: #363636;
+  background-color: #fff;
+}
+
+#kf_body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: auto;
+}
+
+#toolbar
+{
+  padding: 3px 0 3px 10px;
+  margin: 15px 0;
+  border-bottom: 1px solid #dddddd;
+  list-style-type: none;
+  text-align: left; /*set to left, center, or right to align the menu as desired*/
+}
+#toolbar li
+{
+  display: inline;
+  margin: 0;
+}
+#toolbar li a
+{
+  text-decoration: none;
+  padding: 3px 7px;
+  margin-right: 3px;
+  border: 1px solid #dddddd;
+  border-bottom: none;
+  background-color: #E8E8E8;
+}
+#toolbar li a:link,
+#toolbar li a:visited
+{
+  color: #AFAFAF;
+  background-color: #e8e8e8;
+}
+#toolbar li.extra_tab a {
+  color:#003366;
+  background-color: #e8e8e8;
+}
+#toolbar li a:hover,
+#toolbar li a:active
+{
+  background-color: #FFFFCC;
+  color: #000;
+}
+#toolbar li.active a
+{ /*selected tab effect*/
+  position: relative;
+  top: 1px;
+  padding-top: 4px;
+  color: #000;
+  background-color: #fff;
+  font-weight: bold;
+}
+#content {
+  width: 99%;
+  padding: 0.5%;
+  margin: 0;
+}
+#content a {
+  text-decoration: none;
+}
+#content a:link,
+#content a:visited {
+  color: #da251d;
+  background-color: transparent;
+  text-decoration: none;
+}
+#content a:hover,
+#content a:active {
+  color: #da251d;
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+.clear {
+  clear: both;
+  width: 0;
+  height: 0;
+}
+
+.message
+{
+  border: 1px solid #ccc;
+  color: #000;
+  background-color: #fff8dc;
+  margin: 20px 0 10px 0;
+  padding: 10px;
+  font-size: 13px;
+  text-align: left;
+}
+.message .item {
+  border: none;
+  padding: 0;
+  margin: 5px 0 5px 0;
+}
+.event_form {
+  margin: 40px 0 20px 0;
+  padding: 0;
+  width: 100%;
+}

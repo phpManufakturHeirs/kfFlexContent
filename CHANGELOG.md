@@ -1,4 +1,4 @@
-## Content for kitFramework ##
+## flexContent for kitFramework ##
 
 (c) 2013 phpManufaktur by Ralf Hertsch
 

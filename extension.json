@@ -1,5 +1,5 @@
 {
-  "name":"Content",
+  "name":"flexContent",
   "guid":"58EBDCF2-D193-4A06-8E86-027570AB6B46",
   "category":"extension",
   "group":"phpManufaktur",
@@ -16,10 +16,10 @@
       "phone":"+49 30 68813647"
   },
   "type":"application",
-  "path":"\/extension\/phpmanufaktur\/phpManufaktur\/Content",
-  "namespace":"phpManufaktur\\Content",
+  "path":"\/extension\/phpmanufaktur\/phpManufaktur\/flexContent",
+  "namespace":"phpManufaktur\\flexContent",
   "link":{
-    "about":"\/content\/about"
+    "about":"\/flexcontent\/about"
   },
   "release":{
     "number":"0.10",
@@ -50,7 +50,7 @@
                 "release":"0.61"
             },
             "CKEditor":{
-                "release":"0.19",
+                "release":"0.19"
             },
             "CommandCollection":{
                 "release":"0.28"
@@ -62,25 +62,25 @@
     }
   },
   "setup": {
-      "install":"\/admin\/content\/setup",
-      "update":"\/admin\/content\/update",
-      "uninstall":"\/admin\/content\/uninstall",
+      "install":"\/admin\/flexcontent\/setup",
+      "update":"\/admin\/flexcontent\/update",
+      "uninstall":"\/admin\/flexcontent\/uninstall",
       "icon_path":{
-        "BlackCat":"\/extension\/phpmanufaktur\/phpManufaktur\/Content\/Data\/Setup\/Icon\/icon.png",
-        "WebsiteBaker":"\/extension\/phpmanufaktur\/phpManufaktur\/Content\/Data\/Setup\/Icon\/tool_icon.png"
+        "BlackCat":"\/extension\/phpmanufaktur\/phpManufaktur\/flexContent\/Data\/Setup\/Icon\/icon.png",
+        "WebsiteBaker":"\/extension\/phpmanufaktur\/phpManufaktur\/flexContent\/Data\/Setup\/Icon\/tool_icon.png"
       }
   },
   "license": {
     "name":"MIT License",
-    "url":"https:\/\/github.com\/phpManufaktur\/kfContent\/raw\/master\/LICENSE.md"
+    "url":"https:\/\/github.com\/phpManufaktur\/kfFlexContent\/raw\/master\/LICENSE.md"
   },
   "download":{
     "availability":"public",
     "agreement":"free",
     "github":{
       "organization":"phpManufaktur",
-      "repository":"kfContent"
+      "repository":"kfFlexContent"
     },
-    "url":"https:\/\/github.com\/phpManufaktur\/kfContent"
+    "url":"https:\/\/github.com\/phpManufaktur\/kfFlexContent"
   }
 }
