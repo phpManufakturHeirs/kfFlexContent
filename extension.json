@@ -22,7 +22,7 @@
     "about":"\/flexcontent\/about"
   },
   "release":{
-    "number":"0.10",
+    "number":"0.12",
     "date":"2013-11-30",
     "status":"alpha"
   },
@@ -36,7 +36,7 @@
     "de":{
         "title":"Flexible Verwaltung von Inhalten",
         "short":"Verwalten und organisieren sie beliebige Inhalte mit dem kitFramework",
-        "long":"Verwalten und organisieren sie beliebige Inhalte mit dem kitFramework",
+        "long":"Verwalten und organisieren sie beliebige Inhalte mit dem kitFramework. Kategorien und #Tags ermöglichen eine sehr flexible Präsentation und Veröffentlichung von Inhalten - flexContent ist eine Mischung aus herkömmlichen WYSIWYG Seiten, Blog Artikeln einem Archiv und beliebig vielen RSS Feedern für die Interaktion mit den sozialen Netzen.",
         "url":"https:\/\/kit2.phpmanufaktur.de"
     }
   },

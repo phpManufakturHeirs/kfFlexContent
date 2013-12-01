@@ -27,7 +27,7 @@ class Configuration
     public function __construct(Application $app)
     {
         $this->app = $app;
-        self::$config_path = MANUFAKTUR_PATH.'/flexContent/config.event.json';
+        self::$config_path = MANUFAKTUR_PATH.'/flexContent/config.flexcontent.json';
         $this->readConfiguration();
     }
 
@@ -87,7 +87,7 @@ class Configuration
     {
         // write the formatted config file to the path
         file_put_contents(self::$config_path, $this->app['utils']->JSONFormat(self::$config));
-        $this->app['monolog']->addDebug('Save configuration /flexContent/config.event.json');
+        $this->app['monolog']->addDebug('Save configuration to '.basename(self::$config_path));
     }
 
     /**
