@@ -1,0 +1,135 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+{% if usage == 'framework' %}
+  {% set template_namespace = '@phpManufaktur/Basic/Template' %}
+  {% set template_file = 'framework/body.twig' %}
+{% else %}
+  {% set template_namespace = '@phpManufaktur/flexContent/Template' %}
+  {% set template_file = 'backend/body.twig' %}
+{% endif %}
+{% extends getTemplateFile(template_namespace, template_file) %}
+{% block title %}{{ 'flexContent - About'|trans }}{% endblock %}
+{% block stylesheet %}
+  {{ parent() }}
+  {% if usage == 'framework' %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/backend.css" media="screen, projection" />
+  {% endif %}
+  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/list.css" media="screen, projection" />
+  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+{% endblock stylesheet %}
+
+{% block content %}
+  <div id="content_list">
+    {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
+    {% if message is defined and message|length > 0 %}
+      <div class="message">{{ message }}</div>
+    {% endif %}
+    <div class="create_tag">[ <a href="{{ FRAMEWORK_URL ~ route.create }}">{{ 'Create a new tag'|trans }} ]</a></div>  
+    {% if tags|length > 0 %}
+      {#
+        The pagination serve a automatic 1 2 3 ... 17 18 19 pagination and
+        navigation for the table if it contain more rows than specified in:
+        /flexContent/Template/default/backend/list.json
+        Changes here must be also done at the footer of the table !!!
+       #}
+      {% include '@phpManufaktur/flexContent/Template/default/backend/pagination.twig' with {
+         currentPage: current_page,
+         paginationPath: FRAMEWORK_URL ~ route.pagination|replace({'{order}':order_by|join(','), '{direction}':order_direction}),
+         lastPage: last_page,
+         showAlwaysFirstAndLast: true
+      } only %}
+
+      <table>
+        <thead>
+          <tr>
+            {#
+                Enable an automatic ordering of the table by the columns, just
+                clicking at the head of the column. Default order is specified in:
+                /flexContent/Template/default/backend/list.json
+             #}
+            {% set order_by_str = order_by|join(',') %}
+            {% for head in tags.0|keys %}
+              {% if head in columns %}
+                {% set head_order = order_direction %}
+                {% set head_class = head %}
+                {% if (head == order_by_str) %}
+                  {% if (head_order == 'asc') %}
+                    {% set head_order = 'desc' %}
+                    {% set head_class = head_class ~ ' active asc' %}
+                  {% else %}
+                    {% set head_order = 'asc' %}
+                    {% set head_class = head_class ~ ' active desc' %}
+                  {% endif %}
+                {% endif %}
+                <th class="{{ head_class }}">
+                  {% if head == 'used_by_content_id' %}
+                    {{ head|trans }}
+                  {% else %}
+                    {% if 'active asc' in head_class %}
+                      <i class="icon-caret-down icon-padding"></i>
+                    {% elseif 'active desc' in head_class %}
+                      <i class="icon-caret-up icon-padding"></i>
+                    {% endif %}
+                    <a href="{{ FRAMEWORK_URL ~ route.pagination|replace({'{page}':current_page, '{order}':head, '{direction}':head_order}) }}" title="{% if head_order == 'asc' %}{{ 'Click to sort column ascending'|trans }}{% else %}{{ 'Click to sort column descending'|trans }}{% endif %}">{{ head|trans }}</a>
+                  {% endif %}
+                </th>
+              {% endif %}
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% set i = 0 %}
+          {% for tag in tags %}
+            <tr class="{{ cycle(['flop','flip'], i) }}">
+              {% for column, value in tag %}
+                {% if column in columns %}
+                  {% if column == 'tag_id' %}
+                    <td class="{{ column }}">
+                      <a href="{{ FRAMEWORK_URL ~ route.edit|replace({'{tag_id}':value}) }}">{{ '%05d'|format(value) }}</a>
+                    </td>
+                  {% elseif column == 'tag_name' %}
+                    <td class="{{ column }}">
+                      <a href="{{ FRAMEWORK_URL ~ route.edit|replace({'{tag_id}':tag.tag_id}) }}">{{ value }}</a>
+                    </td>
+                  {% elseif (column == 'tag_description') %}
+                    <td class="{{ column }}">{{ value|striptags }}</td>
+                  {% elseif (column == 'used_by_content_id') %}
+                    <td class="{{ column }}">
+                      {% set separator = '' %}
+                      {% for content_id in value %}
+                        {{ separator }}<a href="{{ FRAMEWORK_URL ~ route.edit_content|replace({'{content_id}':content_id}) }}">{{ '%05d'|format(content_id) }}</a>
+                        {% set separator = ', ' %}
+                      {% endfor %}
+                    </td>
+                  {% else %}
+                    <td class="{{ column }}">{{ value }}</td>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            </tr>
+            {% set i = i+1 %}
+          {% endfor %}
+        </tbody>
+      </table>
+
+      {#
+        See top of the table for more information!
+       #}
+      {% include '@phpManufaktur/flexContent/Template/default/backend/pagination.twig' with {
+        currentPage: current_page,
+        paginationPath: FRAMEWORK_URL ~ route.pagination|replace({'{order}':order_by|join(','), '{direction}':order_direction}),
+        lastPage: last_page,
+        showAlwaysFirstAndLast: true
+      } only %}
+    {% else %}
+      <p>{{ 'The tag type list for flexContent is empty, please create a tag!'|trans }}</p>
+    {% endif %}
+  </div>
+{% endblock content %}

@@ -1,0 +1,17 @@
+{
+  "columns":[
+    "category_id",
+    "category_name",
+    "category_description",
+    "used_by_content_id"
+  ],
+  "list":{
+    "rows_per_page":40,
+    "order":{
+      "by":[
+        "category_name"
+      ],
+      "direction":"ASC"
+    }
+  }
+}

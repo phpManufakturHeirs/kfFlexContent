@@ -26,7 +26,7 @@ class About extends Backend {
         $this->initialize($app);
 
         $extension = $this->app['utils']->readJSON(MANUFAKTUR_PATH.'/flexContent/extension.json');
-        $extension['logo']['type'] = 'png';
+        //$extension['logo']['type'] = 'png';
 
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'backend/about.twig'),

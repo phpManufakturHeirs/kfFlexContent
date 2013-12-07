@@ -14,6 +14,10 @@ namespace phpManufaktur\flexContent\Data\Setup;
 use Silex\Application;
 use phpManufaktur\Basic\Control\CMS\UninstallAdminTool;
 use phpManufaktur\flexContent\Data\Content\Content;
+use phpManufaktur\flexContent\Data\Content\TagType;
+use phpManufaktur\flexContent\Data\Content\Tag;
+use phpManufaktur\flexContent\Data\Content\CategoryType;
+use phpManufaktur\flexContent\Data\Content\Category;
 
 class Uninstall
 {
@@ -26,6 +30,22 @@ class Uninstall
             // drop content table
             $Content = new Content($app);
             $Content->dropTable();
+
+            // drop the tag type table
+            $TagType = new TagType($app);
+            $TagType->dropTable();
+
+            // drop the tag table
+            $Tag = new Tag($app);
+            $Tag->dropTable();
+
+            // drop the category type table
+            $CategoryType = new CategoryType($app);
+            $CategoryType->dropTable();
+
+            // drop the category table
+            $Category = new Category($app);
+            $Category->dropTable();
 
             // uninstall kit_framework_flexcontent from the CMS
             $admin_tool = new UninstallAdminTool($app);

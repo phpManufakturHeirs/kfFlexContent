@@ -23,6 +23,8 @@
   <script src="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/jquery/jquery-ui-timepicker-addon.js"></script>
   <script src="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/jquery/jquery-ui-timepicker-de.js"></script>
   <script type="text/javascript" src="{{ MANUFAKTUR_URL }}/CKEditor/Source/ckeditor.js"></script>
+  <script type="text/javascript" src="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/jquery/tagedit/js/jquery.autoGrowInput.js"></script>
+  <script type="text/javascript" src="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/jquery/tagedit/js/jquery.tagedit.js"></script>
 {% endblock jquery %}
 
 {% block stylesheet %}
@@ -30,18 +32,113 @@
   {% if usage == 'framework' %}
     <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/backend.css" media="screen, projection" />
   {% endif %}
-  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/Basic/Template/default/pattern/css/edit.css" media="screen, projection" />
+  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/edit.css" media="screen, projection" />
   <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css" media="screen, projection" />
   <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/jquery-ui-timepicker-addon.css" media="screen, projection" />
-  
+  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/jquery/tagedit/css/tagedit.css" media="all"/>
 {% endblock stylesheet %}
 
 {% block content %}
+  {{ parent() }}
   <div id="edit">
     {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
+    {% if message is defined and message|length > 0 %}
+      <div class="message">{{ message }}</div>
+    {% endif %}
     <div class="content_form">
-      <form action="{{ FRAMEWORK_URL }}/admin/content/edit?usage={{ usage }}" method="post" {{ form_enctype(form) }}>
-        {{ form_widget(form) }}
+      <form id="content_edit" method="post" {{ form_enctype(form) }}>
+        {{ form_errors(form) }}
+        {{ form_row(form._token) }}        
+        
+        <div id="seo">
+          <div class="image_container">
+            <div class="image">
+              {% if form.teaser_image.vars.value|length > 0 %}
+                <img src="{{ FRAMEWORK_URL ~ form.teaser_image.vars.value }}" width="200" />
+              {% endif %}
+            </div>
+            <input type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/edit/image/select?usage={{ usage }}');" value="{{ 'Select teaser image'|trans }}" />
+          </div>
+          {{ form_row(form.content_id) }}
+          <div>
+            <label>{{ 'Content ID'|trans }}</label>
+            <div class="value">
+              {% if form.content_id.vars.value > 0 %}
+                {{ '%05d'|format(form.content_id.vars.value) }}
+              {% else %}
+                {{ '- new entry -'|trans }}
+              {% endif %}
+            </div>
+          </div>
+          {{ form_row(form.status) }}<br />
+          {{ form_label(form.title) }} {{ form_widget(form.title) }}       
+          {{ form_label(form.description) }} {{ form_widget(form.description) }}
+          {{ form_label(form.keywords) }} {{ form_widget(form.keywords) }}
+          <div class="clear"></div>  
+        </div>
+        
+        <div id="dates">
+          {{ form_label(form.publish_from) }}{{ form_widget(form.publish_from) }}
+          {{ form_label(form.breaking_to) }}{{ form_widget(form.breaking_to) }}
+          {{ form_label(form.archive_from) }}{{ form_widget(form.archive_from) }}
+        </div>
+        
+        <div>
+          {{ form_label(form.teaser) }}
+          <div class="editor">
+            {{ CKEditor(
+                  form.teaser.vars.id,
+                  form.teaser.vars.full_name,
+                  form.teaser.vars.value,
+                  '100%', '100px',
+                  MANUFAKTUR_URL ~ '/flexContent/Template/default/backend/ckeditor.config.teaser.js'
+            ) }}
+          </div>
+        </div>
+        
+        <div>
+          {{ form_label(form.permalink) }}
+          <div class="permalink_url_prefix">{{ form.permalink_url.vars.value }}</div>
+          {{ form_widget(form.permalink) }}
+        </div>
+        
+        {{ form_row(form.redirect_url) }}
+        
+        <div>
+          <label for="submit">&nbsp;</label>
+          <input type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
+        </div>
+        
+        <div>
+          <label for="tag">{{ 'Tags'|trans }}</label>
+          {% if tags|length > 0 %}
+            {% for tag in tags %}
+              <input type="text" name="tag[{{ tag.tag_id ~ '-a' }}]" value="{{ tag.tag_name }}" class="tag"/>
+            {% endfor %}
+          {% else %}
+            <input type="text" name="tag[]" value="" class="tag"/>
+          {% endif %}
+        </div>
+        
+        <div>
+          {{ form_label(form.content) }}
+          <div class="editor">
+            {{ CKEditor(
+                  form.content.vars.id,
+                  form.content.vars.full_name,
+                  form.content.vars.value,
+                  '100%', '400px',
+                  MANUFAKTUR_URL ~ '/flexContent/Template/default/backend/ckeditor.config.content.js'
+            ) }}
+          </div>
+        </div>
+                
+        <div>
+          <label for="submit">&nbsp;</label>
+          <input type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
+        </div>
+        <div class="clear"></div>
+        {#{ form_rest(form) }#}
       </form>
     </div>
   </div>
@@ -49,11 +146,37 @@
 
 {% block footer %}
   {# add the height of CKE's to the iframe_add_height (default = 30) #}
-  {% set iframe_add_height = 380 %}
+  {% set iframe_add_height = 610 %}
   {{ parent() }}
   <script type="text/javascript">
     if (typeof 'jQuery' !== 'undefined') {
+      function submitForm(action)
+      {
+        if (!$('#content_edit')[0].checkValidity()) {
+          alert('{{ 'Please fill in all requested fields before submitting the form!'|trans }}');
+        }
+        else {
+          $('#content_edit').attr('action', action);
+          $('#content_edit').submit();
+        }
+      }
       $(document).ready(function() {
+        
+        document.getElementById('edit').scrollIntoView(true);
+        
+        $('#content_edit').find('input.tag').tagedit({
+          autocompleteURL: '{{ FRAMEWORK_URL }}/admin/flexcontent/tag/autocomplete',
+          texts: { 
+            removeLinkTitle: "{{ 'Remove from list'|trans }}",
+            saveEditLinkTitle: "{{ 'Save changes'|trans }}",
+            deleteLinkTitle: "{{ 'Delete this tag from database'|trans }}",
+            deleteConfirmation: "{{ 'Are you sure to delete this entry?'|trans }}",
+            deletedElementTitle: "{{ 'This Element will be deleted'|trans }}",
+            breakEditLinkTitle: "{{ 'Cancel'|trans }}",
+            forceDeleteConfirmation: "{{ 'There are more records using this tag, are you sure do you want to remove it?'|trans }}"
+          }
+        });
+	
         $.datepicker.setDefaults($.datepicker.regional['{{ app.translator.locale }}']);
         $.timepicker.setDefaults($.timepicker.regional['{{ app.translator.locale }}']);
         $('.publish_from').datetimepicker({
@@ -61,7 +184,12 @@
           stepHour: 1,
           stepMinute: 5
         });
-        $('.publish_to').datetimepicker({
+        $('.breaking_to').datetimepicker({
+          timeFormat: "HH:mm",
+          stepHour: 1,
+          stepMinute: 5
+        });
+        $('.archive_from').datetimepicker({
           timeFormat: "HH:mm",
           stepHour: 1,
           stepMinute: 5

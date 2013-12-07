@@ -44,15 +44,17 @@ class Content
         `description` VARCHAR(512) NOT NULL DEFAULT '',
         `keywords` VARCHAR(512) NOT NULL DEFAULT '',
         `permalink` VARCHAR(255) NOT NULL DEFAULT '',
+        `redirect_url` TEXT NOT NULL,
         `publish_from` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
-        `publish_to` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
-        `publish_type` ENUM('UNPUBLISHED','PUBLISHED','PROTECTED','HIDDEN','BREAKING','ARCHIVE') NOT NULL DEFAULT 'UNPUBLISHED',
+        `breaking_to` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+        `archive_from` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+        `status` ENUM('UNPUBLISHED','PUBLISHED','BREAKING','HIDDEN','ARCHIVED','DELETED') NOT NULL DEFAULT 'UNPUBLISHED',
         `teaser` TEXT NOT NULL,
         `teaser_image` TEXT NOT NULL,
         `content` TEXT NOT NULL,
-        `status` ENUM('ACTIVE', 'LOCKED', 'DELETED') NOT NULL DEFAULT 'ACTIVE',
         `timestamp` TIMESTAMP,
-        PRIMARY KEY (`content_id`)
+        PRIMARY KEY (`content_id`),
+        UNIQUE INDEX (`permalink`)
         )
     COMMENT='The main table for flexContent'
     ENGINE=InnoDB
@@ -82,14 +84,197 @@ EOD;
      *
      * @return array
      */
-    public function getPublishTypeValuesForForm()
+    public function getStatusTypeValuesForForm()
     {
-        $enums = $this->app['db.utils']->getEnumValues(self::$table_name, 'publish_type');
+        $enums = $this->app['db.utils']->getEnumValues(self::$table_name, 'status');
         $result = array();
         foreach ($enums as $enum) {
             $result[$enum] = $enum;
         }
         return $result;
+    }
+
+    /**
+     * Insert a new flexContent record
+     *
+     * @param array $data
+     * @param integer reference $content_id
+     * @throws \Exception
+     */
+    public function insert($data, &$content_id)
+    {
+        try {
+            $insert = array();
+            foreach ($data as $key => $value) {
+                if (($key == 'content_id') || ($key == 'timestamp')) continue;
+                $insert[$this->app['db']->quoteIdentifier($key)] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
+            }
+            $this->app['db']->insert(self::$table_name, $insert);
+            $content_id = $this->app['db']->lastInsertId();
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Update an existing flexContent record
+     *
+     * @param array $data
+     * @param integer $content_id
+     * @throws \Exception
+     */
+    public function update($data, $content_id)
+    {
+        try {
+            $update = array();
+            foreach ($data as $key => $value) {
+                if (($key == 'content_id') || ($key == 'timestamp')) continue;
+                $update[$this->app['db']->quoteIdentifier($key)] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
+            }
+            $this->app['db']->update(self::$table_name, $update, array('content_id' => $content_id));
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Select a flexContent record by the given content ID
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return Ambigous <boolean, multitype:unknown >
+     */
+    public function select($content_id)
+    {
+        try {
+            $SQL = "SELECT * FROM `".self::$table_name."` WHERE `content_id`='$content_id'";
+            $result = $this->app['db']->fetchAssoc($SQL);
+            $content = array();
+            foreach ($result as $key => $value) {
+                $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+            }
+            return (!empty($content)) ? $content : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Get the columns of the flexContent table
+     *
+     * @param string $table
+     * @throws \Exception
+     * @return array
+     */
+    public function getColumns()
+    {
+        return $this->app['db.utils']->getColumns(self::$table_name);
+    }
+
+    /**
+     * Select a list from the flexContent table in paging view
+     *
+     * @param integer $limit_from start selection at position
+     * @param integer $rows_per_page select max. rows per page
+     * @param array $select_status tags, i.e. array('UNPUBLISHED','PUBLISHED')
+     * @param array $order_by fields to order by
+     * @param string $order_direction 'ASC' (default) or 'DESC'
+     * @throws \Exception
+     * @return array selected records
+     */
+    public function selectList($limit_from, $rows_per_page, $select_status=null, $order_by=null, $order_direction='ASC', $columns)
+    {
+        try {
+            $content = self::$table_name;
+            $SQL = "SELECT * FROM `$content`";
+            if (is_array($select_status) && !empty($select_status)) {
+                $SQL .= " WHERE ";
+                $use_status = false;
+                if (is_array($select_status) && !empty($select_status)) {
+                    $use_status = true;
+                    $SQL .= '(';
+                    $start = true;
+                    foreach ($select_status as $stat) {
+                        if (!$start) {
+                            $SQL .= " OR ";
+                        }
+                        else {
+                            $start = false;
+                        }
+                        $SQL .= "`status`='$stat'";
+                    }
+                    $SQL .= ')';
+                }
+            }
+            if (is_array($order_by) && !empty($order_by)) {
+                $SQL .= " ORDER BY ";
+                $start = true;
+                foreach ($order_by as $by) {
+                    if (!$start) {
+                        $SQL .= ", ";
+                    }
+                    else {
+                        $start = false;
+                    }
+                    $SQL .= "$by";
+                }
+                $SQL .= " $order_direction";
+            }
+            $SQL .= " LIMIT $limit_from, $rows_per_page";
+            $results = $this->app['db']->fetchAll($SQL);
+
+            $contents = array();
+            foreach ($results as $result) {
+                $content = array();
+                foreach ($columns as $column) {
+                    foreach ($result as $key => $value) {
+                        if ($key == $column) {
+                            $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                        }
+                    }
+                }
+                $contents[] = $content;
+            }
+        return $contents;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Count the records in the table
+     *
+     * @param array $status flags, i.e. array('UNPUBLISHED','PUBLISHED')
+     * @throws \Exception
+     * @return integer number of records
+     */
+    public function count($status=null)
+    {
+        try {
+            $SQL = "SELECT COUNT(*) FROM `".self::$table_name."`";
+            if (is_array($status) && !empty($status)) {
+                $SQL .= " WHERE ";
+                $use_status = false;
+                if (is_array($status) && !empty($status)) {
+                    $use_status = true;
+                    $SQL .= '(';
+                    $start = true;
+                    foreach ($status as $stat) {
+                        if (!$start) {
+                            $SQL .= " OR ";
+                        }
+                        else {
+                            $start = false;
+                        }
+                        $SQL .= "`status`='$stat'";
+                    }
+                    $SQL .= ')';
+                }
+            }
+            return $this->app['db']->fetchColumn($SQL);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
     }
 
 }

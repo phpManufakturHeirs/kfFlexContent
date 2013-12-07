@@ -58,16 +58,34 @@ class Backend {
      */
     public function getToolbar($active) {
         $toolbar_array = array(
+            'list' => array(
+                'text' => 'List',
+                'hint' => 'List of all flexContent articles',
+                'link' => FRAMEWORK_URL.'/admin/flexcontent/list'.self::$usage_param,
+                'active' => ($active == 'list')
+            ),
             'edit' => array(
                 'text' => 'Edit',
                 'hint' => 'Create or edit a flexContent article',
-                'link' => FRAMEWORK_URL.'/admin/content/edit'.self::$usage_param,
+                'link' => FRAMEWORK_URL.'/admin/flexcontent/edit'.self::$usage_param,
                 'active' => ($active == 'edit')
+            ),
+            'tags' => array(
+                'text' => 'Tags',
+                'hint' => 'Create or edit tags',
+                'link' => FRAMEWORK_URL.'/admin/flexcontent/tag/list'.self::$usage_param,
+                'active' => ($active == 'tags')
+            ),
+            'categories' => array(
+                'text' => 'Categories',
+                'hint' => 'Create or edit categories',
+                'link' => FRAMEWORK_URL.'/admin/flexcontent/category/list'.self::$usage_param,
+                'active' => ($active == 'categories')
             ),
             'about' => array(
                 'text' => 'About',
                 'hint' => 'Information about the flexContent extension',
-                'link' => FRAMEWORK_URL.'/admin/content/about'.self::$usage_param,
+                'link' => FRAMEWORK_URL.'/admin/flexcontent/about'.self::$usage_param,
                 'active' => ($active == 'about')
                 ),
         );

@@ -1,0 +1,106 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+{% if usage == 'framework' %}
+  {% set template_namespace = '@phpManufaktur/Basic/Template' %}
+  {% set template_file = 'framework/body.twig' %}
+{% else %}
+  {% set template_namespace = '@phpManufaktur/flexContent/Template' %}
+  {% set template_file = 'backend/body.twig' %}
+{% endif %}
+{% extends getTemplateFile(template_namespace, template_file) %}
+{% block title %}{{ 'flexContent - Create or Edit Content'|trans }}{% endblock %}
+{% block jquery %}
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script type="text/javascript" src="{{ MANUFAKTUR_URL }}/CKEditor/Source/ckeditor.js"></script>
+{% endblock jquery %}
+
+{% block stylesheet %}
+  {{ parent() }}
+  {% if usage == 'framework' %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/backend.css" media="screen, projection" />
+  {% endif %}
+  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/edit.css" media="screen, projection" />
+{% endblock stylesheet %}
+
+{% block content %}
+  <div id="edit">
+    {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
+    {% if message is defined and message|length > 0 %}
+      <div class="message">{{ message }}</div>
+    {% endif %}
+    <div class="tag_form">
+      <form id="tag_edit" method="post" {{ form_enctype(form) }}>
+        {{ form_errors(form) }}
+        {{ form_row(form._token) }}        
+        
+        {{ form_row(form.tag_id) }}
+        
+        {{ form_row(form.tag_name) }}
+        
+        
+        <div class="clear"></div>
+        
+        <div>
+          {{ form_label(form.tag_description) }}
+          <div class="image_container">
+          <div class="image">
+            {% if form.tag_image.vars.value|length > 0 %}
+              <img src="{{ FRAMEWORK_URL ~ form.tag_image.vars.value }}" width="200" />
+            {% endif %}
+          </div>
+          <input type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/tag/image/select?usage={{ usage }}');" value="{{ 'Select tag type image'|trans }}" />  
+        </div>
+          <div class="editor tag">
+            {{ CKEditor(
+                  form.tag_description.vars.id,
+                  form.tag_description.vars.full_name,
+                  form.tag_description.vars.value,
+                  '100%', '200px',
+                  MANUFAKTUR_URL ~ '/flexContent/Template/default/backend/ckeditor.config.tag.type.js'
+            ) }}
+          </div>
+        </div>
+        
+        <div>
+          <label>&nbsp;</label>
+          {{ form_widget(form.delete) }} <div class="label">{{ 'delete this tag type'|trans }}</div>
+        </div>
+        
+        <div>
+          <label for="submit">&nbsp;</label>
+          <input type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/tag/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
+        </div>
+        <div class="clear"></div>
+        {#{ form_rest(form) }#}
+      </form>
+    </div>
+  </div>
+{% endblock content %}
+
+{% block footer %}
+  {# add the height of CKE's to the iframe_add_height (default = 30) #}
+  {% set iframe_add_height = 60 %}
+  {{ parent() }}
+  <script type="text/javascript">
+    if (typeof 'jQuery' !== 'undefined') {
+      function submitForm(action)
+      {
+        if (!$('#tag_edit')[0].checkValidity()) {
+          alert('{{ 'Please fill in all requested fields before submitting the form!'|trans }}');
+        }
+        else {
+          $('#tag_edit').attr('action', action);
+          $('#tag_edit').submit();
+        }
+      }
+    }
+  </script>
+{% endblock footer %}
+  

@@ -32,28 +32,86 @@ $app['utils']->addLanguageFiles(MANUFAKTUR_PATH.'/flexContent/Data/Locale/Custom
  *
  * @link https://github.com/phpManufaktur/kitFramework/wiki/Extensions-%23-Embedded-Administration
  */
-$app->get('/content/cms/{cms_information}', function ($cms_information) use ($app) {
+$app->get('/flexcontent/cms/{cms_information}', function ($cms_information) use ($app) {
     $administration = new EmbeddedAdministration($app);
-    return $administration->route('/admin/content/about', $cms_information);
+    return $administration->route('/admin/flexcontent/about', $cms_information);
 });
+
+/**
+ * The PermanentLink for flexContent uses the route /content.
+ * Setup will create the directory /content in the CMS root and place a
+ * .htaccess file which redirect to /content.
+ */
+$app->get('/content/{name}',
+    'phpManufaktur\flexContent\Control\PermanentLink::ControllerName');
+$app->get('/content/id/{content_id}',
+    'phpManufaktur\flexContent\Control\PermanentLink::ControllerContentID');
+
+if (file_exists(MANUFAKTUR_PATH.'/flexContent/bootstrap.include.inc')) {
+    // the PermanentLink routes must exists similiar for installations
+    // of the kitFramework in a subdirectory!
+    include_once MANUFAKTUR_PATH.'/flexContent/bootstrap.include.inc';
+}
 
 /**
  * ADMIN routes
  */
 
-$app->get('/admin/content/setup',
+$app->get('/admin/flexcontent/setup',
     // setup routine for flexContent
     'phpManufaktur\flexContent\Data\Setup\Setup::Controller');
-$app->get('/admin/content/update',
+$app->get('/admin/flexcontent/update',
     // update flexContent
     'phpManufaktur\flexContent\Data\Setup\Update::Controller');
-$app->get('/admin/content/uninstall',
+$app->get('/admin/flexcontent/uninstall',
     // uninstall routine for flexContent
     'phpManufaktur\flexContent\Data\Setup\Uninstall::Controller');
 
-$app->get('/admin/content/about',
+$app->get('/admin/flexcontent/about',
     'phpManufaktur\flexContent\Control\Backend\About::Controller');
-$app->get('/admin/content/edit',
-    'phpManufaktur\flexContent\Control\Backend\Edit::ControllerEdit');
-$app->get('/admin/content/edit/id/{content_id}',
-    'phpManufaktur\flexContent\Control\Backend\Edit::ControllerEdit');
+
+$app->get('/admin/flexcontent/edit',
+    'phpManufaktur\flexContent\Control\Backend\ContentEdit::ControllerEdit');
+$app->get('/admin/flexcontent/edit/id/{content_id}',
+    'phpManufaktur\flexContent\Control\Backend\ContentEdit::ControllerEdit');
+$app->post('/admin/flexcontent/edit/check',
+    'phpManufaktur\flexContent\Control\Backend\ContentEdit::ControllerEditCheck');
+$app->post('/admin/flexcontent/edit/image/select',
+    'phpManufaktur\flexContent\Control\Backend\ContentEdit::ControllerImage');
+$app->get('/admin/flexcontent/edit/image/check/id/{content_id}',
+    'phpManufaktur\flexContent\Control\Backend\ContentEdit::ControllerImageCheck');
+
+$app->get('/admin/flexcontent/list',
+    'phpManufaktur\flexContent\Control\Backend\ContentList::ControllerList');
+$app->get('/admin/flexcontent/list/page/{page}',
+    'phpManufaktur\flexContent\Control\Backend\ContentList::ControllerList');
+$app->post('/admin/flexcontent/search',
+    'phpManufaktur\flexContent\Control\Backend\ContentSearch::ControllerSearch');
+
+$app->get('/admin/flexcontent/tag/autocomplete',
+    'phpManufaktur\flexContent\Control\Backend\TagResponse::ControllerAutocomplete');
+$app->get('/admin/flexcontent/tag/list',
+    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerList');
+$app->get('/admin/flexcontent/tag/list/page/{page}',
+    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerList');
+$app->get('/admin/flexcontent/tag/create',
+    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerEdit');
+$app->get('/admin/flexcontent/tag/edit/id/{tag_id}',
+    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerEdit');
+$app->post('/admin/flexcontent/tag/edit/check',
+    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerEditCheck');
+$app->post('/admin/flexcontent/tag/image/select',
+    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerImage');
+$app->get('/admin/flexcontent/tag/image/check/id/{tag_id}',
+    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerImageCheck');
+
+$app->get('/admin/flexcontent/category/list',
+    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerList');
+$app->get('/admin/flexcontent/category/list/page/{page}',
+    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerList');
+$app->get('/admin/flexcontent/category/create',
+    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerEdit');
+$app->get('/admin/flexcontent/category/edit/id/{category_id}',
+    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerEdit');
+$app->post('/admin/flexcontent/category/edit/check',
+    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerEditCheck');

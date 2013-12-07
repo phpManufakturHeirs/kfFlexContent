@@ -42,29 +42,72 @@ class Configuration
             'content' => array(
                 'field' => array(
                     'title' => array(
-                        'required' => true
+                        'required' => true,
+                        'length' => array(
+                            'minimum' => 10,
+                            'maximum' => 128
+                        )
                     ),
                     'description' => array(
-                        'required' => true
+                        'required' => false,
+                        'length' => array(
+                            'minimum' => 50,
+                            'maximum' => 180
+                        )
                     ),
                     'keywords' => array(
-                        'required' => false
+                        'required' => false,
+                        'separator' => 'comma', // alternate: 'space'
+                        'words' => array(
+                            'minimum' => 3,
+                            'maximum' => 20
+                        )
                     ),
                     'permalink' => array(
                         'required' => true
                     ),
-                    'publish_from' => array(
-                        'required' => true
-                    ),
-                    'publish_to' => array(
+                    'redirect_url' => array(
                         'required' => false
                     ),
-                    'publish_type' => array(
-                        'required' => true
+                    'publish_from' => array(
+                        'required' => true,
+                        'add' => array(
+                            'hours' => 0
+                        )
                     ),
-
+                    'breaking_to' => array(
+                        'required' => false,
+                        'add' => array(
+                            'hours' => 168
+                        )
+                    ),
+                    'archive_from' => array(
+                        'required' => false,
+                        'add' => array(
+                            'days' => 365
+                        )
+                    ),
+                    'teaser' => array(
+                        'required' => false
+                    ),
+                    'content' => array(
+                        'required' => false
+                    ),
+                    'status' => array(
+                        'required' => true
+                    )
+                ),
+                'permalink' => array(
+                    'directory' => '/content'
+                ),
+                'images' => array(
+                    'directory' => array(
+                        'start' => '/media/public',
+                        'select' => '/media/public/content/teaser'
+                     )
                 )
-            )
+            ),
+
         );
     }
 

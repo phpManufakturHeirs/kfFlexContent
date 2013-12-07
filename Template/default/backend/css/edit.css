@@ -1,0 +1,133 @@
+/**
+ * flexContent
+ *
+ * @author Team phpManufaktur <team@phpmanufaktur.de>
+ * @link https://addons.phpmanufaktur.de/event
+ * @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+ * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+ */
+
+input,
+select,
+textarea {
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  font-size: 11px;
+  color: #363636;
+  background-color: #fff;
+}
+.category_form label,
+.tag_form label,
+.content_form label {
+  clear: both;
+  float: left;
+  width: 14%;
+  text-align: right;
+  margin: 0 0 10px 0;
+  padding: 3px 5px 0 0;
+}
+.category_form label,
+.tag_form label {
+  width: 11%;
+}
+.label {
+  float: left;
+}
+.category_form label.required:after,
+.tag_form label.required:after,
+.content_form label.required:after {
+  content: '*';
+  color: #da251d;
+  background-color: transparent;
+  font-weight: bold;
+}
+
+#dates,
+#seo {
+  clear: both;
+}
+#seo label {
+  clear: left;
+}
+#dates label {
+  clear: none;
+}
+label[for=form_breaking_to],
+label[for=form_archive_from] {
+  width: 120px;
+}
+
+.category_form input,
+.tag_form input,
+.content_form select,
+.content_form textarea,
+.content_form input {
+  float: left;
+  width: 50%;
+  margin: 0 0 10px 0;
+}
+
+select#form_status {
+  width: 150px;
+}
+
+input[type=checkbox] {
+  width: 20px;
+}
+
+input#form_breaking_to,
+input#form_archive_from,
+input#form_publish_from {
+  width: 110px;
+}
+input#form_tag_name,
+input#form_permalink {
+  width: 250px;
+}
+input#form_redirect_url {
+  width: 84%;
+}
+input#form_title {
+  width: 53%;
+}
+input[name=save_content] {
+  width: 200px;
+}
+textarea#form_keywords,
+textarea#form_description {
+  width: 53%;
+  height: 50px;
+}
+.editor,
+.value {
+  float: left;
+  width: 50%;
+  padding: 3px 0;
+}
+.editor {
+  width: 85%;
+}
+.editor.tag {
+  width: 55%;
+}
+
+.permalink_url_prefix {
+  float: left;
+  width: auto;
+  margin: 0 2px 0 0;
+  padding: 3px 0 0 0;
+  color: #afafaf;
+  background-color: transparent;
+}
+.image_container {
+  float: right;
+  width: 30%;  
+}
+.image {
+  min-width: 200px;
+  min-height: 200px;
+  padding: 0;
+  margin: 0 0 15px 0;
+}
+.image_container input {
+  width: 200px;
+}

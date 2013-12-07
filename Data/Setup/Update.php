@@ -25,7 +25,10 @@ class Update
     public function Controller(Application $app)
     {
         $this->app = $app;
+        $Setup = new Setup();
 
+        // update subdirectory routes
+        $Setup->addSubdirectoryRoutes($app);
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

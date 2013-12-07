@@ -1,0 +1,24 @@
+{
+  "columns":[
+    "content_id",
+    "publish_from",
+    "status",
+    "title",
+    "description"
+  ],
+  "list":{
+    "rows_per_page":40,
+    "select_status":[
+      "UNPUBLISHED",
+      "PUBLISHED",
+      "BREAKING",
+      "HIDDEN"
+    ],
+    "order":{
+      "by":[
+        "content_id"
+      ],
+      "direction":"DESC"
+    }
+  }
+}
