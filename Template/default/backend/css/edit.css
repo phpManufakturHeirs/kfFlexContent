@@ -55,8 +55,13 @@ label[for=form_breaking_to],
 label[for=form_archive_from] {
   width: 120px;
 }
+label[for=form_secondary_categories] {
+  clear: none;
+  float: left;
+}
 
 .category_form input,
+.category_form select,
 .tag_form input,
 .content_form select,
 .content_form textarea,
@@ -65,11 +70,19 @@ label[for=form_archive_from] {
   width: 50%;
   margin: 0 0 10px 0;
 }
-
+select#form_target_url {
+  width: auto;
+}
 select#form_status {
   width: 150px;
 }
-
+select#form_primary_category {
+  width: 25%;
+}
+select#form_secondary_categories {
+  height: 50px;
+  width: 25%;
+}
 input[type=checkbox] {
   width: 20px;
 }
@@ -79,9 +92,11 @@ input#form_archive_from,
 input#form_publish_from {
   width: 110px;
 }
-input#form_tag_name,
-input#form_permalink {
+input#form_tag_name {
   width: 250px;
+}
+input#form_permalink {
+  width: 50%;
 }
 input#form_redirect_url {
   width: 84%;
@@ -110,14 +125,6 @@ textarea#form_description {
   width: 55%;
 }
 
-.permalink_url_prefix {
-  float: left;
-  width: auto;
-  margin: 0 2px 0 0;
-  padding: 3px 0 0 0;
-  color: #afafaf;
-  background-color: transparent;
-}
 .image_container {
   float: right;
   width: 30%;  
@@ -130,4 +137,23 @@ textarea#form_description {
 }
 .image_container input {
   width: 200px;
+}
+
+.permalink_url_prefix,
+.cms_url {
+  float: left;
+  width: auto;
+  margin: 0 2px 0 0;
+  padding: 4px 0 0 0;
+  font-size: 10px;
+  color: #afafaf;
+  background-color: transparent;
+}
+
+.extra_space {
+  clear: both;
+  height: 10px;
+  width: 1px;
+  margin: 0;
+  padding: 0;
 }

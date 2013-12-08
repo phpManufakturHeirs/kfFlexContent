@@ -96,6 +96,8 @@
           </div>
         </div>
         
+        <div class="extra_space"></div>
+        
         <div>
           {{ form_label(form.permalink) }}
           <div class="permalink_url_prefix">{{ form.permalink_url.vars.value }}</div>
@@ -103,11 +105,8 @@
         </div>
         
         {{ form_row(form.redirect_url) }}
-        
-        <div>
-          <label for="submit">&nbsp;</label>
-          <input type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
-        </div>
+        {{ form_row(form.primary_category) }}
+        {{ form_row(form.secondary_categories) }}
         
         <div>
           <label for="tag">{{ 'Tags'|trans }}</label>
@@ -119,6 +118,15 @@
             <input type="text" name="tag[]" value="" class="tag"/>
           {% endif %}
         </div>
+        
+        <div class="extra_space"></div>
+        
+        <div>
+          <label for="submit">&nbsp;</label>
+          <input type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
+        </div>
+        
+        <div class="extra_space"></div>
         
         <div>
           {{ form_label(form.content) }}
@@ -132,7 +140,9 @@
             ) }}
           </div>
         </div>
-                
+         
+        <div class="extra_space"></div>
+        
         <div>
           <label for="submit">&nbsp;</label>
           <input type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
@@ -149,7 +159,11 @@
   {% set iframe_add_height = 610 %}
   {{ parent() }}
   <script type="text/javascript">
+    
+    
+      
     if (typeof 'jQuery' !== 'undefined') {
+      
       function submitForm(action)
       {
         if (!$('#content_edit')[0].checkValidity()) {
@@ -160,9 +174,35 @@
           $('#content_edit').submit();
         }
       }
+
       $(document).ready(function() {
         
+        // on page load scroll to the top of the form
         document.getElementById('edit').scrollIntoView(true);
+        
+        $("#form_title").change(function () {
+          var permalink = $('#form_permalink').val();
+          var title = $('#form_title').val();
+                    
+          if (permalink.length < 1) { 
+            // no permalink defined, use the page title as propose ...
+            $.ajax({
+              url:"{{ FRAMEWORK_URL }}/admin/flexcontent/permalink/create",
+              type: "POST",
+              dataType: "json",
+              data: {
+                link: title
+              },
+              complete: function (XMLHttpRequest, textStatus) {
+                var result = $.parseJSON(XMLHttpRequest.responseText);
+                $('#form_permalink').val(result);
+              },  
+              error: function(jqXHR, textStatus, errorThrown) {
+                alert('Error creating PermaLink:'+textStatus);
+              }
+            });
+          }
+        });
         
         $('#content_edit').find('input.tag').tagedit({
           autocompleteURL: '{{ FRAMEWORK_URL }}/admin/flexcontent/tag/autocomplete',

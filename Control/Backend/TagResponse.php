@@ -11,7 +11,6 @@
 
 namespace phpManufaktur\flexContent\Control\Backend;
 
-use Symfony\Component\HttpFoundation\Response;
 use Silex\Application;
 use phpManufaktur\flexContent\Data\Content\TagType;
 
@@ -34,12 +33,15 @@ class TagResponse
         $results = $TagType->selectLikeName($search);
 
         $result = array();
-
         foreach ($results as $tag) {
-            // loop through the results and create the autocomplete response
-            $result[] = '{"id":'.$tag['tag_id'].',"label":"'.$tag['tag_name'].'","value":"'.$tag['tag_name'].'"}';
+            $result[] = array(
+                'id' => $tag['tag_id'],
+                'label' => $tag['tag_name'],
+                'value' => $tag['tag_name']
+            );
         }
-        return new Response("[".implode(',', $result)."]");
+        // return JSON result
+        return $app->json($result, 201);
     }
 
 }

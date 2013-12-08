@@ -54,7 +54,7 @@ class Backend {
      * Get the toolbar for all backend dialogs
      *
      * @param string $active dialog
-     * @return multitype:multitype:string boolean
+     * @return array
      */
     public function getToolbar($active) {
         $toolbar_array = array(
@@ -100,12 +100,13 @@ class Backend {
         return self::$message;
     }
 
-      /**
+    /**
      * @param string $message
      */
     public function setMessage($message, $params=array())
     {
-        self::$message .= $this->app['twig']->render($this->app['utils']->getTemplateFile('@phpManufaktur/flexContent/Template', 'backend/message.twig'),
+        self::$message .= $this->app['twig']->render($this->app['utils']->getTemplateFile(
+            '@phpManufaktur/flexContent/Template', 'backend/message.twig'),
             array('message' => $this->app['translator']->trans($message, $params)));
     }
 

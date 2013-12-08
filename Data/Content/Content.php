@@ -277,4 +277,57 @@ EOD;
         }
     }
 
+    /**
+     * Check if a permalink already exists
+     *
+     * @param link $permalink
+     * @throws \Exception
+     * @return boolean
+     */
+    public function existsPermaLink($permalink)
+    {
+        try {
+            $this->app['monolog']->addDebug('??', array(__METHOD__, __LINE__));
+            $SQL = "SELECT `permalink` FROM `".self::$table_name."` WHERE `permalink`='$permalink'";
+            $this->app['monolog']->addDebug($SQL, array(__METHOD__, __LINE__));
+            $result = $this->app['db']->fetchColumn($SQL);
+            return ($result == $permalink);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Count PermaLinks which starts LIKE the given $this
+     *
+     * @param string $this
+     * @throws \Exception
+     */
+    public function countPermaLinksLikeThis($permalink)
+    {
+        try {
+            $SQL = "SELECT COUNT(`permalink`) FROM `".self::$table_name."` WHERE `permalink` LIKE '$permalink%'";
+            return $this->app['db']->fetchColumn($SQL);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Select the Content ID by the given PermanentLink
+     *
+     * @param string $permalink
+     * @throws \Exception
+     * @return Ambigous <boolean, unknown>
+     */
+    public function selectContentIDbyPermaLink($permalink)
+    {
+        try {
+            $SQL = "SELECT `content_id` FROM `".self::$table_name."` WHERE `permalink`='$permalink'";
+            $result = $this->app['db']->fetchColumn($SQL);
+            return ($result > 0) ? $result : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
 }

@@ -32,6 +32,12 @@ return array(
     'Breaking to'
         => 'Hervorheben bis',
 
+    'category_description'
+        => 'Beschreibung',
+    'category_id'
+        => 'Category ID',
+    'category_name'
+        => 'Bezeichner',
     'Content'
         => 'Inhalt',
     'Content ID'
@@ -74,6 +80,8 @@ return array(
         => 'Bitte geben Sie eine Bezeichnung für die Kategorie an.',
     'Please type in a name for the tag type.'
         => 'Bitte geben Sie eine Bezeichnung für die Markierung an.',
+    'Primary category'
+        => 'Kategorie',
     "Problem: '%first%' must be defined before '%second%', please check the configuration file!"
         => "Problem: '%first%' muss vor dem Eintrag '%second%' festgelegt werden, bitte prüfen Sie die Konfiguration!",
     'publish_from'
@@ -88,6 +96,8 @@ return array(
 
     'Save'
         => 'Speichern',
+    'Secondary categories'
+        => 'Zusätzliche Kategorien',
     'Select category type image'
         => 'Bild auswählen',
     'Select tag type image'
@@ -115,6 +125,8 @@ return array(
         => 'Bezeichner',
     'tag_name'
         => 'Bezeichner',
+    'Target URL'
+        => 'Ziel URL',
     'Teaser'
         => 'Anreisser',
     'The category type %category% already exists and can not inserted!'
@@ -133,6 +145,10 @@ return array(
         => 'Es existiert kein flexContent Datensatz mit der ID %id%!',
     'The image %image% was successfull inserted.'
         => 'Das Bild %image% wurde dem Datensatz hinzugefügt.',
+    'The permalink %permalink% is already in use, please select another one!'
+        => 'Der PermanentLink <b>%permalink%</b> wird bereits verwendet, bitte wählen Sie einen anderen permanenten Link aus!',
+    'The permalink %permalink% is already in use by the flexContent record %id%, please select another one!'
+        => 'Der PermanentLink <b>%permalink%</b> wird bereits von dem flexContent Datensatz <b>%id%</b> verwendet, bitte wählen Sie einen anderen permanenten Link aus!',
     'The permanent link is always needed and can not switched off, please check the configuration!'
         => 'Der PermanentLink wird immer benötigt und kann in den Einstellungen nicht ausgeschaltet werden. Bitte prüfen Sie die Konfiguration!',
     "The 'publish from' field is always needed and can not switched off, please check the configuration!"

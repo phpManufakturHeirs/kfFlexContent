@@ -40,12 +40,14 @@
         {{ form_errors(form) }}
         {{ form_row(form._token) }}        
         
-        {{ form_row(form.category_id) }}
-        
+        {{ form_row(form.category_id) }}        
         {{ form_row(form.category_name) }}
         
-        
-        <div class="clear"></div>
+        <div>
+          {{ form_label(form.target_url) }}
+          <div class="cms_url">{{ CMS_URL }}</div>
+          {{ form_widget(form.target_url) }}
+        </div>
         
         <div>
           {{ form_label(form.category_description) }}

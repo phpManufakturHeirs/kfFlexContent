@@ -81,6 +81,9 @@ $app->post('/admin/flexcontent/edit/image/select',
 $app->get('/admin/flexcontent/edit/image/check/id/{content_id}',
     'phpManufaktur\flexContent\Control\Backend\ContentEdit::ControllerImageCheck');
 
+$app->match('/admin/flexcontent/permalink/create',
+    'phpManufaktur\flexContent\Control\Backend\PermaLinkResponse::ControllerPermaLink');
+
 $app->get('/admin/flexcontent/list',
     'phpManufaktur\flexContent\Control\Backend\ContentList::ControllerList');
 $app->get('/admin/flexcontent/list/page/{page}',
@@ -115,3 +118,7 @@ $app->get('/admin/flexcontent/category/edit/id/{category_id}',
     'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerEdit');
 $app->post('/admin/flexcontent/category/edit/check',
     'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerEditCheck');
+$app->post('/admin/flexcontent/category/image/select',
+    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerImage');
+$app->get('/admin/flexcontent/category/image/check/id/{category_id}',
+    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerImageCheck');

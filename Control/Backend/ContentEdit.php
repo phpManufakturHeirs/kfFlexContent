@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use phpManufaktur\flexContent\Data\Content\Tag;
 use phpManufaktur\flexContent\Data\Content\TagType;
+use phpManufaktur\flexContent\Data\Content\Category;
+use phpManufaktur\flexContent\Data\Content\CategoryType;
 
 class ContentEdit extends Backend
 {
@@ -25,6 +27,8 @@ class ContentEdit extends Backend
     protected static $content_id = null;
     protected $TagData = null;
     protected $TagTypeData = null;
+    protected $CategoryTypeData = null;
+    protected $CategoryData = null;
 
     /**
      * (non-PHPdoc)
@@ -37,6 +41,8 @@ class ContentEdit extends Backend
         $this->ContentData = new ContentData($app);
         $this->TagData = new Tag($app);
         $this->TagTypeData = new TagType($app);
+        $this->CategoryData = new Category($app);
+        $this->CategoryTypeData = new CategoryType($app);
     }
 
     /**
@@ -72,6 +78,13 @@ class ContentEdit extends Backend
         }
         else {
             $archive_from = $data['archive_from'];
+        }
+
+        if (false === ($primary_category = $this->CategoryData->selectPrimaryCategoryIDbyContentID(self::$content_id))) {
+            $primary_category = null;
+        }
+        if (false === ($secondary_categories = $this->CategoryData->selectSecondaryCategoryIDsByContentID(self::$content_id))) {
+            $secondary_categories = null;
         }
 
         $form = $this->app['form.factory']->createBuilder('form')
@@ -138,6 +151,21 @@ class ContentEdit extends Backend
         ->add('teaser_image', 'hidden', array(
             'data' => isset($data['teaser_image']) ? $data['teaser_image'] : ''
         ))
+        ->add('primary_category', 'choice', array(
+            'choices' => $this->CategoryTypeData->getListForSelect(),
+            'empty_value' => '- please select -',
+            'expanded' => false,
+            'required' => true,
+            'data' => $primary_category
+        ))
+        ->add('secondary_categories', 'choice', array(
+            'choices' => $this->CategoryTypeData->getListForSelect(),
+            'empty_value' => '- please select -',
+            'required' => false,
+            'multiple' => true,
+            'data' => $secondary_categories
+        ))
+
         ;
         return $form->getForm();
     }
@@ -231,8 +259,24 @@ class ContentEdit extends Backend
                             $this->setMessage('The permanent link is always needed and can not switched off, please check the configuration!');
                         }
 
-                        // @todo: permanent link integration
-                        $data[$name] = !is_null($content[$name]) ? $content[$name] : '';
+                        $permalink = !is_null($content[$name]) ? strtolower($content[$name]) : '';
+                        $permalink = $this->app['utils']->sanitizeLink($permalink);
+
+                        if ((self::$content_id < 1) && $this->ContentData->existsPermaLink($permalink)) {
+                            // this PermaLink already exists!
+                            $this->setMessage('The permalink %permalink% is already in use, please select another one!',
+                                    array('%permalink%' => $permalink));
+                            $checked = false;
+                        }
+                        elseif (self::$content_id > 0) {
+                            $used_by = $this->ContentData->selectContentIDbyPermaLink($permalink);
+                            if ($used_by != self::$content_id) {
+                                $this->setMessage('The permalink %permalink% is already in use by the flexContent record %id%, please select another one!',
+                                    array('%permalink%' => $permalink, '%id%' => $used_by));
+                                $checked = false;
+                            }
+                        }
+                        $data[$name] = $permalink;
                         break;
                     case 'redirect_url':
 
@@ -312,6 +356,14 @@ class ContentEdit extends Backend
                             $checked = false;
                         }
                         $data[$name] = $content[$name];
+                        break;
+                    case 'primary_category':
+                        // ignore the property 'required'
+                        if (intval($content['name'] < 1)) {
+                            $this->setMessage('Please select a category!');
+                            $checked = false;
+                        }
+                        break;
                 }
             }
 
@@ -337,6 +389,9 @@ class ContentEdit extends Backend
                         array('%id%' => self::$content_id));
                 }
 
+                // check the CATEGORIES
+                $this->checkContentCategories($content['primary_category'], $content['secondary_categories']);
+
                 // check the TAGs
                 $this->checkContentTags();
                 return true;
@@ -352,6 +407,75 @@ class ContentEdit extends Backend
         return false;
     }
 
+    /**
+     * Check the primary and secondary CATEGORIES, add or remove them ...
+     *
+     * @param unknown $primary_category
+     * @param unknown $secondary_categories
+     */
+    protected function checkContentCategories($primary_category, $secondary_categories)
+    {
+        // check the primary category
+        if (false !== ($old_category = $this->CategoryData->selectPrimaryCategoryIDbyContentID(self::$content_id))) {
+            if ($old_category != $primary_category) {
+                // delete the old category
+                $this->CategoryData->deleteByContentIDandCategoryID(self::$content_id, $old_category);
+                // delete the new category, perhaps it is used as secondary category
+                $this->CategoryData->deleteByContentIDandCategoryID(self::$content_id, $primary_category);
+                // insert the primary category
+                $data = array(
+                    'content_id' => self::$content_id,
+                    'category_id' => $primary_category,
+                    'is_primary' => 1
+                );
+                $this->CategoryData->insert($data);
+            }
+        }
+        else {
+            // insert a primary category
+            $data = array(
+                'content_id' => self::$content_id,
+                'category_id' => $primary_category,
+                'is_primary' => 1
+            );
+            $this->CategoryData->insert($data);
+        }
+
+        // check the secondary categories
+        if (false !== ($old_categories = $this->CategoryData->selectSecondaryCategoryIDsByContentID(self::$content_id))) {
+            foreach ($old_categories as $old_category) {
+                if (!in_array($old_category, $secondary_categories)) {
+                    // delete this category
+                    $this->CategoryData->deleteByContentIDandCategoryID(self::$content_id, $old_category);
+                }
+                else {
+                    // unset this key
+                    unset($secondary_categories[array_search($old_category, $secondary_categories)]);
+                }
+            }
+        }
+
+        foreach ($secondary_categories as $category) {
+            if ($category == $primary_category) {
+                // ignore the primary category in the seconds ...
+                continue;
+            }
+            // insert as second category
+            $data = array(
+                'content_id' => self::$content_id,
+                'category_id' => $category,
+                'is_primary' => 0
+            );
+            $this->CategoryData->insert($data);
+        }
+
+    }
+
+    /**
+     * Check the tags which are associated to the flexContent, insert, update and delete them
+     *
+     * @throws \Exception
+     */
     protected function checkContentTags()
     {
         if (null !== ($tags = $this->app['request']->get('tag'))) {

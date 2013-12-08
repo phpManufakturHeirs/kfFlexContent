@@ -86,7 +86,7 @@ EOD;
      * @param integer reference $id
      * @throws \Exception
      */
-    public function insert($data, &$id)
+    public function insert($data, &$id=null)
     {
         try {
             $this->app['db']->insert(self::$table_name, $data);
@@ -112,6 +112,25 @@ EOD;
     }
 
     /**
+     * Delete ID by the given CONTENT ID and CATEGORY ID
+     *
+     * @param integer $content_id
+     * @param integer $category_id
+     * @throws \Exception
+     */
+    public function deleteByContentIDandCategoryID($content_id, $category_id)
+    {
+        try {
+            $this->app['db']->delete(self::$table_name, array(
+                'content_id' => $content_id,
+                'category_id' => $category_id
+            ));
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
      * Select the flexContent IDs which are using the given CATEGORY ID
      *
      * @param integer $category_id
@@ -128,6 +147,74 @@ EOD;
                 $ids[] = $result['content_id'];
             }
             return $ids;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    public function selectByContentID($content_id)
+    {
+        try {
+            $SQL = "SELECT * FROM `".self::$table_name."` WHERE `content_id`='$content_id' ORDER BY `category_name` ASC";
+            $results = $this->app['db']->fetchAll($SQL);
+            $categories = array();
+            foreach ($results as $result) {
+                $category = array();
+                foreach ($result as $key => $value) {
+                    $category[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                }
+                $categories[] = $category;
+            }
+            return $categories;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    public function selectPrimaryCategoryIDbyContentID($content_id)
+    {
+        try {
+            $SQL = "SELECT `category_id` FROM `".self::$table_name."` WHERE `content_id`='$content_id' AND `is_primary`='1'";
+            $id = $this->app['db']->fetchColumn($SQL);
+            return ($id > 0) ? $id : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    public function selectSecondaryCategoryIDsByContentID($content_id)
+    {
+        try {
+            $SQL = "SELECT `category_id` FROM `".self::$table_name."` WHERE `content_id`='$content_id' AND `is_primary`='0'";
+            $results = $this->app['db']->fetchAll($SQL);
+            $ids = array();
+            foreach ($results as $result) {
+                $ids[] = $result['category_id'];
+            }
+            return (!empty($ids)) ? $ids : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Update the given CATEGORY record
+     *
+     * @param integer $id
+     * @param array $data
+     * @throws \Exception
+     */
+    public function update($id, $data)
+    {
+        try {
+            $update = array();
+            foreach ($data as $key => $value) {
+                if ($key == 'id') {
+                    continue;
+                }
+                $update[$key] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
+            }
+            $this->app['db']->update(self::$table_name, $update, array('id' => $id));
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }

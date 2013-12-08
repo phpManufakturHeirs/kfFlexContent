@@ -15,7 +15,7 @@
   {% set template_file = 'backend/body.twig' %}
 {% endif %}
 {% extends getTemplateFile(template_namespace, template_file) %}
-{% block title %}{{ 'flexContent - Create or Edit Content'|trans }}{% endblock %}
+{% block title %}{{ 'flexContent - Create or Edit Tags'|trans }}{% endblock %}
 {% block jquery %}
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script type="text/javascript" src="{{ MANUFAKTUR_URL }}/CKEditor/Source/ckeditor.js"></script>
@@ -40,13 +40,9 @@
         {{ form_errors(form) }}
         {{ form_row(form._token) }}        
         
-        {{ form_row(form.tag_id) }}
-        
+        {{ form_row(form.tag_id) }}        
         {{ form_row(form.tag_name) }}
-        
-        
-        <div class="clear"></div>
-        
+               
         <div>
           {{ form_label(form.tag_description) }}
           <div class="image_container">
@@ -85,7 +81,7 @@
 {% endblock content %}
 
 {% block footer %}
-  {# add the height of CKE's to the iframe_add_height (default = 30) #}
+  {# add the height of CKE to the iframe_add_height (default = 30) #}
   {% set iframe_add_height = 60 %}
   {{ parent() }}
   <script type="text/javascript">

@@ -45,7 +45,8 @@ class CategoryType
         `category_id` INT(11) NOT NULL AUTO_INCREMENT,
         `category_name` VARCHAR(64) NOT NULL DEFAULT '',
         `category_description` TEXT NOT NULL DEFAULT '',
-        `category_image` TEXT NOT NULL DEFAULT '',
+        `category_image` TEXT NOT NULL,
+        `target_url` TEXT NOT NULL,
         `timestamp` TIMESTAMP,
         PRIMARY KEY (`category_id`),
         UNIQUE INDEX (`category_name`)
@@ -263,4 +264,26 @@ EOD;
             throw new \Exception($e);
         }
     }
+
+    /**
+     * Get the categories for a SELECT in form.factory / Twig
+     *
+     * @throws \Exception
+     * @return multitype:NULL
+     */
+    public function getListForSelect()
+    {
+        try {
+            $SQL = "SELECT `category_id`, `category_name` FROM `".self::$table_name."` ORDER BY `category_name` ASC";
+            $results = $this->app['db']->fetchAll($SQL);
+            $categories = array();
+            foreach ($results as $category) {
+                $categories[$category['category_id']] = $this->app['utils']->unsanitizeText($category['category_name']);
+            }
+            return $categories;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
 }

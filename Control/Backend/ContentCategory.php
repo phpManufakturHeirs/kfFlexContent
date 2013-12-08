@@ -14,12 +14,15 @@ namespace phpManufaktur\flexContent\Control\Backend;
 use Silex\Application;
 use phpManufaktur\Basic\Data\CMS\Page;
 use phpManufaktur\flexContent\Data\Content\CategoryType as CategoryTypeData;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ContentCategory extends Backend
 {
 
     protected static $category_id = null;
     protected $CategoryTypeData = null;
+    protected $CMSPage = null;
 
     protected static $route = null;
     protected static $columns = null;
@@ -36,8 +39,11 @@ class ContentCategory extends Backend
     protected function initialize(Application $app)
     {
         parent::initialize($app);
+
         $this->CategoryTypeData = new CategoryTypeData($app);
+        $this->CMSPage = new Page($app);
         self::$category_id = -1;
+
         try {
             // search for the config file in the template directory
             $cfg_file = $this->app['utils']->getTemplateFile('@phpManufaktur/flexContent/Template', 'backend/category.type.list.json', '', true);
@@ -113,17 +119,33 @@ class ContentCategory extends Backend
      */
     protected function getCategoryTypeForm($data = array())
     {
+        $pagelist = $this->CMSPage->getPageLinkList();
+        $links = array();
+        foreach ($pagelist as $link) {
+            $links[$link['complete_link']] = $link['complete_link'];
+        }
+
         $form = $this->app['form.factory']->createBuilder('form')
         ->add('category_id', 'hidden', array(
             'data' => isset($data['category_id']) ? $data['category_id'] : -1
         ))
         ->add('category_name', 'text', array(
+            'label' => 'Name',
             'data' => isset($data['category_name']) ? $data['category_name'] : ''
+        ))
+        ->add('target_url', 'choice', array(
+            'choices' => $links,
+            'empty_value' => '- please select -',
+            'expanded' => false,
+            'required' => true,
+            'label' => 'Target URL',
+            'data' => isset($data['target_url']) ? $data['target_url'] : null
         ))
         ->add('category_image', 'hidden', array(
             'data' => isset($data['category_image']) ? $data['category_image'] : ''
         ))
         ->add('category_description', 'textarea', array(
+            'label' => 'Description',
             'data' => isset($data['category_description']) ? $data['category_description'] : '',
             'required' => false
         ))
@@ -203,6 +225,7 @@ class ContentCategory extends Backend
 
             $data['category_name'] = $category['category_name'];
             $data['category_description'] = !empty($category['category_description']) ? $category['category_description'] : '';
+            $data['target_url'] = $category['target_url'];
 
             if (self::$category_id < 1) {
                 // create a new category type record
@@ -308,5 +331,70 @@ class ContentCategory extends Backend
         return $this->ControllerList($app);
     }
 
+    /**
+     * Controller to select a image for the category type
+     *
+     * @param Application $app
+     */
+    public function ControllerImage(Application $app)
+    {
+        $this->initialize($app);
+
+        // check the form data and set self::$contact_id
+        $data = array();
+        if (!$this->checkCategoryTypeForm($data)) {
+            // the check fails - show the form again
+            $form = $this->getCategoryTypeForm($data);
+            return $this->renderCategoryTypeForm($form);
+        }
+
+        // grant that the directory exists
+        $app['filesystem']->mkdir(FRAMEWORK_PATH.self::$config['content']['images']['directory']['select']);
+
+        // exec the MediaBrowser
+        $subRequest = Request::create('/admin/mediabrowser', 'GET', array(
+            'usage' => self::$usage,
+            'start' => self::$config['content']['images']['directory']['start'],
+            'redirect' => '/admin/flexcontent/category/image/check/id/'.self::$category_id,
+            'mode' => 'public',
+            'directory' => self::$config['content']['images']['directory']['select']
+        ));
+        return $app->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+    }
+
+    /**
+     * Controller check the submitted image
+     *
+     * @param Application $app
+     * @param integer $category_id
+     * @return string
+     */
+    public function ControllerImageCheck(Application $app, $category_id)
+    {
+        $this->initialize($app);
+
+        self::$category_id = $category_id;
+
+        // get the selected image
+        if (null == ($image = $app['request']->get('file'))) {
+            $this->setMessage('There was no image selected.');
+        }
+        else {
+            // udate the Category record
+            $data = array(
+                'category_image' => $image
+            );
+            $this->CategoryTypeData->update(self::$category_id, $data);
+            $this->setMessage('The image %image% was successfull inserted.',
+                array('%image%' => basename($image)));
+        }
+
+        if (false === ($data = $this->CategoryTypeData->select(self::$category_id))) {
+            $this->setMessage('The Category Type record with the ID %id% does not exists!',
+                array('%id%' => self::$category_id));
+        }
+        $form = $this->getCategoryTypeForm($data);
+        return $this->renderCategoryTypeForm($form);
+    }
 
 }
