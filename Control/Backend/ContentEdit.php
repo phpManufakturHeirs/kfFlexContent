@@ -268,13 +268,12 @@ class ContentEdit extends Backend
                                     array('%permalink%' => $permalink));
                             $checked = false;
                         }
-                        elseif (self::$content_id > 0) {
-                            $used_by = $this->ContentData->selectContentIDbyPermaLink($permalink);
-                            if ($used_by != self::$content_id) {
-                                $this->setMessage('The permalink %permalink% is already in use by the flexContent record %id%, please select another one!',
-                                    array('%permalink%' => $permalink, '%id%' => $used_by));
-                                $checked = false;
-                            }
+                        elseif ((self::$content_id > 0) &&
+                            (false !== ($used_by = $this->ContentData->selectContentIDbyPermaLink($permalink))) &&
+                            ($used_by != self::$content_id)) {
+                            $this->setMessage('The permalink %permalink% is already in use by the flexContent record %id%, please select another one!',
+                                array('%permalink%' => $permalink, '%id%' => $used_by));
+                            $checked = false;
                         }
                         $data[$name] = $permalink;
                         break;
