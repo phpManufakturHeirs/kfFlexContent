@@ -7,38 +7,47 @@
   @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
   @license MIT License (MIT) http://www.opensource.org/licenses/MIT
 #}
-{% spaceless %}
 <!DOCTYPE html>
-<html>
+{% spaceless %}
+<html lang="en">
   <head>
     {% block head %}
-      <title>{% block title %}{% endblock %}</title>
+      <title>{% block title %}flexContent - Administration{% endblock %}</title>
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
       <meta name="robots" content="noindex,nofollow" />
       <meta name="description" content="{% block description %}{% endblock %}" />
       <meta name="keywords" content="{% block keywords %}{% endblock %}" />
+      <meta name=”content-language” content=”{% block content_language %}{% if app.translator.locale == 'de' %}de{% else %}en{% endif %}{% endblock content_language %}” />
+      <meta name="viewport" content="{% block viewport %}width=device-width, initial-scale=1.0{% endblock viewport %}">
       {% block stylesheet %}
-        <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/backend.css" media="screen, projection" />
+        {# Bootstrap #}
+        <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/bootstrap/3.0.3/css/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/font-awesome/4.0.3/css/font-awesome.min.css" />
       {% endblock stylesheet %}
       {% block jquery %}
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-        
-      {% endblock jquery %} 
+        <!--[if lt IE 9]>
+          <script type="text/javascript" src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+          <script type="text/javascript" src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+        <![endif]-->
+      {% endblock jquery %}
+      <link rel="shortcut icon" type="image/x-icon" href="{{ MANUFAKTUR_URL }}/Basic/Template/default/framework/image/favicon.ico" />
     {% endblock head %}
   </head>
   <body>
     <div id="content">
-      {% block content %}
-        
-      {% endblock content %}
+      {% block content %}{% endblock content %}
     </div>
+    {% block footer_jquery %}
+      <script src="{{ LIBRARY_URL }}/jquery/jquery/1.10.2/jquery.min.js"></script>        
+    {% endblock footer_jquery %}
     {% block footer %}
       <script type="text/javascript">
         if (typeof 'jQuery' !== 'undefined') {
           $(document).ready(function() {
             {# setting the iFrame height dynamically by the height of the inbounded document #}
-            var content_height = $('#content').height() + {{ iframe_add_height|default(30) }} + "px";
-            parent.document.getElementById("kitframework_iframe").style.height = content_height;            
+            var frame_id = window.frameElement.getAttribute('id');
+            var content_height = $('#content').height() + {{ iframe_add_height|default(30) }} + "px";             alert(content_height + ' - '+ {{ iframe_add_height|default(30) }});
+            parent.document.getElementById(frame_id).style.height = content_height;            
           });
         }
       </script>

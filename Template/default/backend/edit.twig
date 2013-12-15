@@ -17,151 +17,194 @@
 {% extends getTemplateFile(template_namespace, template_file) %}
 {% block title %}{{ 'flexContent - Create or Edit Content'|trans }}{% endblock %}
 {% block jquery %}
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/i18n/jquery-ui-i18n.min.js"></script>
-  <script src="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/jquery/jquery-ui-timepicker-addon.js"></script>
-  <script src="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/jquery/jquery-ui-timepicker-de.js"></script>
-  <script type="text/javascript" src="{{ MANUFAKTUR_URL }}/CKEditor/Source/ckeditor.js"></script>
-  <script type="text/javascript" src="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/jquery/tagedit/js/jquery.autoGrowInput.js"></script>
-  <script type="text/javascript" src="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/jquery/tagedit/js/jquery.tagedit.js"></script>
+  {# most jQuery files are loaded at the end of file in block footer_jquery! #}
+  <script type="text/javascript" src="{{ MANUFAKTUR_URL }}/CKEditor/Source/ckeditor.js"></script> 
 {% endblock jquery %}
-
 {% block stylesheet %}
   {{ parent() }}
-  {% if usage == 'framework' %}
-    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/backend.css" media="screen, projection" />
-  {% endif %}
-  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/edit.css" media="screen, projection" />
-  <link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css" media="screen, projection" />
-  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/jquery-ui-timepicker-addon.css" media="screen, projection" />
-  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/jquery/tagedit/css/tagedit.css" media="all"/>
+  <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/ui/1.10.3/themes/smoothness/jquery-ui.min.css" media="screen, projection" />
+  <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/timepicker/1.4.3/jquery-ui-timepicker-addon.min.css" media="screen, projection" />
+  <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/tagedit/1.5.1/css/jquery.tagedit.css" media="all"/>
+  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/flexcontent.css" media="screen, projection" />  
 {% endblock stylesheet %}
 
 {% block content %}
   {{ parent() }}
-  <div id="edit">
+  <div id="edit"></div>
+  <div class="container">    
     {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
+    <div class="height-15"></div> 
     {% if message is defined and message|length > 0 %}
-      <div class="message">{{ message }}</div>
+      <div class="alert alert-info">{{ message }}</div>
     {% endif %}
-    <div class="content_form">
-      <form id="content_edit" method="post" {{ form_enctype(form) }}>
-        {{ form_errors(form) }}
-        {{ form_row(form._token) }}        
+    <form id="content_edit" method="post" {{ form_enctype(form) }} role="form">
+      {{ form_errors(form) }}
+      {{ form_row(form._token) }}  
+      {{ form_row(form.content_id) }}
         
-        <div id="seo">
-          <div class="image_container">
-            <div class="image">
-              {% if form.teaser_image.vars.value|length > 0 %}
-                <img src="{{ FRAMEWORK_URL ~ form.teaser_image.vars.value }}" width="200" />
-              {% endif %}
+      <div class="row">
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+          {# form contents at the left column #}
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+              <div class="form-group">
+                <label>{{ 'Content ID'|trans }}</label>
+                <div>
+                {% if form.content_id.vars.value > 0 %}
+                  {{ '%05d'|format(form.content_id.vars.value) }}
+                {% else %}
+                  {{ '- new entry -'|trans }}
+                {% endif %}
+                </div>
+              </div>
             </div>
-            <input type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/edit/image/select?usage={{ usage }}');" value="{{ 'Select teaser image'|trans }}" />
-          </div>
-          {{ form_row(form.content_id) }}
-          <div>
-            <label>{{ 'Content ID'|trans }}</label>
-            <div class="value">
-              {% if form.content_id.vars.value > 0 %}
-                {{ '%05d'|format(form.content_id.vars.value) }}
-              {% else %}
-                {{ '- new entry -'|trans }}
-              {% endif %}
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+              <div class="form-group">
+                {{ form_label(form.status) }}
+                {{ form_widget(form.status, {'attr':{'class':'form-control input-sm'}}) }}
+              </div>              
             </div>
           </div>
-          {{ form_row(form.status) }}<br />
-          {{ form_label(form.title) }} {{ form_widget(form.title) }}       
-          {{ form_label(form.description) }} {{ form_widget(form.description) }}
-          {{ form_label(form.keywords) }} {{ form_widget(form.keywords) }}
-          <div class="clear"></div>  
-        </div>
-        
-        <div id="dates">
-          {{ form_label(form.publish_from) }}{{ form_widget(form.publish_from) }}
-          {{ form_label(form.breaking_to) }}{{ form_widget(form.breaking_to) }}
-          {{ form_label(form.archive_from) }}{{ form_widget(form.archive_from) }}
-        </div>
-        
-        <div>
-          {{ form_label(form.teaser) }}
-          <div class="editor">
-            {{ CKEditor(
-                  form.teaser.vars.id,
-                  form.teaser.vars.full_name,
-                  form.teaser.vars.value,
-                  '100%', '100px',
-                  MANUFAKTUR_URL ~ '/flexContent/Template/default/backend/ckeditor.config.teaser.js'
-            ) }}
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs12">              
+              <div class="form-group">
+                {{ form_label(form.title) }} 
+                {{ form_widget(form.title, {'attr':{'class':'form-control input-sm'}}) }}       
+              </div>
+              <div class="form-group">
+                {{ form_label(form.description) }} 
+                {{ form_widget(form.description, {'attr':{'class':'form-control input-sm'}}) }}
+              </div>
+              <div class="form-group">
+                {{ form_label(form.keywords) }} 
+                {{ form_widget(form.keywords, {'attr':{'class':'form-control input-sm'}}) }}
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+              <div class="form-group">
+                {{ form_label(form.publish_from) }}
+                {{ form_widget(form.publish_from, {'attr':{'class':'form-control input-sm publish_from'}}) }}
+              </div>  
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+              <div class="form-group">
+                {{ form_label(form.breaking_to) }}
+                {{ form_widget(form.breaking_to, {'attr':{'class':'form-control input-sm breaking_to'}}) }}
+              </div>    
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+              <div class="form-group">
+                {{ form_label(form.archive_from) }}
+                {{ form_widget(form.archive_from, {'attr':{'class':'form-control input-sm archive_from'}}) }}
+              </div>
+            </div>
           </div>
         </div>
-        
-        <div class="extra_space"></div>
-        
-        <div>
-          {{ form_label(form.permalink) }}
-          <div class="permalink_url_prefix">{{ form.permalink_url.vars.value }}</div>
-          {{ form_widget(form.permalink) }}
-        </div>
-        
-        {{ form_row(form.redirect_url) }}
-        {{ form_row(form.primary_category) }}
-        {{ form_row(form.secondary_categories) }}
-        
-        <div>
-          <label for="tag">{{ 'Tags'|trans }}</label>
-          {% if tags|length > 0 %}
-            {% for tag in tags %}
-              <input type="text" name="tag[{{ tag.tag_id ~ '-a' }}]" value="{{ tag.tag_name }}" class="tag"/>
-            {% endfor %}
-          {% else %}
-            <input type="text" name="tag[]" value="" class="tag"/>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+          {# image container #}
+          <div class="height-30"></div>
+          {% if form.teaser_image.vars.value|length > 0 %}
+            <img class="img-rounded img-responsive" src="{{ FRAMEWORK_URL ~ form.teaser_image.vars.value }}" />
           {% endif %}
+          <div class="height-15"></div>
+          <input class="form-control btn btn-default" type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/edit/image/select?usage={{ usage }}');" value="{{ 'Select teaser image'|trans }}" />
         </div>
-        
-        <div class="extra_space"></div>
-        
-        <div>
-          <label for="submit">&nbsp;</label>
-          <input type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
+      </div>
+      
+      <div class="form-group">
+        {{ form_label(form.teaser) }}
+        <div class="editor editor-150">
+          {{ CKEditor(
+                form.teaser.vars.id,
+                form.teaser.vars.full_name,
+                form.teaser.vars.value,
+                '100%', '100px',
+                MANUFAKTUR_URL ~ '/flexContent/Template/default/backend/ckeditor.config.teaser.js'
+          ) }}
         </div>
-        
-        <div class="extra_space"></div>
-        
-        <div>
-          {{ form_label(form.content) }}
-          <div class="editor">
-            {{ CKEditor(
-                  form.content.vars.id,
-                  form.content.vars.full_name,
-                  form.content.vars.value,
-                  '100%', '400px',
-                  MANUFAKTUR_URL ~ '/flexContent/Template/default/backend/ckeditor.config.content.js'
-            ) }}
+      </div>
+
+      <div class="form-group">
+        <label class="{% if form.permalink.vars.required %}required{% endif %}" for="{{ form.permalink.vars.id }}">{{ 'Permalink'|trans }}&nbsp;<span class="label-info">{{ form.permalink_url.vars.value }}</span>&nbsp;</label>
+        {{ form_widget(form.permalink, {'attr':{'class':'form-control input-sm'}}) }}
+      </div>
+      <div class="form-group">
+        {{ form_label(form.redirect_url) }}
+        {{ form_widget(form.redirect_url, {'attr':{'class':'form-control input-sm'}}) }}
+      </div>
+      
+      <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <div class="form-group">
+            {{ form_label(form.primary_category) }}
+            {{ form_widget(form.primary_category, {'attr':{'class':'form-control input-sm'}}) }}
           </div>
         </div>
-         
-        <div class="extra_space"></div>
-        
-        <div>
-          <label for="submit">&nbsp;</label>
-          <input type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+          <div class="form-group">
+            {{ form_label(form.secondary_categories) }}
+            {{ form_widget(form.secondary_categories, {'attr':{'class':'form-control input-sm'}}) }}
+          </div>
         </div>
-        <div class="clear"></div>
-        {#{ form_rest(form) }#}
-      </form>
-    </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="tag">{{ 'Tags'|trans }}</label>
+        {% if tags|length > 0 %}
+          {% for tag in tags %}
+            <input type="text" name="tag[{{ tag.tag_id ~ '-a' }}]" value="{{ tag.tag_name }}" class="tag form-control input-sm"/>
+          {% endfor %}
+        {% else %}
+          <input type="text" name="tag[]" value="" class="tag form-control input-sm"/>
+        {% endif %}
+      </div>
+      
+      <div class="form-group">
+        <label for="submit">&nbsp;</label>
+        <input class="form-control btn btn-default" type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
+      </div>
+
+      <div class="form-group">
+        {{ form_label(form.content) }}
+        <div class="editor editor-450">
+          {{ CKEditor(
+                form.content.vars.id,
+                form.content.vars.full_name,
+                form.content.vars.value,
+                '100%', '400px',
+                MANUFAKTUR_URL ~ '/flexContent/Template/default/backend/ckeditor.config.content.js'
+          ) }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="submit">&nbsp;</label>
+        <input class="form-control btn btn-default" type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
+      </div>
+      {#{ form_rest(form) }#}
+    </form>    
   </div>
 {% endblock content %}
 
+ {% block footer_jquery %}
+  {{ parent() }}
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/ui/1.10.3/ui/minified/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/ui/1.10.3/ui/minified//i18n/jquery-ui-i18n.min.js"></script>
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/timepicker/1.4.3/jquery-ui-timepicker-addon.min.js"></script>
+  {% if app.translator.locale == 'de' %}
+    <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/timepicker/1.4.3/i18n/jquery-ui-timepicker-de.js"></script>
+  {% endif %}
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/tagedit/1.5.1/js/jquery.autoGrowInput.js"></script>
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/tagedit/1.5.1/js/jquery.tagedit.js"></script>
+{% endblock footer_jquery %}
+   
 {% block footer %}
   {# add the height of CKE's to the iframe_add_height (default = 30) #}
-  {% set iframe_add_height = 610 %}
+  {% set iframe_add_height = 200 %}
   {{ parent() }}
   <script type="text/javascript">
     
-    
-      
     if (typeof 'jQuery' !== 'undefined') {
       
       function submitForm(action)
@@ -176,6 +219,19 @@
       }
 
       $(document).ready(function() {
+        
+        $('#content_edit').find('input.tag').tagedit({
+          autocompleteURL: '{{ FRAMEWORK_URL }}/admin/flexcontent/tag/autocomplete',
+          texts: { 
+            removeLinkTitle: "{{ 'Remove from list'|trans }}",
+            saveEditLinkTitle: "{{ 'Save changes'|trans }}",
+            deleteLinkTitle: "{{ 'Delete this tag from database'|trans }}",
+            deleteConfirmation: "{{ 'Are you sure to delete this entry?'|trans }}",
+            deletedElementTitle: "{{ 'This Element will be deleted'|trans }}",
+            breakEditLinkTitle: "{{ 'Cancel'|trans }}",
+            forceDeleteConfirmation: "{{ 'There are more records using this tag, are you sure do you want to remove it?'|trans }}"
+          }
+        });
         
         // on page load scroll to the top of the form
         document.getElementById('edit').scrollIntoView(true);

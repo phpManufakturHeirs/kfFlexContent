@@ -105,20 +105,18 @@ class ContentEdit extends Backend
         ))
         ->add('permalink', 'text', array(
             'data' => isset($data['permalink']) ? $data['permalink'] : '',
-            'required' => self::$config['content']['field']['permalink']['required']
+            'required' => self::$config['content']['field']['permalink']['required'],
+            'label' => 'Permalink'
         ))
         ->add('publish_from', 'text', array(
-            'attr' => array('class' => 'publish_from'),
             'required' => self::$config['content']['field']['publish_from']['required'],
             'data' => date($this->app['translator']->trans('DATETIME_FORMAT'), strtotime($publish_from)),
         ))
         ->add('breaking_to', 'text', array(
-            'attr' => array('class' => 'breaking_to'),
             'required' => self::$config['content']['field']['breaking_to']['required'],
             'data' => date($this->app['translator']->trans('DATETIME_FORMAT'), strtotime($breaking_to)),
         ))
         ->add('archive_from', 'text', array(
-            'attr' => array('class' => 'archive_from'),
             'required' => self::$config['content']['field']['archive_from']['required'],
             'data' => date($this->app['translator']->trans('DATETIME_FORMAT'), strtotime($archive_from)),
         ))

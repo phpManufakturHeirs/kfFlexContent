@@ -18,15 +18,12 @@
 {% block title %}{{ 'flexContent - About'|trans }}{% endblock %}
 {% block stylesheet %}
   {{ parent() }}
-  {% if usage == 'framework' %}
-    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/backend.css" media="screen, projection" />
-  {% endif %}
-  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/Basic/Template/default/pattern/css/about.css" media="screen, projection" />
+  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/flexcontent.css" media="screen, projection" />
 {% endblock stylesheet %}
 
 {% block content %}
-  <div id="about">
+  <div class="container">
     {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
-    {% include '@phpManufaktur/Basic/Template/default/pattern/about.twig' %}
+    {% include '@phpManufaktur/Basic/Template/default/pattern/bootstrap/about.twig' %}
   </div>
 {% endblock content %}

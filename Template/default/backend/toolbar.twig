@@ -1,7 +1,7 @@
 {% block toolbar %}
-    <ul id="toolbar">
+  <ul class="nav nav-tabs">
     {% for item in toolbar %}
-        <li{% if item.active %} class="active"{% endif %}><a href="{{ item.link }}" title="{{ item.hint|trans }}">{{ item.text|trans }}</a></li>
+      <li{% if item.active %} class="active"{% endif %}><a href="{{ item.link }}" title="{{ item.hint|trans }}">{{ item.text|trans }}</a></li>
     {% endfor %}
-    </ul>
+  </ul>
 {% endblock toolbar %}

@@ -74,6 +74,16 @@
     "name":"MIT License",
     "url":"https:\/\/github.com\/phpManufaktur\/kfFlexContent\/raw\/master\/LICENSE.md"
   },
+  "wiki": {
+    "en": {
+      "url":"https:\/\/github.com/phpManufaktur\/kfEvent\/wiki"
+    }
+  },
+  "firststeps": {
+    "de": {
+      "url":"https:\/\/kit2.phpmanufaktur.de\/event\/firststeps"
+    }
+  },
   "download":{
     "availability":"public",
     "agreement":"free",

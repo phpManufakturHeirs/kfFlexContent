@@ -1,0 +1,137 @@
+/* 
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki  
+  @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+*/
+
+html,
+body {
+  height: 100%;
+}
+
+a {
+  text-decoration: none;
+}
+a:link,
+a:visited {
+  color: #da251d;
+  background-color: transparent;
+  text-decoration: none;
+}
+a:hover,
+a:active {
+  color: #da251d;
+  background-color: transparent;
+  text-decoration: underline;
+}
+label {
+  margin: 0 0 3px 0;
+}
+label.required:after {
+  content: '*';
+  color: #da251d;
+  background-color: transparent;
+  font-weight: bold;
+}
+ul.pagination a:link,
+ul.pagination a:visited,
+a:link.btn,
+a:visited.btn,
+.nav-tabs li a:link,
+.nav-tabs li a:visited {
+  color: #000;
+  text-decoration: none;
+}
+ul.pagination a:hover,
+ul.pagination a:active,
+a:hover.btn,
+a:active.btn,
+.nav-tabs li a:hover,
+.nav-tabs li a:active {
+  color: #da251d;
+  text-decoration: none;
+}
+ul.pagination li.active a {
+  color: #fff;
+}
+#about-wrap {
+  margin: 50px 0 0 0;
+  padding: 0;
+}
+.table-striped > tbody > tr:nth-child(odd) > td,
+.table-striped > tbody > tr:nth-child(odd) > th {
+  background-color: #fdf5e6;
+}
+.table-hover > tbody > tr:hover > td,
+.table-hover > tbody > tr:hover > th {
+  background-color: #ffe4b5;
+}
+.height-5 {
+  min-height: 5px;
+}
+.height-15 {
+  min-height: 15px;
+}
+.height-30 {
+  min-height: 30px;
+}
+.height-tag-dialog {
+  min-height: 450px;
+}
+.height-category-dialog {
+  min-height: 530px;
+}
+select {
+  width: auto;
+}
+input {
+  width: 100%;  
+}
+input#form_delete {
+  width: 15px;
+}
+input.btn.btn-default {
+  width: auto;
+  padding: 0 30px;
+}
+input.btn.btn-default:hover {
+  color: #da251d;
+}
+.label-info {
+  font-weight: normal;
+  font-size: 12px;
+  color: #999;
+  background-color: transparent;
+}
+select#form_secondary_categories {
+  height: 60px;
+}
+/*
+  TagEdit
+*/
+.tagedit-list {
+  border: 1px solid #c6c6c6; 
+  width: 100%; 
+  font-size: 11px; 
+  min-height: 26px; 
+}
+.tagedit-list input {
+  margin: 0;
+}
+.tagedit-list li.tagedit-listelement-old {
+  background-color: #d6d6d6;
+  border: 1px solid #a9a9a9; /*#CAD8F3; */
+ }
+.tagedit-list li.tagedit-listelement-old:hover {
+  background-color: #ffe4b5;
+}
+.tagedit-list li.tagedit-listelement-old a.tagedit-close,
+.tagedit-list li.tagedit-listelement-old a.tagedit-break,
+.tagedit-list li.tagedit-listelement-old a.tagedit-delete,
+.tagedit-list li.tagedit-listelement-old a.tagedit-save {
+  border-left: 1px dotted #a9a9a9; /*#7E9DD6;*/ 
+}

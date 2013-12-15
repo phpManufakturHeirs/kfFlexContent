@@ -67,6 +67,8 @@ $app->get('/admin/flexcontent/uninstall',
     // uninstall routine for flexContent
     'phpManufaktur\flexContent\Data\Setup\Uninstall::Controller');
 
+$app->get('/admin/flexcontent',
+    'phpManufaktur\flexContent\Control\Backend\About::Controller');
 $app->get('/admin/flexcontent/about',
     'phpManufaktur\flexContent\Control\Backend\About::Controller');
 

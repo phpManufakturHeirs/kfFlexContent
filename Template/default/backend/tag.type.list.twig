@@ -15,23 +15,24 @@
   {% set template_file = 'backend/body.twig' %}
 {% endif %}
 {% extends getTemplateFile(template_namespace, template_file) %}
-{% block title %}{{ 'flexContent - About'|trans }}{% endblock %}
+{% block title %}{{ 'flexContent - Tag types'|trans }}{% endblock %}
 {% block stylesheet %}
   {{ parent() }}
-  {% if usage == 'framework' %}
-    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/backend.css" media="screen, projection" />
-  {% endif %}
-  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/list.css" media="screen, projection" />
-  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/flexcontent.css" media="screen, projection" />
 {% endblock stylesheet %}
 
 {% block content %}
-  <div id="content_list">
+  <div class="container">
     {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
+    <div class="height-15"></div>
     {% if message is defined and message|length > 0 %}
-      <div class="message">{{ message }}</div>
+      <div class="alert alert-info">{{ message }}</div>
     {% endif %}
-    <div class="create_tag">[ <a href="{{ FRAMEWORK_URL ~ route.create }}">{{ 'Create a new tag'|trans }} ]</a></div>  
+    <div>
+      <a class="btn btn-default" role="button" href="{{ FRAMEWORK_URL ~ route.create }}">{{ 'Create a new tag'|trans }}</a>
+    </div>  
+    <div class="height-15"></div>  
+      
     {% if tags|length > 0 %}
       {#
         The pagination serve a automatic 1 2 3 ... 17 18 19 pagination and
@@ -46,9 +47,10 @@
          showAlwaysFirstAndLast: true
       } only %}
 
-      <table>
-        <thead>
-          <tr>
+      <div class="table-responsive">
+        <table class="table table-striped table-condensed table-hover">
+          <thead>
+            <tr>
             {#
                 Enable an automatic ordering of the table by the columns, just
                 clicking at the head of the column. Default order is specified in:
@@ -68,14 +70,14 @@
                     {% set head_class = head_class ~ ' active desc' %}
                   {% endif %}
                 {% endif %}
-                <th class="{{ head_class }}">
+                 <th class="{{ head_class }}">
                   {% if head == 'used_by_content_id' %}
                     {{ head|trans }}
                   {% else %}
                     {% if 'active asc' in head_class %}
-                      <i class="icon-caret-down icon-padding"></i>
+                      <i class="fa fa-sort-alpha-asc"></i>&nbsp;
                     {% elseif 'active desc' in head_class %}
-                      <i class="icon-caret-up icon-padding"></i>
+                      <i class="fa fa-sort-alpha-desc"></i>&nbsp;
                     {% endif %}
                     <a href="{{ FRAMEWORK_URL ~ route.pagination|replace({'{page}':current_page, '{order}':head, '{direction}':head_order}) }}" title="{% if head_order == 'asc' %}{{ 'Click to sort column ascending'|trans }}{% else %}{{ 'Click to sort column descending'|trans }}{% endif %}">{{ head|trans }}</a>
                   {% endif %}
@@ -85,9 +87,8 @@
           </tr>
         </thead>
         <tbody>
-          {% set i = 0 %}
           {% for tag in tags %}
-            <tr class="{{ cycle(['flop','flip'], i) }}">
+            <tr>
               {% for column, value in tag %}
                 {% if column in columns %}
                   {% if column == 'tag_id' %}
@@ -114,7 +115,6 @@
                 {% endif %}
               {% endfor %}
             </tr>
-            {% set i = i+1 %}
           {% endfor %}
         </tbody>
       </table>
@@ -129,7 +129,7 @@
         showAlwaysFirstAndLast: true
       } only %}
     {% else %}
-      <p>{{ 'The tag type list for flexContent is empty, please create a tag!'|trans }}</p>
+      <div class="alert alert-info">{{ 'The tag type list for flexContent is empty, please create a tag!'|trans }}</div>
     {% endif %}
   </div>
 {% endblock content %}

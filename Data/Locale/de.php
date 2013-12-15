@@ -85,7 +85,7 @@ return array(
     "Problem: '%first%' must be defined before '%second%', please check the configuration file!"
         => "Problem: '%first%' muss vor dem Eintrag '%second%' festgelegt werden, bitte prüfen Sie die Konfiguration!",
     'publish_from'
-        => 'Veröffentlichen ab',
+        => 'Veröffentlichen&nbsp;ab',
     'PUBLISHED'
         => 'Veröffentlicht',
 

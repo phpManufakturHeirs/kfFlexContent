@@ -16,79 +16,73 @@
 {% endif %}
 {% extends getTemplateFile(template_namespace, template_file) %}
 {% block title %}{{ 'flexContent - Create or edit a category'|trans }}{% endblock %}
+{% block stylesheet %}
+  {{ parent() }}
+  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/flexcontent.css" media="screen, projection" />
+{% endblock stylesheet %}
 {% block jquery %}
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  {{ parent() }}
   <script type="text/javascript" src="{{ MANUFAKTUR_URL }}/CKEditor/Source/ckeditor.js"></script>
 {% endblock jquery %}
 
-{% block stylesheet %}
-  {{ parent() }}
-  {% if usage == 'framework' %}
-    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/backend.css" media="screen, projection" />
-  {% endif %}
-  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/edit.css" media="screen, projection" />
-{% endblock stylesheet %}
-
 {% block content %}
-  <div id="edit">
+  <div class="container">
     {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
+    <div class="height-15"></div>
     {% if message is defined and message|length > 0 %}
-      <div class="message">{{ message }}</div>
+      <div class="alert alert-info">{{ message }}</div>
     {% endif %}
-    <div class="category_form">
-      <form id="category_edit" method="post" {{ form_enctype(form) }}>
-        {{ form_errors(form) }}
-        {{ form_row(form._token) }}        
-        
-        {{ form_row(form.category_id) }}        
-        {{ form_row(form.category_name) }}
-        
-        <div>
-          {{ form_label(form.target_url) }}
-          <div class="cms_url">{{ CMS_URL }}</div>
-          {{ form_widget(form.target_url) }}
-        </div>
-        
-        <div>
-          {{ form_label(form.category_description) }}
-          <div class="image_container">
-          <div class="image">
-            {% if form.category_image.vars.value|length > 0 %}
-              <img src="{{ FRAMEWORK_URL ~ form.category_image.vars.value }}" width="200" />
-            {% endif %}
+    <form id="category_edit" method="post" {{ form_enctype(form) }} role="form">
+      {{ form_errors(form) }}
+      {{ form_row(form._token) }}
+      {{ form_row(form.category_id) }}
+      
+      <div class="row">
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
+          {# form contents at the left column #}
+          <div class="form-group">
+            {{ form_label(form.category_name) }}
+            {{ form_widget(form.category_name, {'attr':{'class':'form-control input-sm'}}) }}
           </div>
-          <input type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/category/image/select?usage={{ usage }}');" value="{{ 'Select category type image'|trans }}" />  
-        </div>
-          <div class="editor tag">
+          <div class="form-group">
+            {{ form_label(form.target_url) }}&nbsp;-&nbsp;<span class="text-muted small">{{ CMS_URL }}</span>
+            {{ form_widget(form.target_url, {'attr':{'class':'form-control input-sm'}}) }}
+          </div>
+          <div class="form-group">
+            {{ form_label(form.category_description) }}
             {{ CKEditor(
-                  form.category_description.vars.id,
-                  form.category_description.vars.full_name,
-                  form.category_description.vars.value,
-                  '100%', '200px',
-                  MANUFAKTUR_URL ~ '/flexContent/Template/default/backend/ckeditor.config.category.type.js'
+                form.category_description.vars.id,
+                form.category_description.vars.full_name,
+                form.category_description.vars.value,
+                '100%', '200px',
+                MANUFAKTUR_URL ~ '/flexContent/Template/default/backend/ckeditor.config.category.type.js'
             ) }}
           </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            {{ form_widget(form.delete) }}&nbsp;<span class="small text-muted">{{ 'delete this category type'|trans }}</span>
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <input class="form-control btn btn-default" type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/category/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
+          </div>
+          
         </div>
-        
-        <div>
-          <label>&nbsp;</label>
-          {{ form_widget(form.delete) }} <div class="label">{{ 'delete this category type'|trans }}</div>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 height-category-dialog">
+          <div class="height-30"></div>
+          {% if form.category_image.vars.value|length > 0 %}
+            <img class="img-rounded img-responsive" src="{{ FRAMEWORK_URL ~ form.category_image.vars.value }}" />
+          {% endif %}
+          <div class="height-15"></div>
+          <input class="form-control btn btn-default" type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/category/image/select?usage={{ usage }}');" value="{{ 'Select category type image'|trans }}" />  
         </div>
-        
-        <div>
-          <label for="submit">&nbsp;</label>
-          <input type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/category/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
-        </div>
-        <div class="clear"></div>
-        {#{ form_rest(form) }#}
-      </form>
-    </div>
+      </div>
+      {#{ form_rest(form) }#}
+    </form>
   </div>
 {% endblock content %}
 
 {% block footer %}
-  {# add the height of CKE's to the iframe_add_height (default = 30) #}
-  {% set iframe_add_height = 60 %}
   {{ parent() }}
   <script type="text/javascript">
     if (typeof 'jQuery' !== 'undefined') {

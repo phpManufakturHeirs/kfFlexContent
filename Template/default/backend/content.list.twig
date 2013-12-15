@@ -15,28 +15,21 @@
   {% set template_file = 'backend/body.twig' %}
 {% endif %}
 {% extends getTemplateFile(template_namespace, template_file) %}
-{% block title %}{{ 'flexContent - About'|trans }}{% endblock %}
+{% block title %}{{ 'flexContent - Content list'|trans }}{% endblock %}
 {% block stylesheet %}
   {{ parent() }}
-  {% if usage == 'framework' %}
-    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/backend.css" media="screen, projection" />
-  {% endif %}
-  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/list.css" media="screen, projection" />
-  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/flexcontent.css" media="screen, projection" />
 {% endblock stylesheet %}
-
+  
 {% block content %}
-  <div id="content_list">
+  <div class="container">
     {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
+    <div class="height-15"></div>
     {% if message is defined and message|length > 0 %}
-      <div class="message">{{ message }}</div>
+      <div class="alert alert-info">{{ message }}</div>
     {% endif %}
+      
     {% if contents|length > 0 %}
-      <div class="search-container">
-        <form action="{{ FRAMEWORK_URL ~ route.search }}" method="post" >
-          <input type="text" name="search" /><input type="submit" value="{{ 'Search'|trans }}" />
-        </form>
-      </div>
       {#
         The pagination serve a automatic 1 2 3 ... 17 18 19 pagination and
         navigation for the table if it contain more rows than specified in:
@@ -49,74 +42,72 @@
          lastPage: last_page,
          showAlwaysFirstAndLast: true
       } only %}
-
-      <table>
-        <thead>
-          <tr>
-            {#
-                Enable an automatic ordering of the table by the columns, just
-                clicking at the head of the column. Default order is specified in:
-                /flexContent/Template/default/backend/list.json
-             #}
-            {% set order_by_str = order_by|join(',') %}
-            {% for head in contents.0|keys %}
-              {% if head in columns %}
-                {% set head_order = order_direction %}
-                {% set head_class = head %}
-                {% if (head == order_by_str) %}
-                  {% if (head_order == 'asc') %}
-                    {% set head_order = 'desc' %}
-                    {% set head_class = head_class ~ ' active asc' %}
-                  {% else %}
-                    {% set head_order = 'asc' %}
-                    {% set head_class = head_class ~ ' active desc' %}
+      <div class="table-responsive">  
+        <table class="table table-striped table-condensed table-hover">
+          <thead>
+            <tr>
+              {#
+                  Enable an automatic ordering of the table by the columns, just
+                  clicking at the head of the column. Default order is specified in:
+                  /flexContent/Template/default/backend/list.json
+               #}
+              {% set order_by_str = order_by|join(',') %}
+              {% for head in contents.0|keys %}
+                {% if head in columns %}
+                  {% set head_order = order_direction %}
+                  {% set head_class = head %}
+                  {% if (head == order_by_str) %}
+                    {% if (head_order == 'asc') %}
+                      {% set head_order = 'desc' %}
+                      {% set head_class = head_class ~ ' active asc' %}
+                    {% else %}
+                      {% set head_order = 'asc' %}
+                      {% set head_class = head_class ~ ' active desc' %}
+                    {% endif %}
                   {% endif %}
-                {% endif %}
-                <th class="{{ head_class }}">
-                  {% if 'active asc' in head_class %}
-                    <i class="icon-caret-down icon-padding"></i>
-                  {% elseif 'active desc' in head_class %}
-                    <i class="icon-caret-up icon-padding"></i>
-                  {% endif %}
-                  <a href="{{ FRAMEWORK_URL ~ route.pagination|replace({'{page}':current_page, '{order}':head, '{direction}':head_order}) }}" title="{% if head_order == 'asc' %}{{ 'Click to sort column ascending'|trans }}{% else %}{{ 'Click to sort column descending'|trans }}{% endif %}">{{ head|trans }}</a>
-                </th>
-              {% endif %}
-            {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          {% set i = 0 %}
-          {% for content in contents %}
-            <tr class="{{ cycle(['flop','flip'], i) }}">
-              {% for column, value in content %}
-                {% if column in columns %}
-                  {% if column == 'content_id' %}
-                    <td class="{{ column }}">
-                      <a href="{{ FRAMEWORK_URL ~ route.edit|replace({'{content_id}':value}) }}">{{ '%05d'|format(value) }}</a>
-                    </td>
-                  {% elseif column == 'title' %}
-                    <td class="{{ column }}">
-                      <a href="{{ FRAMEWORK_URL ~ route.edit|replace({'{content_id}':content.content_id}) }}">{{ value }}</a>
-                    </td>
-                  {% elseif (column == 'description') %}
-                    <td class="{{ column }}">{{ value|striptags }}</td>
-                  {% elseif ((column == 'publish_from') or (column == 'breaking_to') or (column == 'archive_from')) %}
-                    {# formatting date and time #}
-                    <td class="{{ column }}">{{ value|date('DATETIME_FORMAT'|trans) }}</td>
-                  {% elseif (column == 'status') %}
-                    {# translate this column value #}
-                    <td class="{{ column }}">{{ value|trans }}</td>
-                  {% else %}
-                    <td class="{{ column }}">{{ value }}</td>
-                  {% endif %}
+                  <th class="{{ head_class }}">
+                    {% if 'active asc' in head_class %}
+                      <i class="fa fa-sort-alpha-asc"></i>&nbsp;
+                    {% elseif 'active desc' in head_class %}
+                      <i class="fa fa-sort-alpha-desc"></i>&nbsp;
+                    {% endif %}
+                    <a href="{{ FRAMEWORK_URL ~ route.pagination|replace({'{page}':current_page, '{order}':head, '{direction}':head_order}) }}" title="{% if head_order == 'asc' %}{{ 'Click to sort column ascending'|trans }}{% else %}{{ 'Click to sort column descending'|trans }}{% endif %}">{{ head|trans }}</a>
+                  </th>
                 {% endif %}
               {% endfor %}
             </tr>
-            {% set i = i+1 %}
-          {% endfor %}
-        </tbody>
-      </table>
-
+          </thead>
+          <tbody>
+            {% for content in contents %}
+              <tr>
+                {% for column, value in content %}
+                  {% if column in columns %}
+                    {% if column == 'content_id' %}
+                      <td class="{{ column }}">
+                        <a href="{{ FRAMEWORK_URL ~ route.edit|replace({'{content_id}':value}) }}">{{ '%05d'|format(value) }}</a>
+                      </td>
+                    {% elseif column == 'title' %}
+                      <td class="{{ column }}">
+                        <a href="{{ FRAMEWORK_URL ~ route.edit|replace({'{content_id}':content.content_id}) }}">{{ value }}</a>
+                      </td>
+                    {% elseif (column == 'description') %}
+                      <td class="{{ column }}">{{ value|striptags }}</td>
+                    {% elseif ((column == 'publish_from') or (column == 'breaking_to') or (column == 'archive_from')) %}
+                      {# formatting date and time #}
+                      <td class="{{ column }}">{{ value|date('DATETIME_FORMAT'|trans) }}</td>
+                    {% elseif (column == 'status') %}
+                      {# translate this column value #}
+                      <td class="{{ column }}">{{ value|trans }}</td>
+                    {% else %}
+                      <td class="{{ column }}">{{ value }}</td>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>  
       {#
         See top of the table for more information!
        #}
@@ -127,7 +118,7 @@
         showAlwaysFirstAndLast: true
       } only %}
     {% else %}
-      <p>{{ 'The flexContent list is empty, please create a content!'|trans }}</p>
+      <div class="alert alert-info">{{ 'The flexContent list is empty, please create your first content!'|trans }}</div>
     {% endif %}
   </div>
 {% endblock content %}
