@@ -8,11 +8,6 @@
   @license MIT License (MIT) http://www.opensource.org/licenses/MIT
 */
 
-html,
-body {
-  height: 100%;
-}
-
 a {
   text-decoration: none;
 }
@@ -70,6 +65,7 @@ ul.pagination li.active a {
 .table-hover > tbody > tr:hover > th {
   background-color: #ffe4b5;
 }
+
 .height-5 {
   min-height: 5px;
 }

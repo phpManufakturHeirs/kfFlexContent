@@ -22,6 +22,7 @@
 {% endblock jquery %}
 {% block stylesheet %}
   {{ parent() }}
+  
   <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/ui/1.10.3/themes/smoothness/jquery-ui.min.css" media="screen, projection" />
   <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/timepicker/1.4.3/jquery-ui-timepicker-addon.min.css" media="screen, projection" />
   <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/tagedit/1.5.1/css/jquery.tagedit.css" media="all"/>
@@ -29,7 +30,6 @@
 {% endblock stylesheet %}
 
 {% block content %}
-  {{ parent() }}
   <div id="edit"></div>
   <div class="container">    
     {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
@@ -201,7 +201,7 @@
    
 {% block footer %}
   {# add the height of CKE's to the iframe_add_height (default = 30) #}
-  {% set iframe_add_height = 200 %}
+  {% set iframe_add_height = 670 %}
   {{ parent() }}
   <script type="text/javascript">
     
