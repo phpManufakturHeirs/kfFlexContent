@@ -25,6 +25,7 @@
         <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/font-awesome/4.0.3/css/font-awesome.min.css" />
       {% endblock stylesheet %}
       {% block jquery %}
+        {# if possible load jQuery files in block footer_jquery above the </body> tag to improve page loading speed! #}
         <!--[if lt IE 9]>
           <script type="text/javascript" src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
           <script type="text/javascript" src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
@@ -39,6 +40,7 @@
     </div>
     {% block footer_jquery %}
       <script src="{{ LIBRARY_URL }}/jquery/jquery/1.10.2/jquery.min.js"></script>        
+      <script src="{{ LIBRARY_URL }}/bootstrap/3.0.3/js/bootstrap.min.js"></script>  
     {% endblock footer_jquery %}
     {% block footer %}
       <script type="text/javascript">
