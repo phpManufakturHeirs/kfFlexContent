@@ -12,7 +12,7 @@
   {% set template_file = 'framework/body.twig' %}
 {% else %}
   {% set template_namespace = '@phpManufaktur/flexContent/Template' %}
-  {% set template_file = 'backend/body.twig' %}
+  {% set template_file = 'admin/body.twig' %}
 {% endif %}
 {% extends getTemplateFile(template_namespace, template_file) %}
 {% block title %}{{ 'flexContent - Create or Edit Content'|trans }}{% endblock %}
@@ -21,22 +21,25 @@
   <script type="text/javascript" src="{{ MANUFAKTUR_URL }}/CKEditor/Source/ckeditor.js"></script> 
 {% endblock jquery %}
 {% block stylesheet %}
-  {{ parent() }}
-  
+  {{ parent() }}  
   <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/ui/1.10.3/themes/smoothness/jquery-ui.min.css" media="screen, projection" />
   <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/timepicker/1.4.3/jquery-ui-timepicker-addon.min.css" media="screen, projection" />
   <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/tagedit/1.5.1/css/jquery.tagedit.css" media="all"/>
-  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/flexcontent.css" media="screen, projection" />  
+  {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css') %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css' }}" media="screen, projection" />
+  {% else %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/admin.min.css' }}" media="screen, projection" />
+  {% endif %}
 {% endblock stylesheet %}
 
 {% block content %}
   <div id="edit"></div>
   <div class="container">    
-    {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
+    {% include '@phpManufaktur/flexContent/Template/default/admin/toolbar.twig' %}
     <div class="height-15"></div> 
-    {% if message is defined and message|length > 0 %}
-      <div class="alert alert-info">{{ message }}</div>
-    {% endif %}
+    
+    {{ alert }}
+    
     <form id="content_edit" method="post" {{ form_enctype(form) }} role="form">
       {{ form_errors(form) }}
       {{ form_row(form._token) }}  
@@ -121,7 +124,7 @@
                 form.teaser.vars.full_name,
                 form.teaser.vars.value,
                 '100%', '100px',
-                MANUFAKTUR_URL ~ '/flexContent/Template/default/backend/ckeditor.config.teaser.js'
+                MANUFAKTUR_URL ~ '/flexContent/Template/default/admin/ckeditor.config.teaser.js'
           ) }}
         </div>
       </div>
@@ -174,7 +177,7 @@
                 form.content.vars.full_name,
                 form.content.vars.value,
                 '100%', '400px',
-                MANUFAKTUR_URL ~ '/flexContent/Template/default/backend/ckeditor.config.content.js'
+                MANUFAKTUR_URL ~ '/flexContent/Template/default/admin/ckeditor.config.content.js'
           ) }}
         </div>
       </div>

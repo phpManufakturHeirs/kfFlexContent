@@ -9,27 +9,18 @@
  * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 
-namespace phpManufaktur\flexContent\Control\Backend;
+namespace phpManufaktur\flexContent\Control\Admin;
 
 use Silex\Application;
 use phpManufaktur\flexContent\Control\Configuration;
+use phpManufaktur\Basic\Control\Pattern\Alert;
 
-class Backend {
+class Admin extends Alert
+{
 
-    protected $app = null;
     protected static $usage = null;
     protected static $usage_param = null;
-    protected static $message = '';
     protected static $config = null;
-
-    /**
-     * Constructor
-     */
-    public function __construct(Application $app=null) {
-        if (!is_null($app)) {
-            $this->initialize($app);
-        }
-    }
 
     /**
      * Initialize the class with the needed parameters
@@ -38,7 +29,8 @@ class Backend {
      */
     protected function initialize(Application $app)
     {
-        $this->app = $app;
+        parent::initialize($app);
+
         $cms = $this->app['request']->get('usage');
         self::$usage = is_null($cms) ? 'framework' : $cms;
         self::$usage_param = (self::$usage != 'framework') ? '?usage='.self::$usage : '';
@@ -90,38 +82,5 @@ class Backend {
                 ),
         );
         return $toolbar_array;
-    }
-
-    /**
-     * @return the $message
-     */
-    public function getMessage ()
-    {
-        return self::$message;
-    }
-
-    /**
-     * @param string $message
-     */
-    public function setMessage($message, $params=array())
-    {
-        self::$message .= $this->app['twig']->render($this->app['utils']->getTemplateFile(
-            '@phpManufaktur/flexContent/Template', 'backend/message.twig'),
-            array('message' => $this->app['translator']->trans($message, $params)));
-    }
-
-    public function clearMessage()
-    {
-        self::$message = '';
-    }
-
-    /**
-     * Check if a message is active
-     *
-     * @return boolean
-     */
-    public function isMessage()
-    {
-        return !empty(self::$message);
     }
  }

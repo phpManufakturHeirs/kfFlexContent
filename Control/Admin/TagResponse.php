@@ -9,7 +9,7 @@
  * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 
-namespace phpManufaktur\flexContent\Control\Backend;
+namespace phpManufaktur\flexContent\Control\Admin;
 
 use Silex\Application;
 use phpManufaktur\flexContent\Data\Content\TagType;

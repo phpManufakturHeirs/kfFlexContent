@@ -9,7 +9,7 @@
  * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 
-namespace phpManufaktur\flexContent\Control\Backend;
+namespace phpManufaktur\flexContent\Control\Admin;
 
 use Silex\Application;
 use phpManufaktur\Basic\Data\CMS\Page;
@@ -17,7 +17,7 @@ use phpManufaktur\flexContent\Data\Content\CategoryType as CategoryTypeData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class ContentCategory extends Backend
+class ContentCategory extends Admin
 {
 
     protected static $category_id = null;
@@ -34,7 +34,7 @@ class ContentCategory extends Backend
 
     /**
      * (non-PHPdoc)
-     * @see \phpManufaktur\flexContent\Control\Backend\Backend::initialize()
+     * @see \phpManufaktur\flexContent\Control\Admin\Admin::initialize()
      */
     protected function initialize(Application $app)
     {
@@ -46,7 +46,7 @@ class ContentCategory extends Backend
 
         try {
             // search for the config file in the template directory
-            $cfg_file = $this->app['utils']->getTemplateFile('@phpManufaktur/flexContent/Template', 'backend/category.type.list.json', '', true);
+            $cfg_file = $this->app['utils']->getTemplateFile('@phpManufaktur/flexContent/Template', 'admin/category.type.list.json', '', true);
             $cfg = $this->app['utils']->readJSON($cfg_file);
 
             // get the columns to show in the list
@@ -164,11 +164,11 @@ class ContentCategory extends Backend
     protected function renderCategoryTypeForm($form)
     {
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-            '@phpManufaktur/flexContent/Template', 'backend/category.type.edit.twig'),
+            '@phpManufaktur/flexContent/Template', 'admin/category.type.edit.twig'),
             array(
                 'usage' => self::$usage,
                 'toolbar' => $this->getToolbar('categories'),
-                'message' => $this->getMessage(),
+                'alert' => $this->getAlert(),
                 'form' => $form->createView()
             ));
     }
@@ -197,29 +197,29 @@ class ContentCategory extends Backend
             if (isset($category['delete']) && ($category['delete'] == 1)) {
                 // delete this tag type
                 $this->CategoryTypeData->delete(self::$category_id);
-                $this->setMessage('The category type %category% was successfull deleted.',
-                    array('%category%' => $category['category_name']));
+                $this->setAlert('The category type %category% was successfull deleted.',
+                    array('%category%' => $category['category_name']), self::ALERT_TYPE_SUCCESS);
                 return true;
             }
 
             if (empty($category['category_name'])) {
-                $this->setMessage('Please type in a name for the category type.');
+                $this->setAlert('Please type in a name for the category type.', array(), self::ALERT_TYPE_WARNING);
                 return false;
             }
 
             // check for forbidden chars in the category name
             foreach (CategoryTypeData::$forbidden_chars as $forbidden) {
                 if (false !== strpos($category['category_name'], $forbidden)) {
-                    $this->setMessage('The category type name %category% contains the forbidden character %char%, please change the name.',
-                        array('%char%' => $forbidden, '%category%' => $category['tag_name']));
+                    $this->setAlert('The category type name %category% contains the forbidden character %char%, please change the name.',
+                        array('%char%' => $forbidden, '%category%' => $category['tag_name']), self::ALERT_TYPE_WARNING);
                     return false;
                 }
             }
 
             // check if the category already exists
             if ((self::$category_id < 1) && $this->CategoryTypeData->existsName($category['category_name'])) {
-                $this->setMessage('The category type %category% already exists and can not inserted!',
-                    array('%category%' => $category['category_name']));
+                $this->setAlert('The category type %category% already exists and can not inserted!',
+                    array('%category%' => $category['category_name']), self::ALERT_TYPE_WARNING);
                 return false;
             }
 
@@ -232,20 +232,20 @@ class ContentCategory extends Backend
                 $this->CategoryTypeData->insert($data, self::$category_id);
                 // important: set the category_id also in the $data array!
                 $data['category_id'] = self::$category_id;
-                $this->setMessage('Successfull create the new category type %category%.',
-                    array('%category%' => $data['category_name']));
+                $this->setAlert('Successfull create the new category type %category%.',
+                    array('%category%' => $data['category_name']), self::ALERT_TYPE_SUCCESS);
             }
             else {
                 // update an existing record
                 $this->CategoryTypeData->update(self::$category_id, $data);
-                $this->setMessage('Updated the category type %category%',
-                    array('%category%' => $data['category_name']));
+                $this->setAlert('Updated the category type %category%',
+                    array('%category%' => $data['category_name']), self::ALERT_TYPE_SUCCESS);
             }
             return true;
         }
         else {
             // general error (timeout, CSFR ...)
-            $this->setMessage('The form is not valid, please check your input and try again!');
+            $this->setMessage('The form is not valid, please check your input and try again!', array(), self::ALERT_TYPE_DANGER);
         }
         return false;
     }
@@ -271,11 +271,11 @@ class ContentCategory extends Backend
         $categories = $this->getList(self::$current_page, self::$rows_per_page, self::$max_pages, $order_by, $order_direction);
 
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-            '@phpManufaktur/flexContent/Template', 'backend/category.type.list.twig'),
+            '@phpManufaktur/flexContent/Template', 'admin/category.type.list.twig'),
             array(
                 'usage' => self::$usage,
                 'toolbar' => $this->getToolbar('categories'),
-                'message' => $this->getMessage(),
+                'alert' => $this->getAlert(),
                 'categories' => $categories,
                 'columns' => self::$columns,
                 'current_page' => self::$current_page,
@@ -302,8 +302,8 @@ class ContentCategory extends Backend
 
         $data = array();
         if ((self::$category_id > 0) && (false === ($data = $this->CategoryTypeData->select(self::$category_id)))) {
-            $this->setMessage('The Category Type record with the ID %id% does not exists!',
-                array('%id%' => self::$category_id));
+            $this->setAlert('The Category Type record with the ID %id% does not exists!',
+                array('%id%' => self::$category_id), self::ALERT_TYPE_WARNING);
         }
 
         $form = $this->getCategoryTypeForm($data);
@@ -377,7 +377,7 @@ class ContentCategory extends Backend
 
         // get the selected image
         if (null == ($image = $app['request']->get('file'))) {
-            $this->setMessage('There was no image selected.');
+            $this->setAlert('There was no image selected.', array(), self::ALERT_TYPE_INFO);
         }
         else {
             // udate the Category record
@@ -385,13 +385,13 @@ class ContentCategory extends Backend
                 'category_image' => $image
             );
             $this->CategoryTypeData->update(self::$category_id, $data);
-            $this->setMessage('The image %image% was successfull inserted.',
-                array('%image%' => basename($image)));
+            $this->setAlert('The image %image% was successfull inserted.',
+                array('%image%' => basename($image)), self::ALERT_TYPE_SUCCESS);
         }
 
         if (false === ($data = $this->CategoryTypeData->select(self::$category_id))) {
-            $this->setMessage('The Category Type record with the ID %id% does not exists!',
-                array('%id%' => self::$category_id));
+            $this->setAlert('The Category Type record with the ID %id% does not exists!',
+                array('%id%' => self::$category_id), self::ALERT_TYPE_WARNING);
         }
         $form = $this->getCategoryTypeForm($data);
         return $this->renderCategoryTypeForm($form);

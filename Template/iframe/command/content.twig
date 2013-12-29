@@ -1,0 +1,13 @@
+{% extends getTemplateFile('@phpManufaktur/Basic/Template', 'kitcommand/bootstrap/iframe.body.twig') %}
+{% block title %}{{ title|default('') }}{% endblock %}
+{% block description %}{{ 'Message from the kitFramework Event application'|trans }}{% endblock %}
+{% block stylesheet %}
+  {{ parent() }}
+  
+{% endblock stylesheet %}
+{% block content %}
+  <pre>
+{{ dump(parameter) }}
+</pre>
+  {{ content }}
+{% endblock %}

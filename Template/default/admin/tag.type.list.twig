@@ -12,35 +12,42 @@
   {% set template_file = 'framework/body.twig' %}
 {% else %}
   {% set template_namespace = '@phpManufaktur/flexContent/Template' %}
-  {% set template_file = 'backend/body.twig' %}
+  {% set template_file = 'admin/body.twig' %}
 {% endif %}
 {% extends getTemplateFile(template_namespace, template_file) %}
 {% block title %}{{ 'flexContent - Tag types'|trans }}{% endblock %}
 {% block stylesheet %}
   {{ parent() }}
-  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/flexcontent.css" media="screen, projection" />
+  {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css') %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css' }}" media="screen, projection" />
+  {% else %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/admin.min.css' }}" media="screen, projection" />
+  {% endif %}
 {% endblock stylesheet %}
 
 {% block content %}
   <div class="container">
-    {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
+    {% include '@phpManufaktur/flexContent/Template/default/admin/toolbar.twig' %}
     <div class="height-15"></div>
-    {% if message is defined and message|length > 0 %}
-      <div class="alert alert-info">{{ message }}</div>
-    {% endif %}
+
+    {{ alert }}
+    
     <div>
       <a class="btn btn-default" role="button" href="{{ FRAMEWORK_URL ~ route.create }}">{{ 'Create a new tag'|trans }}</a>
     </div>  
     <div class="height-15"></div>  
       
-    {% if tags|length > 0 %}
+    {% if tags|length < 1 %}
+      {% include '@phpManufaktur/Basic/Template/default/pattern/bootstrap/alert.twig' 
+        with {content:'The tag type list for flexContent is empty, please create a tag!'|trans} only %}
+    {% else %}      
       {#
         The pagination serve a automatic 1 2 3 ... 17 18 19 pagination and
         navigation for the table if it contain more rows than specified in:
         /flexContent/Template/default/backend/list.json
         Changes here must be also done at the footer of the table !!!
        #}
-      {% include '@phpManufaktur/flexContent/Template/default/backend/pagination.twig' with {
+      {% include '@phpManufaktur/flexContent/Template/default/admin/pagination.twig' with {
          currentPage: current_page,
          paginationPath: FRAMEWORK_URL ~ route.pagination|replace({'{order}':order_by|join(','), '{direction}':order_direction}),
          lastPage: last_page,
@@ -122,14 +129,12 @@
       {#
         See top of the table for more information!
        #}
-      {% include '@phpManufaktur/flexContent/Template/default/backend/pagination.twig' with {
+      {% include '@phpManufaktur/flexContent/Template/default/admin/pagination.twig' with {
         currentPage: current_page,
         paginationPath: FRAMEWORK_URL ~ route.pagination|replace({'{order}':order_by|join(','), '{direction}':order_direction}),
         lastPage: last_page,
         showAlwaysFirstAndLast: true
-      } only %}
-    {% else %}
-      <div class="alert alert-info">{{ 'The tag type list for flexContent is empty, please create a tag!'|trans }}</div>
+      } only %}    
     {% endif %}
   </div>
 {% endblock content %}

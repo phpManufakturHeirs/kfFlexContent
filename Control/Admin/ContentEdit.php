@@ -9,7 +9,7 @@
  * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 
-namespace phpManufaktur\flexContent\Control\Backend;
+namespace phpManufaktur\flexContent\Control\Admin;
 
 use Silex\Application;
 use phpManufaktur\flexContent\Data\Content\Content as ContentData;
@@ -21,7 +21,7 @@ use phpManufaktur\flexContent\Data\Content\TagType;
 use phpManufaktur\flexContent\Data\Content\Category;
 use phpManufaktur\flexContent\Data\Content\CategoryType;
 
-class ContentEdit extends Backend
+class ContentEdit extends Admin
 {
     protected $ContentData = null;
     protected static $content_id = null;
@@ -197,13 +197,15 @@ class ContentEdit extends Backend
                     case 'title':
                         if (!$property['required']) {
                             // the title must be always set!
-                            $this->setMessage('The title is always needed and con not switched off, please check the configuration!');
+                            $this->setAlert('The title is always needed and con not switched off, please check the configuration!',
+                                array(), self::ALERT_TYPE_WARNING);
                         }
                         if ((strlen($content[$name]) < $property['length']['minimum']) ||
                         (strlen($content[$name]) > $property['length']['maximum'])) {
-                            $this->setMessage('The title should have a length between %minimum% and %maximum% characters (actual: %length%).',
+                            $this->setAlert('The title should have a length between %minimum% and %maximum% characters (actual: %length%).',
                                 array('%minimum%' => $property['length']['minimum'],
-                                    '%maximum%' => $property['length']['maximum'], '%length%' => strlen($content[$name])));
+                                    '%maximum%' => $property['length']['maximum'], '%length%' => strlen($content[$name])),
+                                self::ALERT_TYPE_WARNING);
                             $checked = false;
                         }
                         $data[$name] = !is_null($content[$name]) ? $content[$name] : '';
@@ -212,9 +214,10 @@ class ContentEdit extends Backend
                         if ($property['required']) {
                             if ((strlen($content[$name]) < $property['length']['minimum']) ||
                                 (strlen($content[$name]) > $property['length']['maximum'])) {
-                                $this->setMessage('The description should have a length between %minimum% and %maximum% characters (actual: %length%).',
+                                $this->setAlert('The description should have a length between %minimum% and %maximum% characters (actual: %length%).',
                                     array('%minimum%' => $property['length']['minimum'],
-                                        '%maximum%' => $property['length']['maximum'], '%length%' => strlen($content[$name])));
+                                        '%maximum%' => $property['length']['maximum'], '%length%' => strlen($content[$name])),
+                                    self::ALERT_TYPE_WARNING);
                                 $checked = false;
                             }
                         }
@@ -224,7 +227,7 @@ class ContentEdit extends Backend
                         if ($property['required']) {
                             $separator = ($property['separator'] == 'comma') ? ',' : ' ';
                             if (false === strpos($content[$name], $separator)) {
-                                $this->setMessage('Please define keywords for the content');
+                                $this->setAlert('Please define keywords for the content', array(), self::ALERT_TYPE_WARNING);
                                 $data[$name] = $content[$name];
                                 $checked = false;
                             }
@@ -239,9 +242,10 @@ class ContentEdit extends Backend
                                 }
                                 if ((count($keywords) < $property['words']['minimum']) ||
                                     (count($keywords) > $property['words']['maximum'])) {
-                                    $this->setMessage('Please define between %minimum% and %maximum% keywords, actual: %count%',
+                                    $this->setAlert('Please define between %minimum% and %maximum% keywords, actual: %count%',
                                         array('%minimum%' => $property['words']['minimum'],
-                                            '%maximum' => $property['words']['maximum'], '%count%' => count($keywords)));
+                                            '%maximum' => $property['words']['maximum'], '%count%' => count($keywords)),
+                                        self::ALERT_TYPE_WARNING);
                                     $checked = false;
                                 }
                                 $data[$name] = implode($separator, $keywords);
@@ -254,7 +258,8 @@ class ContentEdit extends Backend
                     case 'permalink':
                         if (!$property['required']) {
                             // the 'required' flag for the permanent link can not switched off
-                            $this->setMessage('The permanent link is always needed and can not switched off, please check the configuration!');
+                            $this->setAlert('The permanent link is always needed and can not switched off, please check the configuration!',
+                                    array(), self::ALERT_TYPE_DANGER);
                         }
 
                         $permalink = !is_null($content[$name]) ? strtolower($content[$name]) : '';
@@ -262,15 +267,15 @@ class ContentEdit extends Backend
 
                         if ((self::$content_id < 1) && $this->ContentData->existsPermaLink($permalink)) {
                             // this PermaLink already exists!
-                            $this->setMessage('The permalink %permalink% is already in use, please select another one!',
-                                    array('%permalink%' => $permalink));
+                            $this->setAlert('The permalink %permalink% is already in use, please select another one!',
+                                    array('%permalink%' => $permalink), self::ALERT_TYPE_WARNING);
                             $checked = false;
                         }
                         elseif ((self::$content_id > 0) &&
                             (false !== ($used_by = $this->ContentData->selectContentIDbyPermaLink($permalink))) &&
                             ($used_by != self::$content_id)) {
-                            $this->setMessage('The permalink %permalink% is already in use by the flexContent record %id%, please select another one!',
-                                array('%permalink%' => $permalink, '%id%' => $used_by));
+                            $this->setAlert('The permalink %permalink% is already in use by the flexContent record %id%, please select another one!',
+                                array('%permalink%' => $permalink, '%id%' => $used_by), self::ALERT_TYPE_WARNING);
                             $checked = false;
                         }
                         $data[$name] = $permalink;
@@ -284,7 +289,8 @@ class ContentEdit extends Backend
                     case 'publish_from':
                         if (!$property['required']) {
                             // publish_from is always needed!
-                            $this->setMessage("The 'publish from' field is always needed and can not switched off, please check the configuration!");
+                            $this->setAlert("The 'publish from' field is always needed and can not switched off, please check the configuration!",
+                                array(), self::ALERT_TYPE_DANGER);
                         }
                         if (empty($content[$name])) {
                             // if field is empty set the actual date/time
@@ -300,8 +306,8 @@ class ContentEdit extends Backend
                         // ignore property 'required'!
                         if (!isset($data['publish_from'])) {
                             // problem: publish_from must defined first!
-                            $this->setMessage("Problem: '%first%' must be defined before '%second%', please check the configuration file!",
-                                array('%first%' => 'publish_from', '%second%' => 'breaking_to'));
+                            $this->setAlert("Problem: '%first%' must be defined before '%second%', please check the configuration file!",
+                                array('%first%' => 'publish_from', '%second%' => 'breaking_to'), self::ALERT_TYPE_DANGER);
                             $checked = false;
                             break;
                         }
@@ -319,8 +325,8 @@ class ContentEdit extends Backend
                         // ignore property 'required'!
                         if (!isset($data['publish_from'])) {
                             // problem: publish_from must defined first!
-                            $this->setMessage("Problem: '%first%' must be defined before '%second%', please check the configuration file!",
-                                array('%first%' => 'publish_from', '%second%' => 'archive_from'));
+                            $this->setAlert("Problem: '%first%' must be defined before '%second%', please check the configuration file!",
+                                array('%first%' => 'publish_from', '%second%' => 'archive_from'), self::ALERT_TYPE_DANGER);
                             $checked = false;
                             break;
                         }
@@ -338,8 +344,8 @@ class ContentEdit extends Backend
                     case 'teaser':
                     case 'content':
                         if ($property['required'] && empty($content[$name])) {
-                            $this->setMessage('The field %name% can not be empty!',
-                                array('%name%' => $this->app['translator']->trans($name)));
+                            $this->setAlert('The field %name% can not be empty!',
+                                array('%name%' => $this->app['translator']->trans($name)), self::ALERT_TYPE_WARNING);
                             $checked = false;
                         }
                         $data[$name] = !is_null($content[$name]) ? $content[$name] : '';
@@ -348,8 +354,8 @@ class ContentEdit extends Backend
                         // ignore property 'required'!
                         $values = $this->app['db.utils']->getEnumValues(FRAMEWORK_TABLE_PREFIX.'flexcontent_content', 'status');
                         if (!in_array($content[$name], $values)) {
-                            $this->setMessage('Please check the status, the value %value% is invalid!',
-                                array('%value%' => $content[$name]));
+                            $this->setAlert('Please check the status, the value %value% is invalid!',
+                                array('%value%' => $content[$name]), self::ALERT_TYPE_WARNING);
                             $checked = false;
                         }
                         $data[$name] = $content[$name];
@@ -357,7 +363,7 @@ class ContentEdit extends Backend
                     case 'primary_category':
                         // ignore the property 'required'
                         if (intval($content['name'] < 1)) {
-                            $this->setMessage('Please select a category!');
+                            $this->setAlert('Please select a category!', array(), self::ALERT_TYPE_WARNING);
                             $checked = false;
                         }
                         break;
@@ -366,7 +372,8 @@ class ContentEdit extends Backend
 
             // additional checks
             if (empty($data['teaser']) && empty($data['content'])) {
-                $this->setMessage('At least must it exists some text within the teaser or the content, at the moment the Teaser and the Content are empty!');
+                $this->setAlert('At least must it exists some text within the teaser or the content, at the moment the Teaser and the Content are empty!',
+                            array(), self::ALERT_TYPE_WARNING);
                 $checked = false;
             }
 
@@ -374,16 +381,16 @@ class ContentEdit extends Backend
                 if (self::$content_id < 1) {
                     // insert a new record
                     $this->ContentData->insert($data, self::$content_id);
-                    $this->setMessage('Successfull created a new flexContent record with the ID %id%.',
-                        array('%id%' => self::$content_id));
+                    $this->setAlert('Successfull created a new flexContent record with the ID %id%.',
+                        array('%id%' => self::$content_id), self::ALERT_TYPE_SUCCESS);
                     // important: set the content_id also in the $data array!
                     $data['content_id'] = self::$content_id;
                 }
                 else {
                     // update an existing record
                     $this->ContentData->update($data, self::$content_id);
-                    $this->setMessage('Succesfull updated the flexContent record with the ID %id%',
-                        array('%id%' => self::$content_id));
+                    $this->setAlert('Succesfull updated the flexContent record with the ID %id%',
+                        array('%id%' => self::$content_id), self::ALERT_TYPE_SUCCESS);
                 }
 
                 // check the CATEGORIES
@@ -396,7 +403,7 @@ class ContentEdit extends Backend
         }
         else {
             // general error (timeout, CSFR ...)
-            $this->setMessage('The form is not valid, please check your input and try again!');
+            $this->setAlert('The form is not valid, please check your input and try again!', array(), self::ALERT_TYPE_DANGER);
         }
 
         // always check the TAGs
@@ -494,8 +501,8 @@ class ContentEdit extends Backend
                                     );
                                     // update the TAG TYPE record
                                     $this->TagTypeData->update($keyparts[1], $data);
-                                    $this->setMessage('The tag %old% was changed to %new%. This update will affect all contents.',
-                                        array('%old%' => $name, '%new%' => $value));
+                                    $this->setAlert('The tag %old% was changed to %new%. This update will affect all contents.',
+                                        array('%old%' => $name, '%new%' => $value), self::ALERT_TYPE_SUCCESS);
                                 }
                                 // add the TAG to the tag table
                                 $data = array(
@@ -506,8 +513,8 @@ class ContentEdit extends Backend
                                 if (false === ($id = $this->TagData->selectIDbyTagIDandContentID($keyparts[1], self::$content_id))) {
                                     // insert a new TAG record
                                     $this->TagData->insert($data, $id);
-                                    $this->setMessage('Associated the tag %tag% to this flexContent.',
-                                        array('%tag%' => $value));
+                                    $this->setAlert('Associated the tag %tag% to this flexContent.',
+                                        array('%tag%' => $value), self::ALERT_TYPE_SUCCESS);
                                 }
                                 else {
                                     // update an existing TAG record
@@ -522,8 +529,8 @@ class ContentEdit extends Backend
                                 // delete the Tag
                                 $this->TagTypeData->delete($keyparts[1]);
 
-                                $this->setMessage('The tag %tag% was successfull deleted and removed from all content.',
-                                    array('%tag%' => $value));
+                                $this->setAlert('The tag %tag% was successfull deleted and removed from all content.',
+                                    array('%tag%' => $value), self::ALERT_TYPE_SUCCESS);
                                 break;
                         }
                     }
@@ -548,8 +555,8 @@ class ContentEdit extends Backend
                         $tag_ids[] = $id;
                         $position++;
 
-                        $this->setMessage('Created the new tag %tag% and attached it to this content.',
-                            array('%tag%' => $value));
+                        $this->setAlert('Created the new tag %tag% and attached it to this content.',
+                            array('%tag%' => $value), self::ALERT_TYPE_SUCCESS);
                     }
                 }
             }
@@ -560,8 +567,8 @@ class ContentEdit extends Backend
                     // delete this record
                     $this->TagData->delete($check['id']);
                     $tag_name = $this->TagTypeData->selectNameByID($check['tag_id']);
-                    $this->setMessage('The tag %tag% is no longer associated with this content.',
-                        array('%tag%' => $tag_name));
+                    $this->setAlert('The tag %tag% is no longer associated with this content.',
+                        array('%tag%' => $tag_name), self::ALERT_TYPE_SUCCESS);
                 }
             }
         }
@@ -575,11 +582,11 @@ class ContentEdit extends Backend
     protected function renderContentForm($form)
     {
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-            '@phpManufaktur/flexContent/Template', 'backend/edit.twig'),
+            '@phpManufaktur/flexContent/Template', 'admin/edit.twig'),
             array(
                 'usage' => self::$usage,
                 'toolbar' => $this->getToolbar('edit'),
-                'message' => $this->getMessage(),
+                'alert' => $this->getAlert(),
                 'form' => $form->createView(),
                 'config' => self::$config,
                 'tags' => $this->TagData->getSimpleTagArrayForContentID(self::$content_id)
@@ -602,8 +609,8 @@ class ContentEdit extends Backend
 
         $data = array();
         if ((self::$content_id > 0) && (false === ($data = $this->ContentData->select(self::$content_id)))) {
-            $this->setMessage('The flexContent record with the ID %id% does not exists!',
-                array('%id%' => self::$content_id));
+            $this->setAlert('The flexContent record with the ID %id% does not exists!',
+                array('%id%' => self::$content_id), self::ALERT_TYPE_WARNING);
         }
 
         $form = $this->getContentForm($data);
@@ -675,7 +682,7 @@ class ContentEdit extends Backend
 
         // get the selected image
         if (null == ($image = $app['request']->get('file'))) {
-            $this->setMessage('There was no image selected.');
+            $this->setAlert('There was no image selected.', self::ALERT_TYPE_INFO);
         }
         else {
             // udate the flexContent record
@@ -683,13 +690,13 @@ class ContentEdit extends Backend
                 'teaser_image' => $image
             );
             $this->ContentData->update($data, self::$content_id);
-            $this->setMessage('The image %image% was successfull inserted.',
-                array('%image%' => basename($image)));
+            $this->setAlert('The image %image% was successfull inserted.',
+                array('%image%' => basename($image)), self::ALERT_TYPE_SUCCESS);
         }
 
         if (false === ($data = $this->ContentData->select(self::$content_id))) {
-            $this->setMessage('The flexContent record with the ID %id% does not exists!',
-                array('%id%' => self::$content_id));
+            $this->setAlert('The flexContent record with the ID %id% does not exists!',
+                array('%id%' => self::$content_id), self::ALERT_TYPE_WARNING);
         }
         $form = $this->getContentForm($data);
         return $this->renderContentForm($form);

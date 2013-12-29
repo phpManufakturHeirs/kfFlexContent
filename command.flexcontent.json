@@ -1,0 +1,39 @@
+{
+  "command":"flexContent",
+  "vendor": {
+    "name":"phpManufaktur",
+    "url":"https://phpmanufaktur.de"
+    },
+  "name": {
+    "en":"Organize and publish contents",
+    "de":"Organisieren und Veröffentlichen von Inhalten"
+  },
+  "description": {
+    "en":"Documentation and help for flexContent",
+    "de":"Dokumentation zur Handhabung von flexContent"
+  },
+  "info": {
+    "en": {
+      "link":"https://kit2.phpmanufaktur.de"
+    }
+  },
+  "help": {
+    "en": {
+      "link":"https://gist.github.com/8148890.git",
+      "gist_id":"8148890",
+      "file": {
+        "help":"kitcommand_flexcontent_en.md"
+      }
+    }
+  },
+  "issues": {
+    "en": {
+      "link":"https://github.com/phpManufaktur/kfFlexContent/issues"
+    }
+  },
+  "support": {
+    "en": {
+      "link":"https://support.phpmanufaktur.de"
+    }
+  }
+}

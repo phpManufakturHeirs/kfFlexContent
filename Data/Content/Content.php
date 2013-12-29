@@ -150,8 +150,10 @@ EOD;
             $SQL = "SELECT * FROM `".self::$table_name."` WHERE `content_id`='$content_id'";
             $result = $this->app['db']->fetchAssoc($SQL);
             $content = array();
-            foreach ($result as $key => $value) {
-                $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+            if (is_array($result)) {
+                foreach ($result as $key => $value) {
+                    $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                }
             }
             return (!empty($content)) ? $content : false;
         } catch (\Doctrine\DBAL\DBALException $e) {

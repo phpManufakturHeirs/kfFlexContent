@@ -68,59 +68,75 @@ $app->get('/admin/flexcontent/uninstall',
     'phpManufaktur\flexContent\Data\Setup\Uninstall::Controller');
 
 $app->get('/admin/flexcontent',
-    'phpManufaktur\flexContent\Control\Backend\About::Controller');
+    'phpManufaktur\flexContent\Control\Admin\About::Controller');
 $app->get('/admin/flexcontent/about',
-    'phpManufaktur\flexContent\Control\Backend\About::Controller');
+    'phpManufaktur\flexContent\Control\Admin\About::Controller');
 
 $app->get('/admin/flexcontent/edit',
-    'phpManufaktur\flexContent\Control\Backend\ContentEdit::ControllerEdit');
+    'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerEdit');
 $app->get('/admin/flexcontent/edit/id/{content_id}',
-    'phpManufaktur\flexContent\Control\Backend\ContentEdit::ControllerEdit');
+    'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerEdit');
 $app->post('/admin/flexcontent/edit/check',
-    'phpManufaktur\flexContent\Control\Backend\ContentEdit::ControllerEditCheck');
+    'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerEditCheck');
 $app->post('/admin/flexcontent/edit/image/select',
-    'phpManufaktur\flexContent\Control\Backend\ContentEdit::ControllerImage');
+    'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerImage');
 $app->get('/admin/flexcontent/edit/image/check/id/{content_id}',
-    'phpManufaktur\flexContent\Control\Backend\ContentEdit::ControllerImageCheck');
+    'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerImageCheck');
 
 $app->match('/admin/flexcontent/permalink/create',
-    'phpManufaktur\flexContent\Control\Backend\PermaLinkResponse::ControllerPermaLink');
+    'phpManufaktur\flexContent\Control\Admin\PermaLinkResponse::ControllerPermaLink');
 
 $app->get('/admin/flexcontent/list',
-    'phpManufaktur\flexContent\Control\Backend\ContentList::ControllerList');
+    'phpManufaktur\flexContent\Control\Admin\ContentList::ControllerList');
 $app->get('/admin/flexcontent/list/page/{page}',
-    'phpManufaktur\flexContent\Control\Backend\ContentList::ControllerList');
+    'phpManufaktur\flexContent\Control\Admin\ContentList::ControllerList');
 $app->post('/admin/flexcontent/search',
-    'phpManufaktur\flexContent\Control\Backend\ContentSearch::ControllerSearch');
+    'phpManufaktur\flexContent\Control\Admin\ContentSearch::ControllerSearch');
 
 $app->get('/admin/flexcontent/tag/autocomplete',
-    'phpManufaktur\flexContent\Control\Backend\TagResponse::ControllerAutocomplete');
+    'phpManufaktur\flexContent\Control\Admin\TagResponse::ControllerAutocomplete');
 $app->get('/admin/flexcontent/tag/list',
-    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerList');
+    'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerList');
 $app->get('/admin/flexcontent/tag/list/page/{page}',
-    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerList');
+    'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerList');
 $app->get('/admin/flexcontent/tag/create',
-    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerEdit');
+    'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerEdit');
 $app->get('/admin/flexcontent/tag/edit/id/{tag_id}',
-    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerEdit');
+    'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerEdit');
 $app->post('/admin/flexcontent/tag/edit/check',
-    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerEditCheck');
+    'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerEditCheck');
 $app->post('/admin/flexcontent/tag/image/select',
-    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerImage');
+    'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerImage');
 $app->get('/admin/flexcontent/tag/image/check/id/{tag_id}',
-    'phpManufaktur\flexContent\Control\Backend\ContentTag::ControllerImageCheck');
+    'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerImageCheck');
 
 $app->get('/admin/flexcontent/category/list',
-    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerList');
+    'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerList');
 $app->get('/admin/flexcontent/category/list/page/{page}',
-    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerList');
+    'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerList');
 $app->get('/admin/flexcontent/category/create',
-    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerEdit');
+    'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerEdit');
 $app->get('/admin/flexcontent/category/edit/id/{category_id}',
-    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerEdit');
+    'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerEdit');
 $app->post('/admin/flexcontent/category/edit/check',
-    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerEditCheck');
+    'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerEditCheck');
 $app->post('/admin/flexcontent/category/image/select',
-    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerImage');
+    'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerImage');
 $app->get('/admin/flexcontent/category/image/check/id/{category_id}',
-    'phpManufaktur\flexContent\Control\Backend\ContentCategory::ControllerImageCheck');
+    'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerImageCheck');
+
+/**
+ * kitCommand routes
+ */
+
+$app->post('/command/flexcontent',
+    // create the iFrame for the kitCommands and execute the route /content/action
+    'phpManufaktur\flexContent\Control\Command\flexContentFrame::controllerFlexContentFrame')
+    ->setOption('info', MANUFAKTUR_PATH.'/flexContent/command.flexcontent.json');
+
+$app->get('/command/flexcontent/getheader/id/{content_id}',
+    // return header information to set title, description and keywords
+    'phpManufaktur\flexContent\Control\Command\getHeader::controllerGetHeader');
+
+$app->get('/flexcontent/action',
+    'phpManufaktur\flexContent\Control\Command\Action::controllerAction');

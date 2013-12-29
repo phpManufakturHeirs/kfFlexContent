@@ -9,12 +9,12 @@
  * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 
-namespace phpManufaktur\flexContent\Control\Backend;
+namespace phpManufaktur\flexContent\Control\Admin;
 
-use phpManufaktur\flexContent\Control\Backend\Backend;
+use phpManufaktur\flexContent\Control\Admin\Admin;
 use Silex\Application;
 
-class About extends Backend {
+class About extends Admin {
 
     /**
      * Show the about dialog for Event
@@ -26,10 +26,9 @@ class About extends Backend {
         $this->initialize($app);
 
         $extension = $this->app['utils']->readJSON(MANUFAKTUR_PATH.'/flexContent/extension.json');
-        //$extension['logo']['type'] = 'png';
 
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-            '@phpManufaktur/flexContent/Template', 'backend/about.twig'),
+            '@phpManufaktur/flexContent/Template', 'admin/about.twig'),
             array(
                 'usage' => self::$usage,
                 'toolbar' => $this->getToolbar('about'),

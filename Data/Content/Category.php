@@ -152,6 +152,13 @@ EOD;
         }
     }
 
+    /**
+     * Select the category records for the given flexContent ID
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return array
+     */
     public function selectByContentID($content_id)
     {
         try {
@@ -171,6 +178,13 @@ EOD;
         }
     }
 
+    /**
+     * Select the primary category ID for the given flexContent ID
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return Ambigous <boolean, integer>
+     */
     public function selectPrimaryCategoryIDbyContentID($content_id)
     {
         try {
@@ -182,6 +196,13 @@ EOD;
         }
     }
 
+    /**
+     * Select the secondary category ID's for the given flexContent ID
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     */
     public function selectSecondaryCategoryIDsByContentID($content_id)
     {
         try {
@@ -215,6 +236,54 @@ EOD;
                 $update[$key] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
             }
             $this->app['db']->update(self::$table_name, $update, array('id' => $id));
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Select the target URL for the given flexContent ID
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return Ambigous <boolean, string>
+     */
+    public function selectTargetURLbyContentID($content_id)
+    {
+        try {
+            $category_table = self::$table_name;
+            $type_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category_type';
+            $SQL = "SELECT `target_url` FROM $category_table, $type_table WHERE $category_table.category_id=$type_table.category_id AND `content_id`='$content_id'";
+            $target_url = $this->app['db']->fetchColumn($SQL);
+            return (!empty($target_url)) ? $target_url : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Select all categories and type information for the given flexContent ID
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     */
+    public function selectCategoriesByContentID($content_id)
+    {
+        try {
+            $category_table = self::$table_name;
+            $type_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category_type';
+            $SQL = "SELECT * FROM $category_table, $type_table WHERE $category_table.category_id=$type_table.category_id AND `content_id`='$content_id' ORDER BY `is_primary` DESC, `category_name` ASC";
+            $results = $this->app['db']->fetchAll($SQL);
+            $categories = array();
+            foreach ($results as $result) {
+                $category = array();
+                foreach ($result as $key => $value) {
+                    $category[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                }
+                $categories[] = $category;
+            }
+            return (!empty($categories)) ? $categories : false;
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }

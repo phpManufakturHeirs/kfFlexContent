@@ -12,13 +12,17 @@
   {% set template_file = 'framework/body.twig' %}
 {% else %}
   {% set template_namespace = '@phpManufaktur/flexContent/Template' %}
-  {% set template_file = 'backend/body.twig' %}
+  {% set template_file = 'admin/body.twig' %}
 {% endif %}
 {% extends getTemplateFile(template_namespace, template_file) %}
 {% block title %}{{ 'flexContent - Create or edit a tag'|trans }}{% endblock %}
 {% block stylesheet %}
   {{ parent() }}
-  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/flexcontent.css" media="screen, projection" />
+  {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css') %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css' }}" media="screen, projection" />
+  {% else %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/admin.min.css' }}" media="screen, projection" />
+  {% endif %}
 {% endblock stylesheet %}
 {% block jquery %}
   {{ parent() }}
@@ -27,11 +31,11 @@
 
 {% block content %}
   <div class="container">
-    {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
+    {% include '@phpManufaktur/flexContent/Template/default/admin/toolbar.twig' %}
     <div class="height-15"></div>
-    {% if message is defined and message|length > 0 %}
-      <div class="alert alert-info">{{ message }}</div>
-    {% endif %}
+    
+    {{ alert }}
+    
     <form id="tag_edit" method="post" {{ form_enctype(form) }} role="form">
       {{ form_errors(form) }}
       {{ form_row(form._token) }}
@@ -51,7 +55,7 @@
                 form.tag_description.vars.full_name,
                 form.tag_description.vars.value,
                 '100%', '200px',
-                MANUFAKTUR_URL ~ '/flexContent/Template/default/backend/ckeditor.config.tag.type.js'
+                MANUFAKTUR_URL ~ '/flexContent/Template/default/admin/ckeditor.config.tag.type.js'
             ) }}
           </div>
           <div class="form-group">

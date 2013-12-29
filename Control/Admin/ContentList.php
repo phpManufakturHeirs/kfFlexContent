@@ -9,12 +9,12 @@
  * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 
-namespace phpManufaktur\flexContent\Control\Backend;
+namespace phpManufaktur\flexContent\Control\Admin;
 
 use Silex\Application;
 use phpManufaktur\flexContent\Data\Content\Content as ContentData;
 
-class ContentList extends Backend
+class ContentList extends Admin
 {
     protected $ContentData = null;
     protected static $route = null;
@@ -33,11 +33,12 @@ class ContentList extends Backend
     protected function initialize(Application $app)
     {
         parent::initialize($app);
+
         $this->ContentData = new ContentData($app);
 
         try {
             // search for the config file in the template directory
-            $cfg_file = $this->app['utils']->getTemplateFile('@phpManufaktur/flexContent/Template', 'backend/content.list.json', '', true);
+            $cfg_file = $this->app['utils']->getTemplateFile('@phpManufaktur/flexContent/Template', 'admin/content.list.json', '', true);
             $cfg = $this->app['utils']->readJSON($cfg_file);
 
             // get the columns to show in the list
@@ -124,11 +125,11 @@ class ContentList extends Backend
         $contents = $this->getList(self::$current_page, self::$rows_per_page, self::$select_status, self::$max_pages, $order_by, $order_direction);
 
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-            '@phpManufaktur/flexContent/Template', 'backend/content.list.twig'),
+            '@phpManufaktur/flexContent/Template', 'admin/content.list.twig'),
             array(
                 'usage' => self::$usage,
                 'toolbar' => $this->getToolbar('list'),
-                'message' => $this->getMessage(),
+                'alert' => $this->getAlert(),
                 'contents' => $contents,
                 'columns' => self::$columns,
                 'current_page' => self::$current_page,

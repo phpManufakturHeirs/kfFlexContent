@@ -9,14 +9,14 @@
  * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 
-namespace phpManufaktur\flexContent\Control\Backend;
+namespace phpManufaktur\flexContent\Control\Admin;
 
 use Silex\Application;
 use phpManufaktur\flexContent\Data\Content\TagType as TagTypeData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class ContentTag extends Backend
+class ContentTag extends Admin
 {
     protected static $tag_id = null;
     protected $TagTypeData = null;
@@ -31,16 +31,17 @@ class ContentTag extends Backend
 
     /**
      * (non-PHPdoc)
-     * @see \phpManufaktur\flexContent\Control\Backend\Backend::initialize()
+     * @see \phpManufaktur\flexContent\Control\Admin\Admin::initialize()
      */
     protected function initialize(Application $app)
     {
         parent::initialize($app);
+
         $this->TagTypeData = new TagTypeData($app);
         self::$tag_id = -1;
         try {
             // search for the config file in the template directory
-            $cfg_file = $this->app['utils']->getTemplateFile('@phpManufaktur/flexContent/Template', 'backend/tag.type.list.json', '', true);
+            $cfg_file = $this->app['utils']->getTemplateFile('@phpManufaktur/flexContent/Template', 'admin/tag.type.list.json', '', true);
             $cfg = $this->app['utils']->readJSON($cfg_file);
 
             // get the columns to show in the list
@@ -143,11 +144,11 @@ class ContentTag extends Backend
     protected function renderTagTypeForm($form)
     {
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-            '@phpManufaktur/flexContent/Template', 'backend/tag.type.edit.twig'),
+            '@phpManufaktur/flexContent/Template', 'admin/tag.type.edit.twig'),
             array(
                 'usage' => self::$usage,
                 'toolbar' => $this->getToolbar('tags'),
-                'message' => $this->getMessage(),
+                'alert' => $this->getAlert(),
                 'form' => $form->createView()
             ));
     }
@@ -176,29 +177,29 @@ class ContentTag extends Backend
             if (isset($tag['delete']) && ($tag['delete'] == 1)) {
                 // delete this tag type
                 $this->TagTypeData->delete(self::$tag_id);
-                $this->setMessage('The tag type %tag% was successfull deleted.',
-                    array('%tag%' => $tag['tag_name']));
+                $this->setAlert('The tag type %tag% was successfull deleted.',
+                    array('%tag%' => $tag['tag_name']), self::ALERT_TYPE_SUCCESS);
                 return true;
             }
 
             if (empty($tag['tag_name'])) {
-                $this->setMessage('Please type in a name for the tag type.');
+                $this->setAlert('Please type in a name for the tag type.', array(), self::ALERT_TYPE_WARNING);
                 return false;
             }
 
             // check for forbidden chars in the tag name
             foreach (TagTypeData::$forbidden_chars as $forbidden) {
                 if (false !== strpos($tag['tag_name'], $forbidden)) {
-                    $this->setMessage('The tag type name %tag% contains the forbidden character %char%, please change the name.',
-                        array('%char%' => $forbidden, '%tag%' => $tag['tag_name']));
+                    $this->setAlert('The tag type name %tag% contains the forbidden character %char%, please change the name.',
+                        array('%char%' => $forbidden, '%tag%' => $tag['tag_name']), self::ALERT_TYPE_WARNING);
                     return false;
                 }
             }
 
             // check if the tag already exists
             if ((self::$tag_id < 1) && $this->TagTypeData->existsName($tag['tag_name'])) {
-                $this->setMessage('The tag type %tag% already exists and can not inserted!',
-                    array('%tag%' => $tag['tag_name']));
+                $this->setAlert('The tag type %tag% already exists and can not inserted!',
+                    array('%tag%' => $tag['tag_name']), self::ALERT_TYPE_WARNING);
                 return false;
             }
 
@@ -210,20 +211,20 @@ class ContentTag extends Backend
                 $this->TagTypeData->insert($data, self::$tag_id);
                 // important: set the tag_id also in the $data array!
                 $data['tag_id'] = self::$tag_id;
-                $this->setMessage('Successfull create the new tag type %tag%.',
-                    array('%tag%' => $data['tag_name']));
+                $this->setAlert('Successfull create the new tag type %tag%.',
+                    array('%tag%' => $data['tag_name']), self::ALERT_TYPE_SUCCESS);
             }
             else {
                 // update an existing record
                 $this->TagTypeData->update(self::$tag_id, $data);
-                $this->setMessage('Updated the tag type %tag%',
-                    array('%tag%' => $data['tag_name']));
+                $this->setAlert('Updated the tag type %tag%',
+                    array('%tag%' => $data['tag_name']), self::ALERT_TYPE_SUCCESS);
             }
             return true;
         }
         else {
             // general error (timeout, CSFR ...)
-            $this->setMessage('The form is not valid, please check your input and try again!');
+            $this->setAlert('The form is not valid, please check your input and try again!', array(), self::ALERT_TYPE_DANGER);
         }
         return false;
     }
@@ -244,8 +245,8 @@ class ContentTag extends Backend
 
         $data = array();
         if ((self::$tag_id > 0) && (false === ($data = $this->TagTypeData->select(self::$tag_id)))) {
-            $this->setMessage('The Tag Type record with the ID %id% does not exists!',
-                array('%id%' => self::$tag_id));
+            $this->setAlert('The Tag Type record with the ID %id% does not exists!',
+                array('%id%' => self::$tag_id), self::ALERT_TYPE_WARNING);
         }
 
         $form = $this->getTagTypeForm($data);
@@ -319,7 +320,7 @@ class ContentTag extends Backend
 
         // get the selected image
         if (null == ($image = $app['request']->get('file'))) {
-            $this->setMessage('There was no image selected.');
+            $this->setAlert('There was no image selected.', array(), self::ALERT_TYPE_INFO);
         }
         else {
             // udate the flexContent record
@@ -327,13 +328,13 @@ class ContentTag extends Backend
                 'tag_image' => $image
             );
             $this->TagTypeData->update(self::$tag_id, $data);
-            $this->setMessage('The image %image% was successfull inserted.',
-                array('%image%' => basename($image)));
+            $this->setAlert('The image %image% was successfull inserted.',
+                array('%image%' => basename($image)), self::ALERT_TYPE_SUCCESS);
         }
 
         if (false === ($data = $this->TagTypeData->select(self::$tag_id))) {
-            $this->setMessage('The Tag Type record with the ID %id% does not exists!',
-                array('%id%' => self::$tag_id));
+            $this->setAlert('The Tag Type record with the ID %id% does not exists!',
+                array('%id%' => self::$tag_id), self::ALERT_TYPE_WARNING);
         }
         $form = $this->getTagTypeForm($data);
         return $this->renderTagTypeForm($form);
@@ -359,11 +360,11 @@ class ContentTag extends Backend
         $tags = $this->getList(self::$current_page, self::$rows_per_page, self::$max_pages, $order_by, $order_direction);
 
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-            '@phpManufaktur/flexContent/Template', 'backend/tag.type.list.twig'),
+            '@phpManufaktur/flexContent/Template', 'admin/tag.type.list.twig'),
             array(
                 'usage' => self::$usage,
                 'toolbar' => $this->getToolbar('tags'),
-                'message' => $this->getMessage(),
+                'alert' => $this->getAlert(),
                 'tags' => $tags,
                 'columns' => self::$columns,
                 'current_page' => self::$current_page,

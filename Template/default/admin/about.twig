@@ -12,18 +12,22 @@
   {% set template_file = 'framework/body.twig' %}
 {% else %}
   {% set template_namespace = '@phpManufaktur/flexContent/Template' %}
-  {% set template_file = 'backend/body.twig' %}
+  {% set template_file = 'admin/body.twig' %}
 {% endif %}
 {% extends getTemplateFile(template_namespace, template_file) %}
 {% block title %}{{ 'flexContent - About'|trans }}{% endblock %}
 {% block stylesheet %}
   {{ parent() }}
-  <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL }}/flexContent/Template/default/backend/css/flexcontent.css" media="screen, projection" />
+  {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css') %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css' }}" media="screen, projection" />
+  {% else %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/admin.min.css' }}" media="screen, projection" />
+  {% endif %}
 {% endblock stylesheet %}
 
 {% block content %}
   <div class="container">
-    {% include '@phpManufaktur/flexContent/Template/default/backend/toolbar.twig' %}
+    {% include '@phpManufaktur/flexContent/Template/default/admin/toolbar.twig' %}
     {% include '@phpManufaktur/Basic/Template/default/pattern/bootstrap/about.twig' %}
   </div>
 {% endblock content %}

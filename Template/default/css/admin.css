@@ -8,23 +8,13 @@
   @license MIT License (MIT) http://www.opensource.org/licenses/MIT
 */
 
-a {
-  text-decoration: none;
-}
-a:link,
-a:visited {
-  color: #da251d;
-  background-color: transparent;
-  text-decoration: none;
-}
-a:hover,
-a:active {
-  color: #da251d;
-  background-color: transparent;
-  text-decoration: underline;
-}
 label {
   margin: 0 0 3px 0;
+}
+@media (max-width: 767px) {
+  label {
+    text-align: left;
+  }
 }
 label.required:after {
   content: '*';
@@ -32,38 +22,25 @@ label.required:after {
   background-color: transparent;
   font-weight: bold;
 }
-ul.pagination a:link,
-ul.pagination a:visited,
-a:link.btn,
-a:visited.btn,
-.nav-tabs li a:link,
-.nav-tabs li a:visited {
-  color: #000;
-  text-decoration: none;
-}
-ul.pagination a:hover,
-ul.pagination a:active,
-a:hover.btn,
-a:active.btn,
-.nav-tabs li a:hover,
-.nav-tabs li a:active {
-  color: #da251d;
-  text-decoration: none;
-}
-ul.pagination li.active a {
-  color: #fff;
-}
+
 #about-wrap {
   margin: 50px 0 0 0;
   padding: 0;
 }
+/*
+  stripes for the tables
+*/
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th {
-  background-color: #fdf5e6;
+  background-color: #e8e8e8;
 }
 .table-hover > tbody > tr:hover > td,
 .table-hover > tbody > tr:hover > th {
-  background-color: #ffe4b5;
+  background-color: #e0e0e0;
+}
+
+.row {
+  margin: 5px 0;
 }
 
 .height-5 {

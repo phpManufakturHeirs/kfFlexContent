@@ -1,0 +1,87 @@
+/* 
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki  
+  @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+*/
+
+.flexcontent-container {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: auto;
+}
+
+.flexcontent-container a.close {
+  display: none;
+}
+.flexcontent-container .alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.flexcontent-container .alert .alert-link {
+  font-weight: bold;
+}
+.flexcontent-container .alert > p,
+.flexcontent-container .alert > ul {
+  margin-bottom: 0;
+}
+.flexcontent-container .alert > p + p {
+  margin-top: 5px;
+}
+.flexcontent-container .alert-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+.flexcontent-container .alert-success .alert-link {
+  color: #2b542c;
+}
+.flexcontent-container .alert-info {
+  color: #31708f;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+.flexcontent-container .alert-info .alert-link {
+  color: #245269;
+}
+.flexcontent-container .alert-warning {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+}
+.flexcontent-container .alert-warning .alert-link {
+  color: #66512c;
+}
+.flexcontent-container .alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+.flexcontent-container .alert-danger .alert-link {
+  color: #843534;
+}
+
+.flexcontent-container .description {
+  font-size: smaller;
+  font-style: italic;
+  margin: 0 0 15px 0;
+  padding: 0;
+}
+
+.flexcontent-container .content.categories {
+  width: 100%;
+  height: auto;
+  font-size: smaller;
+  margin: 0 0 10px 0;
+  padding: 0;
+}
+
+span.category.link {
+  margin-right: 10px;
+}

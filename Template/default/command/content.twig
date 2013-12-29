@@ -1,0 +1,51 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+{% spaceless %}
+<div class="flexcontent-container">
+  {% if parameter.css %}
+    <script type="text/javascript">
+      var fileref = document.createElement("link");
+      fileref.setAttribute("rel", "stylesheet");
+      fileref.setAttribute("type", "text/css");
+      fileref.setAttribute("media", "all");
+      fileref.setAttribute("href", '{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/flexcontent.min.css' }}');
+      document.getElementsByTagName("head")[0].appendChild(fileref);
+    </script>          
+  {% endif %}
+      
+  {{ basic.alert }}
+  
+  {#{ dump(categories) }#}
+    
+  {% if content.content|default('')|length > 0 %} 
+    {% if parameter.categories is defined and parameter.categories %}
+      <div class="content categories">
+        {% for category in categories %}
+         <span class="category link">
+           <a href="{{ permalink_base_url ~ '/category/' ~ category.category_id }}" title="{{ category.category_description|ellipsis }}">{{ category.category_name }}</a>
+         </span>
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    {% if parameter.title is defined and parameter.title %}
+      <h{{ parameter.title_level|default('1') }}>{{ content.title|default('') }}</h{{ parameter.title_level|default('1') }}>
+    {% endif %}
+      
+    {% if parameter.description is defined and parameter.description %}
+      {% if content.description|length > 0 %}
+        <div class="description">{{ content.description|default('') }}</div>
+      {% endif %}
+    {% endif %}
+      
+    {{ content.content|default('') }}
+  {% endif %}
+</div>
+{% endspaceless %}

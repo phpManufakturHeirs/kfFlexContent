@@ -107,7 +107,16 @@ class Configuration
                      )
                 )
             ),
-
+            'kitcommand' => array(
+                'template' => array(
+                    'default' => array(
+                        'iframe' => false
+                    ),
+                    'iframe' => array(
+                        'iframe' => true
+                    )
+                )
+            ),
         );
     }
 
