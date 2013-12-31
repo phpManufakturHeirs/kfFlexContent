@@ -42,9 +42,9 @@ $app->get('/flexcontent/cms/{cms_information}', function ($cms_information) use 
  * Setup will create the directory /content in the CMS root and place a
  * .htaccess file which redirect to /content.
  */
-$app->get('/content/{name}',
+$app->get('/{language}/content/{name}',
     'phpManufaktur\flexContent\Control\PermanentLink::ControllerName');
-$app->get('/content/id/{content_id}',
+$app->get('/{language}/content/id/{content_id}',
     'phpManufaktur\flexContent\Control\PermanentLink::ControllerContentID');
 
 if (file_exists(MANUFAKTUR_PATH.'/flexContent/bootstrap.include.inc')) {
@@ -85,6 +85,10 @@ $app->get('/admin/flexcontent/edit/image/check/id/{content_id}',
 
 $app->match('/admin/flexcontent/permalink/create',
     'phpManufaktur\flexContent\Control\Admin\PermaLinkResponse::ControllerPermaLink');
+$app->match('/admin/flexcontent/permalink/create/category',
+    'phpManufaktur\flexContent\Control\Admin\PermaLinkResponse::ControllerPermaLinkCategory');
+$app->match('/admin/flexcontent/permalink/create/tag',
+    'phpManufaktur\flexContent\Control\Admin\PermaLinkResponse::ControllerPermaLinkTag');
 
 $app->get('/admin/flexcontent/list',
     'phpManufaktur\flexContent\Control\Admin\ContentList::ControllerList');

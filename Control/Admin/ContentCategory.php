@@ -16,6 +16,7 @@ use phpManufaktur\Basic\Data\CMS\Page;
 use phpManufaktur\flexContent\Data\Content\CategoryType as CategoryTypeData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use phpManufaktur\flexContent\Control\Configuration;
 
 class ContentCategory extends Admin
 {
@@ -31,6 +32,7 @@ class ContentCategory extends Admin
     protected static $order_direction = null;
     protected static $current_page = null;
     protected static $max_pages = null;
+    protected static $config = null;
 
     /**
      * (non-PHPdoc)
@@ -68,6 +70,9 @@ class ContentCategory extends Admin
             'create' => '/admin/flexcontent/category/create?usage='.self::$usage,
             'edit_content' => '/admin/flexcontent/edit/id/{content_id}?usage='.self::$usage
         );
+
+        $Configuration = new Configuration($app);
+        self::$config = $Configuration->getConfiguration();
     }
 
     /**
@@ -133,6 +138,10 @@ class ContentCategory extends Admin
             'label' => 'Name',
             'data' => isset($data['category_name']) ? $data['category_name'] : ''
         ))
+        ->add('category_permalink', 'text', array(
+            'label' => 'Permalink',
+            'data' => isset($data['category_permalink']) ? $data['category_permalink'] : ''
+        ))
         ->add('target_url', 'choice', array(
             'choices' => $links,
             'empty_value' => '- please select -',
@@ -169,7 +178,8 @@ class ContentCategory extends Admin
                 'usage' => self::$usage,
                 'toolbar' => $this->getToolbar('categories'),
                 'alert' => $this->getAlert(),
-                'form' => $form->createView()
+                'form' => $form->createView(),
+                'config' => self::$config
             ));
     }
 
@@ -223,7 +233,28 @@ class ContentCategory extends Admin
                 return false;
             }
 
+            // check permalink
+            if (empty($category['category_permalink'])) {
+                $category['category_permalink'] = $category['category_name'];
+            }
+            $permalink = $this->app['utils']->sanitizeLink($category['category_permalink']);
+
+            if (self::$category_id < 1 && $this->CategoryTypeData->existsPermaLink($permalink)) {
+                // this PermaLink already exists!
+                $this->setAlert('The permalink %permalink% is already in use, please select another one!',
+                    array('%permalink%' => $permalink), self::ALERT_TYPE_WARNING);
+                return false;
+            }
+            elseif ((self::$category_id > 0) &&
+                (false !== ($used_by = $this->CategoryTypeData->selectCategoryIDbyPermaLink($permalink))) &&
+                ($used_by != self::$category_id)) {
+                $this->setAlert('The permalink %permalink% is already in use by the category type record %id%, please select another one!',
+                    array('%permalink%' => $permalink, '%id%' => $used_by), self::ALERT_TYPE_WARNING);
+                return false;
+            }
+
             $data['category_name'] = $category['category_name'];
+            $data['category_permalink'] = $permalink;
             $data['category_description'] = !empty($category['category_description']) ? $category['category_description'] : '';
             $data['target_url'] = $category['target_url'];
 

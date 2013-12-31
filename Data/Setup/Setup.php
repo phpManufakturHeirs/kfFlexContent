@@ -18,6 +18,7 @@ use phpManufaktur\flexContent\Data\Content\TagType;
 use phpManufaktur\flexContent\Data\Content\Tag;
 use phpManufaktur\flexContent\Data\Content\CategoryType;
 use phpManufaktur\flexContent\Data\Content\Category;
+use phpManufaktur\flexContent\Control\Configuration;
 
 class Setup
 {
@@ -39,6 +40,32 @@ class Setup
                 throw new \Exception("Can't create '/flexContent/bootstrap.include.inc!");
             }
             $app['monolog']->addDebug('Create /flexContent/bootstrap.include.inc');
+        }
+    }
+
+    public function createLanguageRoutes(Application $app)
+    {
+        $Configuration = new Configuration($app);
+        $config = $Configuration->getConfiguration();
+
+        $subdirectory = parse_url(CMS_URL, PHP_URL_PATH);
+        if (strlen($subdirectory) > 1) {
+            $subdirectory .= '/';
+        }
+        else {
+            $subdirectory = '';
+        }
+
+        foreach ($config['content']['languages'] as $language) {
+            $app['filesystem']->mkdir(CMS_PATH.'/'.strtolower($language['code']).$config['content']['permalink']['directory']);
+            if (false === ($include = file_get_contents(MANUFAKTUR_PATH.'/flexContent/Data/Setup/PermaLink/.htaccess'))) {
+                throw new \Exception('Missing /flexContent/Data/Setup/PermaLink/.htaccess!');
+            }
+            $include = str_replace(array('%subdirectory%', '%language%'), array($subdirectory, strtolower($language['code'])), $include);
+            if (false === (file_put_contents(CMS_PATH.'/'.strtolower($language['code']).$config['content']['permalink']['directory'].'/.htaccess', $include))) {
+                throw new \Exception("Can't create ".'/'.strtolower($language['code']).$config['content']['permalink']['directory'].'/.htaccess!');
+            }
+            $app['monolog']->addDebug('Create '.'/'.strtolower($language['code']).$config['content']['permalink']['directory'].'/.htaccess');
         }
     }
 
@@ -80,6 +107,9 @@ class Setup
 
             // add subdirectory routes
             $this->addSubdirectoryRoutes($app);
+
+            // install .htaccess files for the configured languages
+            $this->createLanguageRoutes($app);
 
             return $app['translator']->trans('Successfull installed the extension %extension%.',
                 array('%extension%' => 'flexContent'));

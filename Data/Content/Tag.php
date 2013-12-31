@@ -199,13 +199,57 @@ EOD;
         }
     }
 
+    /**
+     * Return a simple TAG array with TAG ID and TAG NAME for each record only
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return array
+     */
     public function getSimpleTagArrayForContentID($content_id)
     {
         try {
             $tag_table = self::$table_name;
             $type_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_tag_type';
             $SQL = "SELECT $type_table.`tag_id`, `tag_name`  FROM `$tag_table`, `$type_table` WHERE $tag_table.`tag_id`=$type_table.`tag_id` AND `content_id`='$content_id' ORDER BY `position` ASC";
-            return $this->app['db']->fetchAll($SQL);
+            $results = $this->app['db']->fetchAll($SQL);
+            $tags = array();
+            foreach ($results as $result) {
+                $tag = array();
+                foreach ($result as $key => $value) {
+                    $tag[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                }
+                $tags[] = $tag;
+            }
+            return $tags;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Retrurn a TAG array for the given flexContent ID with all available information
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return multitype:multitype:unknown
+     */
+    public function selectTagArrayForContentID($content_id)
+    {
+        try {
+            $tag_table = self::$table_name;
+            $type_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_tag_type';
+            $SQL = "SELECT *  FROM `$tag_table`, `$type_table` WHERE $tag_table.`tag_id`=$type_table.`tag_id` AND `content_id`='$content_id' ORDER BY `position` ASC";
+            $results = $this->app['db']->fetchAll($SQL);
+            $tags = array();
+            foreach ($results as $result) {
+                $tag = array();
+                foreach ($result as $key => $value) {
+                    $tag[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                }
+                $tags[] = $tag;
+            }
+            return $tags;
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }

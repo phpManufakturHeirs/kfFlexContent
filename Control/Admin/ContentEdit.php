@@ -37,6 +37,7 @@ class ContentEdit extends Admin
     protected function initialize(Application $app)
     {
         parent::initialize($app);
+
         self::$content_id = -1;
         $this->ContentData = new ContentData($app);
         $this->TagData = new Tag($app);
@@ -87,9 +88,21 @@ class ContentEdit extends Admin
             $secondary_categories = null;
         }
 
+        $languages = array();
+        foreach (self::$config['content']['languages'] as $language) {
+            $languages[$language['code']] = $language['name'];
+        }
+
         $form = $this->app['form.factory']->createBuilder('form')
         ->add('content_id', 'hidden', array(
             'data' => isset($data['content_id']) ? $data['content_id'] : -1
+        ))
+        ->add('language', 'choice', array(
+            'choices' => $languages,
+            'empty_value' => '- please select -',
+            'expanded' => false,
+            'required' => self::$config['content']['field']['language']['required'],
+            'data' => isset($data['language']) ? $data['language'] : strtoupper($this->app['translator']->getLocale()),
         ))
         ->add('title', 'text', array(
             'data' => isset($data['title']) ? $data['title'] : '',
@@ -360,6 +373,17 @@ class ContentEdit extends Admin
                         }
                         $data[$name] = $content[$name];
                         break;
+                    case 'language':
+                        // ignore property 'required'!
+                        $language_checked = false;
+                        foreach (self::$config['content']['languages'] as $language) {
+                            if ($content[$name] == $language['code']) {
+                                $language_checked = true;
+                                break;
+                            }
+                        }
+                        $data[$name] = $language_checked ? $content[$name] : 'EN';
+                        break;
                     case 'primary_category':
                         // ignore the property 'required'
                         if (intval($content['name'] < 1)) {
@@ -378,8 +402,12 @@ class ContentEdit extends Admin
             }
 
             if ($checked) {
+                // add update information
+                $data['update_username'] = $this->app['account']->getUsername();
+
                 if (self::$content_id < 1) {
                     // insert a new record
+                    $data['author_username'] = $this->app['account']->getUsername();
                     $this->ContentData->insert($data, self::$content_id);
                     $this->setAlert('Successfull created a new flexContent record with the ID %id%.',
                         array('%id%' => self::$content_id), self::ALERT_TYPE_SUCCESS);
@@ -496,8 +524,17 @@ class ContentEdit extends Admin
                                 }
                                 if ($name != $value) {
                                     // the TAG name was changed
+                                    $permalink = $this->app['utils']->sanitizeLink($value);
+                                    if ($this->TagTypeData->existsPermaLink($permalink)) {
+                                        // this permalink is already in use - add a counter
+                                        $count = $this->TagTypeData->countPermaLinksLikeThis($permalink);
+                                        $count++;
+                                        // add a counter to the new permanet link
+                                        $permalink = sprintf('%s-%d', $permalink, $count);
+                                    }
                                     $data = array(
-                                        'tag_name' => $value
+                                        'tag_name' => $value,
+                                        'tag_permalink' => $permalink
                                     );
                                     // update the TAG TYPE record
                                     $this->TagTypeData->update($keyparts[1], $data);
@@ -537,8 +574,17 @@ class ContentEdit extends Admin
                     else {
                         // insert a new key
                         $tag_id = -1;
+                        $permalink = $this->app['utils']->sanitizeLink($value);
+                        if ($this->TagTypeData->existsPermaLink($permalink)) {
+                            // this permalink is already in use - add a counter
+                            $count = $this->TagTypeData->countPermaLinksLikeThis($permalink);
+                            $count++;
+                            // add a counter to the new permanet link
+                            $permalink = sprintf('%s-%d', $permalink, $count);
+                        }
                         $data = array(
-                            'tag_name' => $value
+                            'tag_name' => $value,
+                            'tag_permalink' => $permalink
                         );
                         // create a new TAG ID
                         $this->TagTypeData->insert($data, $tag_id);

@@ -15,6 +15,7 @@ use Silex\Application;
 use phpManufaktur\flexContent\Data\Content\TagType as TagTypeData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use phpManufaktur\flexContent\Control\Configuration;
 
 class ContentTag extends Admin
 {
@@ -28,6 +29,7 @@ class ContentTag extends Admin
     protected static $order_direction = null;
     protected static $current_page = null;
     protected static $max_pages = null;
+    protected static $config = null;
 
     /**
      * (non-PHPdoc)
@@ -63,6 +65,9 @@ class ContentTag extends Admin
             'create' => '/admin/flexcontent/tag/create?usage='.self::$usage,
             'edit_content' => '/admin/flexcontent/edit/id/{content_id}?usage='.self::$usage
         );
+
+        $Configuration = new Configuration($app);
+        self::$config = $Configuration->getConfiguration();
     }
 
     /**
@@ -122,6 +127,10 @@ class ContentTag extends Admin
         ->add('tag_name', 'text', array(
             'data' => isset($data['tag_name']) ? $data['tag_name'] : ''
         ))
+        ->add('tag_permalink', 'text', array(
+            'data' => isset($data['tag_permalink']) ? $data['tag_permalink'] : '',
+            'label' => 'Permalink'
+        ))
         ->add('tag_image', 'hidden', array(
             'data' => isset($data['tag_image']) ? $data['tag_image'] : ''
         ))
@@ -149,7 +158,8 @@ class ContentTag extends Admin
                 'usage' => self::$usage,
                 'toolbar' => $this->getToolbar('tags'),
                 'alert' => $this->getAlert(),
-                'form' => $form->createView()
+                'form' => $form->createView(),
+                'config' => self::$config
             ));
     }
 

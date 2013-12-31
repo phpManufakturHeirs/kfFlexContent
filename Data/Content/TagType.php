@@ -43,11 +43,12 @@ class TagType
     CREATE TABLE IF NOT EXISTS `$table` (
         `tag_id` INT(11) NOT NULL AUTO_INCREMENT,
         `tag_name` VARCHAR(64) NOT NULL DEFAULT '',
+        `tag_permalink` VARCHAR(255) NOT NULL DEFAULT '',
         `tag_description` TEXT NOT NULL,
         `tag_image` TEXT NOT NULL,
         `timestamp` TIMESTAMP,
         PRIMARY KEY (`tag_id`),
-        UNIQUE INDEX (`tag_name`)
+        UNIQUE INDEX (`tag_name`,`tag_permalink`)
         )
     COMMENT='The tag type definition table for flexContent'
     ENGINE=InnoDB
@@ -331,6 +332,58 @@ EOD;
                 $this->app['utils']->sanitizeVariable(strtolower($tag_name))."'";
             $tag = $this->app['db']->fetchColumn($SQL);
             return !empty($tag);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Check if a permalink already exists
+     *
+     * @param link $permalink
+     * @throws \Exception
+     * @return boolean
+     */
+    public function existsPermaLink($permalink)
+    {
+        try {
+            $SQL = "SELECT `tag_permalink` FROM `".self::$table_name."` WHERE `tag_permalink`='$permalink'";
+            $result = $this->app['db']->fetchColumn($SQL);
+            return ($result == $permalink);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Count PermaLinks which starts LIKE the given $this
+     *
+     * @param string $this
+     * @throws \Exception
+     */
+    public function countPermaLinksLikeThis($permalink)
+    {
+        try {
+            $SQL = "SELECT COUNT(`tag_permalink`) FROM `".self::$table_name."` WHERE `tag_permalink` LIKE '$permalink%'";
+            return $this->app['db']->fetchColumn($SQL);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Select the TAG ID by the given PermanentLink
+     *
+     * @param string $permalink
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     */
+    public function selectTagIDbyPermaLink($permalink)
+    {
+        try {
+            $SQL = "SELECT `tag_id` FROM `".self::$table_name."` WHERE `tag_permalink`='$permalink'";
+            $result = $this->app['db']->fetchColumn($SQL);
+            return ($result > 0) ? $result : false;
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }

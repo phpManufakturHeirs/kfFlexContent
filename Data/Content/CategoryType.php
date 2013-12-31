@@ -44,12 +44,13 @@ class CategoryType
     CREATE TABLE IF NOT EXISTS `$table` (
         `category_id` INT(11) NOT NULL AUTO_INCREMENT,
         `category_name` VARCHAR(64) NOT NULL DEFAULT '',
+        `category_permalink` VARCHAR(255) NOT NULL DEFAULT '',
         `category_description` TEXT NOT NULL DEFAULT '',
         `category_image` TEXT NOT NULL,
         `target_url` TEXT NOT NULL,
         `timestamp` TIMESTAMP,
         PRIMARY KEY (`category_id`),
-        UNIQUE INDEX (`category_name`)
+        UNIQUE INDEX (`category_name`, `category_permalink`)
         )
     COMMENT='The category types used by the flexContent records'
     ENGINE=InnoDB
@@ -281,6 +282,58 @@ EOD;
                 $categories[$category['category_id']] = $this->app['utils']->unsanitizeText($category['category_name']);
             }
             return $categories;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Check if a permalink already exists
+     *
+     * @param link $permalink
+     * @throws \Exception
+     * @return boolean
+     */
+    public function existsPermaLink($permalink)
+    {
+        try {
+            $SQL = "SELECT `category_permalink` FROM `".self::$table_name."` WHERE `category_permalink`='$permalink'";
+            $result = $this->app['db']->fetchColumn($SQL);
+            return ($result == $permalink);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Count PermaLinks which starts LIKE the given $this
+     *
+     * @param string $this
+     * @throws \Exception
+     */
+    public function countPermaLinksLikeThis($permalink)
+    {
+        try {
+            $SQL = "SELECT COUNT(`category_permalink`) FROM `".self::$table_name."` WHERE `category_permalink` LIKE '$permalink%'";
+            return $this->app['db']->fetchColumn($SQL);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Select the Category ID by the given PermanentLink
+     *
+     * @param string $permalink
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     */
+    public function selectCategoryIDbyPermaLink($permalink)
+    {
+        try {
+            $SQL = "SELECT `category_id` FROM `".self::$table_name."` WHERE `category_permalink`='$permalink'";
+            $result = $this->app['db']->fetchColumn($SQL);
+            return ($result > 0) ? $result : false;
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }

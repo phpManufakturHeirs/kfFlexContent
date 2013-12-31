@@ -17,6 +17,7 @@ class Category
 {
     protected $app = null;
     protected static $table_name = null;
+    protected $CategoryType = null;
 
     /**
      * Constructor
@@ -27,6 +28,7 @@ class Category
     {
         $this->app = $app;
         self::$table_name = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
+        $this->CategoryType = new CategoryType($app);
     }
 
     /**
@@ -288,4 +290,17 @@ EOD;
             throw new \Exception($e);
         }
     }
+
+    /**
+     * Select the Category ID by the given PermanentLink
+     *
+     * @param string $permalink
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     */
+    public function selectCategoryIDbyPermaLink($permalink)
+    {
+        return $this->CategoryType->selectCategoryIDbyPermaLink($permalink);
+    }
+
 }

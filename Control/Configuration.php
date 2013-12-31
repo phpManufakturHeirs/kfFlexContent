@@ -48,6 +48,9 @@ class Configuration
                             'maximum' => 128
                         )
                     ),
+                    'language' => array(
+                        'required' => true
+                    ),
                     'description' => array(
                         'required' => false,
                         'length' => array(
@@ -105,6 +108,20 @@ class Configuration
                         'start' => '/media/public',
                         'select' => '/media/public/content/teaser'
                      )
+                ),
+                'languages' => array(
+                    'DE' => array(
+                        'code' => 'DE',
+                        'name' => 'German'
+                    ),
+                    'EN' => array(
+                        'code' => 'EN',
+                        'name' => 'English'
+                    ),
+                    'NL' => array(
+                        'code' => 'NL',
+                        'name' => 'Dutch'
+                    )
                 )
             ),
             'kitcommand' => array(
@@ -114,6 +131,22 @@ class Configuration
                     ),
                     'iframe' => array(
                         'iframe' => true
+                    )
+                ),
+                'parameter' => array(
+                    'action' => array(
+                        'view' => array(
+                            'css' => true,
+                            'title' => true,
+                            'title_level' => 1,
+                            'description' => false,
+                            'categories' => true,
+                            'tags' => true,
+                            'permalink' => true,
+                            'control' => true,
+                            'author' => true,
+                            'date' => true
+                        )
                     )
                 )
             ),

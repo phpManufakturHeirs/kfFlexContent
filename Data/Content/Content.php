@@ -40,6 +40,7 @@ class Content
         $SQL = <<<EOD
     CREATE TABLE IF NOT EXISTS `$table` (
         `content_id` INT(11) NOT NULL AUTO_INCREMENT,
+        `language` VARCHAR(2) NOT NULL DEFAULT 'EN',
         `title` VARCHAR(512) NOT NULL DEFAULT '',
         `description` VARCHAR(512) NOT NULL DEFAULT '',
         `keywords` VARCHAR(512) NOT NULL DEFAULT '',
@@ -52,6 +53,8 @@ class Content
         `teaser` TEXT NOT NULL,
         `teaser_image` TEXT NOT NULL,
         `content` TEXT NOT NULL,
+        `author_username` VARCHAR(64) NOT NULL DEFAULT '',
+        `update_username` VARCHAR(64) NOT NULL DEFAULT '',
         `timestamp` TIMESTAMP,
         PRIMARY KEY (`content_id`),
         UNIQUE INDEX (`permalink`)
@@ -144,10 +147,15 @@ EOD;
      * @throws \Exception
      * @return Ambigous <boolean, multitype:unknown >
      */
-    public function select($content_id)
+    public function select($content_id, $language=null)
     {
         try {
-            $SQL = "SELECT * FROM `".self::$table_name."` WHERE `content_id`='$content_id'";
+            if (is_string($language)) {
+                $SQL = "SELECT * FROM `".self::$table_name."` WHERE `content_id`='$content_id' AND `language`='$language'";
+            }
+            else {
+                $SQL = "SELECT * FROM `".self::$table_name."` WHERE `content_id`='$content_id'";
+            }
             $result = $this->app['db']->fetchAssoc($SQL);
             $content = array();
             if (is_array($result)) {
@@ -289,9 +297,7 @@ EOD;
     public function existsPermaLink($permalink)
     {
         try {
-            $this->app['monolog']->addDebug('??', array(__METHOD__, __LINE__));
             $SQL = "SELECT `permalink` FROM `".self::$table_name."` WHERE `permalink`='$permalink'";
-            $this->app['monolog']->addDebug($SQL, array(__METHOD__, __LINE__));
             $result = $this->app['db']->fetchColumn($SQL);
             return ($result == $permalink);
         } catch (\Doctrine\DBAL\DBALException $e) {
@@ -320,16 +326,101 @@ EOD;
      *
      * @param string $permalink
      * @throws \Exception
-     * @return Ambigous <boolean, unknown>
+     * @return Ambigous <boolean, array>
      */
-    public function selectContentIDbyPermaLink($permalink)
+    public function selectContentIDbyPermaLink($permalink, $language=null)
     {
         try {
-            $SQL = "SELECT `content_id` FROM `".self::$table_name."` WHERE `permalink`='$permalink'";
+            if (is_null($language)) {
+                $SQL = "SELECT `content_id` FROM `".self::$table_name."` WHERE `permalink`='$permalink'";
+            }
+            else {
+                $SQL = "SELECT `content_id` FROM `".self::$table_name."` WHERE `permalink`='$permalink' AND `language`='$language'";
+            }
             $result = $this->app['db']->fetchColumn($SQL);
             return ($result > 0) ? $result : false;
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }
     }
+
+    /**
+     * Select the content in previous or next order to the given content ID.
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return boolean|Ambigous <boolean, array>
+     */
+    protected function selectPreviousOrNextContentForID($content_id, $select_previous=true, $language='EN')
+    {
+        try {
+            $category_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
+            $content_table = self::$table_name;
+            // first get the primary category of $content_id
+            $SQL = "SELECT `category_id` FROM `$category_table` WHERE `content_id`='$content_id' AND `is_primary`='1'";
+            $category_id = $this->app['db']->fetchColumn($SQL);
+            if ($category_id < 1) {
+                // no hit ...
+                $this->app['monolog']->addDebug("Can't find the primary category ID for content ID $content_id.", array(__METHOD__, __FILE__));
+                return false;
+            }
+            // get the publishing date of $content_id
+            $SQL = "SELECT `publish_from` FROM `$content_table` WHERE `content_id`='$content_id'";
+            $published_from = $this->app['db']->fetchColumn($SQL);
+            if (empty($published_from)) {
+                // invalid record?
+                $this->app['monolog']->addDebug("Can't select the `publish_from` date for content ID $content_id", array(__METHOD__, __LINE__));
+                return false;
+            }
+            // now select the content record
+            if ($select_previous) {
+                $select = '>=';
+                $direction = 'DESC';
+            }
+            else {
+                $select = '<=';
+                $direction = 'ASC';
+            }
+
+            $SQL = "SELECT * FROM $category_table, $content_table WHERE $category_table.content_id=$content_table.content_id AND $content_table.content_id != '$content_id' AND ".
+                "category_id='$category_id' AND is_primary=1 AND '$published_from' $select `publish_from` AND (status !='UNPUBLISHED' OR status != 'DELETED') ".
+                "AND `language`='$language' ORDER BY publish_from $direction LIMIT 1";
+
+            $result = $this->app['db']->fetchAssoc($SQL);
+            $content = array();
+            if (is_array($result)) {
+                foreach ($result as $key => $value) {
+                    $content[$key] = (is_string($value)) ? $this->app['utils']->unsanitizeText($value) : $value;
+                }
+            }
+            return (!empty($content)) ? $content : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Select the content in previous order to the given content ID.
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return boolean|Ambigous <boolean, array>
+     */
+    public function selectPreviousContentForID($content_id, $language='EN')
+    {
+        return $this->selectPreviousOrNextContentForID($content_id, true, $language);
+    }
+
+    /**
+     * Select the content in next order to the given content ID.
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return boolean|Ambigous <boolean, array>
+     */
+    public function selectNextContentForID($content_id, $language='EN')
+    {
+        return $this->selectPreviousOrNextContentForID($content_id, false, $language);
+    }
+
 }

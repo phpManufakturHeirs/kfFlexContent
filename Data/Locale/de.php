@@ -51,12 +51,29 @@ return array(
     'Created the new tag %tag% and attached it to this content.'
         => 'Die Markierung <b>%tag%</b> wurde erstellt und diesem flexContent Inhalt zugeordnet.',
 
+    'DE'
+        => 'Deutsch',
     'delete this category type'
         => 'diese Kategorie löschen',
     'delete this tag type'
         => 'diese Markierung löschen',
     'description'
         => 'Beschreibung',
+    'Dutch'
+        => 'Niederländisch',
+
+    'EN'
+        => 'Englisch',
+    'English'
+        => 'Englisch',
+
+    'FR'
+        => 'Französisch',
+    'French'
+        => 'Französisch',
+
+    'German'
+        => 'Deutsch',
 
     'HIDDEN'
         => 'Versteckt',
@@ -67,11 +84,25 @@ return array(
     'Keywords'
         => 'Schlüsselbegriffe',
 
+    'language'
+        => 'Sprache',
+    'Language'
+        => 'Sprache',
     'List of all flexContent articles'
         => 'Liste aller flexContent Artikel',
 
+    'Next article'
+        => 'Nächster Artikel',
+    'NL'
+        => 'Niederländisch',
+
+    'Overview'
+        => 'Übersicht',
+
     'Permalink'
         => 'Permanenter Link',
+    'Permanent link to this article'
+        => 'Permanenter Link auf diesen Artikel',
     'Please define keywords for the content'
         => 'Legen Sie bitte Schlüsselwörter für den Inhalt fest!',
     'Please fill in all requested fields before submitting the form!'
@@ -80,6 +111,8 @@ return array(
         => 'Bitte geben Sie eine Bezeichnung für die Kategorie an.',
     'Please type in a name for the tag type.'
         => 'Bitte geben Sie eine Bezeichnung für die Markierung an.',
+    'Previous article'
+        => 'Vorheriger Artikel',
     'Primary category'
         => 'Kategorie',
     "Problem: '%first%' must be defined before '%second%', please check the configuration file!"
@@ -143,6 +176,8 @@ return array(
         => 'Die Beschreibung sollte eine Länge zwischen %minimum% und %maximum% Zeichen haben, zur Zeit sind es %length% Zeichen.',
     'The flexContent record with the ID %id% does not exists!'
         => 'Es existiert kein flexContent Datensatz mit der ID %id%!',
+    'The flexContent record with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!'
+        => 'Es existiert kein flexContent Datensatz mit der <strong>ID %id%</strong> für die Sprache <strong>%language%</strong>!',
     'The image %image% was successfull inserted.'
         => 'Das Bild %image% wurde dem Datensatz hinzugefügt.',
     'The permalink %permalink% is already in use, please select another one!'

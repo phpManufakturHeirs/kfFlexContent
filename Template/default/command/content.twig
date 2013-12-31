@@ -15,21 +15,31 @@
       fileref.setAttribute("rel", "stylesheet");
       fileref.setAttribute("type", "text/css");
       fileref.setAttribute("media", "all");
-      fileref.setAttribute("href", '{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/flexcontent.min.css' }}');
+      {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.min.css') %}
+        fileref.setAttribute("href", '{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.min.css' }}');
+      {% else %}
+        fileref.setAttribute("href", '{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/flexcontent.min.css' }}');
+      {% endif %}      
       document.getElementsByTagName("head")[0].appendChild(fileref);
+      var fileref = document.createElement("link");
+      fileref.setAttribute("rel", "stylesheet");
+      fileref.setAttribute("type", "text/css");
+      fileref.setAttribute("media", "all");
+      fileref.setAttribute("href", '{{ LIBRARY_URL ~ '/font-awesome/4.0.3/css/font-awesome.min.css' }}');
+      document.getElementsByTagName("head")[0].appendChild(fileref);      
     </script>          
   {% endif %}
       
   {{ basic.alert }}
   
-  {#{ dump(categories) }#}
+  {#{ dump(tags) }#}
     
   {% if content.content|default('')|length > 0 %} 
     {% if parameter.categories is defined and parameter.categories %}
       <div class="content categories">
         {% for category in categories %}
          <span class="category link">
-           <a href="{{ permalink_base_url ~ '/category/' ~ category.category_id }}" title="{{ category.category_description|ellipsis }}">{{ category.category_name }}</a>
+           <a href="{{ permalink_base_url ~ '/category/' ~ category.category_permalink }}" title="{{ category.category_description|ellipsis }}">{{ category.category_name }}</a>
          </span>
         {% endfor %}
       </div>
@@ -46,6 +56,69 @@
     {% endif %}
       
     {{ content.content|default('') }}
+        
+    {% if parameter.author is defined and parameter.author %}
+      <div class="content author">
+        {% if parameter.date is defined and parameter.date %}
+          {{ author ~ ', ' ~ content.publish_from|date('DATE_FORMAT'|trans) }}
+        {% else %}
+          {{ author }}
+        {% endif %}
+      </div>  
+    {% elseif parameter.date is defined and parameter.date %}
+      <div class="content date">
+        {{ content.publish_from|date('DATE_FORMAT'|trans) }}    
+      </div>  
+    {% endif %}
+        
+    {% if parameter.tags is defined and parameter.tags %}
+      <div class="content tags">
+        {% for tag in tags %}
+          <span class="tag link">
+            <a href="{{ permalink_base_url ~ '/tag/' ~ tag.tag_permalink }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
+          </span>
+        {% endfor %}
+      </div>  
+    {% endif %}
+  {% endif %}     
+        
+  {% if parameter.control is defined and parameter.control %}
+    <div class="content control">
+      {% if control.previous.permalink is defined %}
+        <span class="item previous">
+          <a href="{{ permalink_base_url ~ '/' ~ control.previous.permalink }}" title="{{ control.previous.title|ellipsis }}"><i class="fa fa-arrow-left"></i> {{ 'Previous article'|trans }}</a>
+        </span>
+      {% else %}
+        <span class="item previous inactive"><i class="fa fa-arrow-left"></i> {{ 'Previous article'|trans }}</span>
+      {% endif %}
+    
+      {% if control.category.category_permalink is defined %}
+        <span class="item category">
+          <a href="{{ permalink_base_url ~ '/category/' ~ control.category.category_permalink }}" title="{{ control.category.category_name|ellipsis }}"><i class="fa fa-list"></i> {{ 'Overview'|trans }}</a>
+        </span>
+      {% else %}
+        <span class="item category inactive"><i class="fa fa-list"></i> {{ 'Overview'|trans }}</span>  
+      {% endif %}
+
+      {% if control.next.permalink is defined %}
+        <span class="item next">
+          <a href="{{ permalink_base_url ~ '/' ~ control.next.permalink }}" title="{{ control.next.title|ellipsis }}">{{ 'Next article'|trans }} <i class="fa fa-arrow-right"></i></a>
+        </span>
+      {% else %}
+        <span class="item next inactive">{{ 'Next article'|trans }} <i class="fa fa-arrow-right"></i></span>
+      {% endif %}
+  
+      {% if parameter.permalink is defined and parameter.permalink %}
+        <span class="item permalink">
+          <a href="{{ permalink_base_url ~ '/' ~ content.permalink }}" title="{{ 'Permanent link to this article'|trans }}"><i class="fa fa-link"></i></a>
+        </span>  
+      {% endif %}       
+    </div>
+  {% elseif parameter.permalink is defined and parameter.permalink %}
+    <div class="content permalink">
+      <a href="{{ permalink_base_url ~ '/' ~ content.permalink }}" title="{{ 'Permanent link to this article'|trans }}"><i class="fa fa-link"></i></a>
+    </div>  
   {% endif %}
+
 </div>
 {% endspaceless %}

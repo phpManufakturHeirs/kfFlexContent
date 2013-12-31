@@ -1,6 +1,7 @@
 {
   "columns":[
     "content_id",
+    "language",
     "publish_from",
     "status",
     "title",

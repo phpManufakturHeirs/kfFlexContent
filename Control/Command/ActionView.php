@@ -16,14 +16,19 @@ use Silex\Application;
 use phpManufaktur\flexContent\Data\Content\Content;
 use phpManufaktur\flexContent\Control\Configuration;
 use phpManufaktur\flexContent\Data\Content\Category;
+use phpManufaktur\flexContent\Data\Content\CategoryType;
+use phpManufaktur\flexContent\Data\Content\Tag;
 
 class ActionView extends Basic
 {
     protected $ContentData = null;
     protected $CategoryData = null;
+    protected $CategoryTypeData = null;
+    protected $TagData = null;
 
     protected static $parameter = null;
     protected static $config = null;
+    protected static $locale = null;
 
     protected static $view_array = array('content', 'teaser');
     protected static $allowed_status_array = array('PUBLISHED', 'BREAKING', 'HIDDEN', 'ARCHIVED');
@@ -38,9 +43,13 @@ class ActionView extends Basic
 
         $this->ContentData = new Content($app);
         $this->CategoryData = new Category($app);
+        $this->CategoryTypeData = new CategoryType($app);
+        $this->TagData = new Tag($app);
 
         $ConfigurationData = new Configuration($app);
         self::$config = $ConfigurationData->getConfiguration();
+
+        self::$locale = strtoupper($this->getCMSlocale());
     }
 
     /**
@@ -76,9 +85,10 @@ class ActionView extends Basic
 
     protected function showID()
     {
-        if (false === ($content = $this->ContentData->select(self::$parameter['id']))) {
-            $this->setAlert('The flexContent record with the ID %id% does not exists!',
-                array('%id%' => self::$parameter['id']), self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
+        if (false === ($content = $this->ContentData->select(self::$parameter['id'], self::$locale))) {
+            $this->setAlert('The flexContent record with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!',
+                array('%id%' => self::$parameter['id'], '%language%' => self::$locale),
+                self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
             if (self::$parameter['use_iframe']) {
                 // we can use the default Bootstrap 3 alert response
                 return $this->promptAlert();
@@ -86,7 +96,7 @@ class ActionView extends Basic
             else {
                 // we must render the iframe free content template
                 return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-                    '@phpManufaktur/flexContent/Template', 'command/content.twig',
+                    '@phpManufaktur/flexContent/Template', 'command/alert.twig',
                     $this->getPreferredTemplateStyle()),
                     array(
                         'basic' => $this->getBasicSettings(),
@@ -102,7 +112,7 @@ class ActionView extends Basic
             else {
                 // we must render the iframe free content template
                 return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-                    '@phpManufaktur/flexContent/Template', 'command/content.twig',
+                    '@phpManufaktur/flexContent/Template', 'command/alert.twig',
                     $this->getPreferredTemplateStyle()),
                     array(
                         'basic' => $this->getBasicSettings(),
@@ -110,8 +120,6 @@ class ActionView extends Basic
                     ));
             }
         }
-
-
 
         // ok - gather the content ...
         $this->setPageTitle($content['title']);
@@ -121,16 +129,34 @@ class ActionView extends Basic
         // get the categories for this content ID
         $categories = $this->CategoryData->selectCategoriesByContentID(self::$parameter['id']);
 
+        // get the tags for this content ID
+        $tags = $this->TagData->selectTagArrayForContentID(self::$parameter['id']);
+
+        // select the previous and the next content
+        $previous_content = $this->ContentData->selectPreviousContentForID(self::$parameter['id'], self::$locale);
+        $next_content = $this->ContentData->selectNextContentForID(self::$parameter['id'], self::$locale);
+
+        // get the primary category
+        $primary_category_id = $this->CategoryData->selectPrimaryCategoryIDbyContentID(self::$parameter['id']);
+        $primary_category = $this->CategoryTypeData->select($primary_category_id);
 
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'command/content.twig',
             $this->getPreferredTemplateStyle()),
             array(
                 'basic' => $this->getBasicSettings(),
+                'config' => self::$config,
                 'content' => $content,
                 'parameter' => self::$parameter,
                 'categories' => $categories,
-                'permalink_base_url' => CMS_URL.self::$config['content']['permalink']['directory']
+                'tags' => $tags,
+                'permalink_base_url' => CMS_URL.self::$config['content']['permalink']['directory'],
+                'control' => array(
+                    'previous' => $previous_content,
+                    'next' => $next_content,
+                    'category' => $primary_category
+                ),
+                'author' => $this->app['account']->getDisplayNameByUsername($content['author_username'])
             ));
     }
 
@@ -172,22 +198,40 @@ class ActionView extends Basic
             return $this->promptAlert();
         }
 
+        // access the default parameters for action -> view from the configuration
+        $default_parameter = self::$config['kitcommand']['parameter']['action']['view'];
+
         self::$parameter['id'] = (isset(self::$parameter['id']) && is_numeric(self::$parameter['id'])) ? self::$parameter['id'] : -1;
 
         // check wether to use the flexcontent.css or not (only needed if self::$parameter['use_iframe'] == false)
-        self::$parameter['css'] = (isset(self::$parameter['css']) && ((self::$parameter['css'] == 0) || (strtolower(self::$parameter['css']) == 'false'))) ? false : true;
+        self::$parameter['css'] = (isset(self::$parameter['css']) && ((self::$parameter['css'] == 0) || (strtolower(self::$parameter['css']) == 'false'))) ? false : $default_parameter['css'];
 
         // set the title above the content?
-        self::$parameter['title'] = (isset(self::$parameter['title']) && ((self::$parameter['title'] == 0) || (strtolower(self::$parameter['title']) == 'false'))) ? false : true;
+        self::$parameter['title'] = (isset(self::$parameter['title']) && ((self::$parameter['title'] == 0) || (strtolower(self::$parameter['title']) == 'false'))) ? false : $default_parameter['title'];
 
         // set the title level - default 1 = <h1>
-        self::$parameter['title_level'] = (isset(self::$parameter['title_level']) && is_numeric(self::$parameter['title_level'])) ? self::$parameter['title_level'] : 1;
+        self::$parameter['title_level'] = (isset(self::$parameter['title_level']) && is_numeric(self::$parameter['title_level'])) ? self::$parameter['title_level'] : $default_parameter['title_level'];
 
         // show the description as sub title?
-        self::$parameter['description'] = (isset(self::$parameter['description']) && ((self::$parameter['description'] == 1) || (strtolower(self::$parameter['description']) == 'true'))) ? true : false;
+        self::$parameter['description'] = (isset(self::$parameter['description']) && ((self::$parameter['description'] == 1) || (strtolower(self::$parameter['description']) == 'true'))) ? true : $default_parameter['description'];
 
         // show the associated categories?
-        self::$parameter['categories'] = (isset(self::$parameter['categories']) && ((self::$parameter['categories'] == 1) || (strtolower(self::$parameter['categories']) == 'true'))) ? true : false;
+        self::$parameter['categories'] = (isset(self::$parameter['categories']) && ((self::$parameter['categories'] == 0) || (strtolower(self::$parameter['categories']) == 'false'))) ? false : $default_parameter['categories'];
+
+        // show the associated tags?
+        self::$parameter['tags'] = (isset(self::$parameter['tags']) && ((self::$parameter['tags'] == 0) || (strtolower(self::$parameter['tags']) == 'false'))) ? false : $default_parameter['tags'];
+
+        // show the permanent link to this content?
+        self::$parameter['permalink'] = (isset(self::$parameter['permalink']) && ((self::$parameter['permalink'] == 0) || (strtolower(self::$parameter['permalink']) == 'false'))) ? false : $default_parameter['permalink'];
+
+        // show the previous - overview - next control?
+        self::$parameter['control'] = (isset(self::$parameter['control']) && ((self::$parameter['control'] == 0) || (strtolower(self::$parameter['control']) == 'false'))) ? false : $default_parameter['control'];
+
+        // show author name?
+        self::$parameter['author'] = (isset(self::$parameter['author']) && ((self::$parameter['author'] == 0) || (strtolower(self::$parameter['author']) == 'false'))) ? false : $default_parameter['author'];
+
+        // show publish_from as date?
+        self::$parameter['date'] = (isset(self::$parameter['date']) && ((self::$parameter['date'] == 0) || (strtolower(self::$parameter['date']) == 'false'))) ? false : $default_parameter['date'];
 
         if (self::$parameter['id'] > 0) {
             return $this->showID();

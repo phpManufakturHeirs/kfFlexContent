@@ -11,8 +11,22 @@
 .flexcontent-container {
   margin: 0;
   padding: 0;
-  width: 100%;
+  width: auto;
   height: auto;
+}
+
+.flexcontent-container .clearfix:before,
+.flexcontent-container .clearfix:after {
+  display: table;
+  content: " ";
+}
+
+.flexcontent-container .clearfix:after {
+  clear: both;
+}
+
+.flexcontent-container .inactive {
+  color: #c6c6c6;
 }
 
 .flexcontent-container a.close {
@@ -74,14 +88,63 @@
   padding: 0;
 }
 
+.flexcontent-container .content.author,
+.flexcontent-container .content.date,
+.flexcontent-container .content.control,
+.flexcontent-container .content.permalink,
+.flexcontent-container .content.tags,
 .flexcontent-container .content.categories {
   width: 100%;
   height: auto;
   font-size: smaller;
-  margin: 0 0 10px 0;
   padding: 0;
+  margin: 0 0 10px 0;
+}
+.flexcontent-container .content.tags {
+  margin: 20px 0 0 0;
+}
+.flexcontent-container .content.permalink {
+  margin: 10px 0 10px 0;
+  text-align: right;
+  font-size: larger;
+}
+.flexcontent-container .content.author,
+.flexcontent-container .content.date {
+  margin: 10px 0 10px 0;
+  text-align: right;
+  font-size: smaller;
+  font-style: italic;
 }
 
+.flexcontent-container .content.tags:before,
+.flexcontent-container .content.categories:before {
+  clear: both;
+}
+.flexcontent-container .content.control {
+  margin: 20px 0 20px 0;
+  text-align: center;
+  font-size: small;
+}
+span.tag.link,
 span.category.link {
   margin-right: 10px;
+}
+
+span.item.previous {
+  margin-right: 10px;
+}
+span.item.next {
+  margin-left: 10px;
+}
+span.item.category {
+  margin-left: 0;
+  margin-right: 0;
+}
+span.item.permalink {
+  margin-left: 20px;
+}
+span.item.previous.inactive,
+span.item.category.inactive,
+span.item.next.inactive {
+  color: #c6c6c6;
 }

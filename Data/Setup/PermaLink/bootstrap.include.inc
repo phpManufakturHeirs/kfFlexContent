@@ -9,7 +9,7 @@
  * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 
-$app->get('%subdirectory%/content/{name}',
+$app->get('%subdirectory%/{language}/content/{name}',
     'phpManufaktur\flexContent\Control\PermanentLink::ControllerName');
-$app->get('%subdirectory%/content/id/{content_id}',
+$app->get('%subdirectory%/{language}/content/id/{content_id}',
     'phpManufaktur\flexContent\Control\PermanentLink::ControllerContentID');
