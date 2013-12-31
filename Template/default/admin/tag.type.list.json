@@ -1,6 +1,7 @@
 {
   "columns":[
     "tag_id",
+    "language",
     "tag_name",
     "tag_description",
     "used_by_content_id"

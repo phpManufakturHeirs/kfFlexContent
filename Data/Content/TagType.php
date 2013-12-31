@@ -42,14 +42,14 @@ class TagType
         $SQL = <<<EOD
     CREATE TABLE IF NOT EXISTS `$table` (
         `tag_id` INT(11) NOT NULL AUTO_INCREMENT,
+        `language` VARCHAR(2) NOT NULL DEFAULT 'EN',
         `tag_name` VARCHAR(64) NOT NULL DEFAULT '',
         `tag_permalink` VARCHAR(255) NOT NULL DEFAULT '',
         `tag_description` TEXT NOT NULL,
         `tag_image` TEXT NOT NULL,
         `timestamp` TIMESTAMP,
-        PRIMARY KEY (`tag_id`),
-        UNIQUE INDEX (`tag_name`,`tag_permalink`)
-        )
+        PRIMARY KEY (`tag_id`)
+    )
     COMMENT='The tag type definition table for flexContent'
     ENGINE=InnoDB
     AUTO_INCREMENT=1
@@ -133,11 +133,11 @@ EOD;
      * @throws \Exception
      * @return multitype:multitype:unknown
      */
-    public function selectLikeName($search)
+    public function selectLikeName($search, $language)
     {
         try {
             $SQL = "SELECT `tag_id`, `tag_name` FROM `".self::$table_name."` ".
-                "WHERE `tag_name` LIKE '%$search%' ORDER BY `tag_name` ASC";
+                "WHERE `language`='$language' AND `tag_name` LIKE '%$search%' ORDER BY `tag_name` ASC";
             $results = $this->app['db']->fetchAll($SQL);
             $tags = array();
             if (is_array($results)) {
@@ -325,11 +325,11 @@ EOD;
      * @throws \Exception
      * @return boolean
      */
-    public function existsName($tag_name)
+    public function existsName($tag_name, $language)
     {
         try {
             $SQL = "SELECT `tag_name` FROM `".self::$table_name."` WHERE LOWER(`tag_name`) = '".
-                $this->app['utils']->sanitizeVariable(strtolower($tag_name))."'";
+                $this->app['utils']->sanitizeVariable(strtolower($tag_name))."' AND `language`='$language'";
             $tag = $this->app['db']->fetchColumn($SQL);
             return !empty($tag);
         } catch (\Doctrine\DBAL\DBALException $e) {
@@ -344,10 +344,10 @@ EOD;
      * @throws \Exception
      * @return boolean
      */
-    public function existsPermaLink($permalink)
+    public function existsPermaLink($permalink, $language)
     {
         try {
-            $SQL = "SELECT `tag_permalink` FROM `".self::$table_name."` WHERE `tag_permalink`='$permalink'";
+            $SQL = "SELECT `tag_permalink` FROM `".self::$table_name."` WHERE `tag_permalink`='$permalink' AND `language`='$language'";
             $result = $this->app['db']->fetchColumn($SQL);
             return ($result == $permalink);
         } catch (\Doctrine\DBAL\DBALException $e) {
@@ -361,10 +361,11 @@ EOD;
      * @param string $this
      * @throws \Exception
      */
-    public function countPermaLinksLikeThis($permalink)
+    public function countPermaLinksLikeThis($permalink, $language)
     {
         try {
-            $SQL = "SELECT COUNT(`tag_permalink`) FROM `".self::$table_name."` WHERE `tag_permalink` LIKE '$permalink%'";
+            $SQL = "SELECT COUNT(`tag_permalink`) FROM `".self::$table_name."` WHERE `tag_permalink` LIKE '$permalink%' ".
+                "AND `language`='$language'";
             return $this->app['db']->fetchColumn($SQL);
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
@@ -378,10 +379,10 @@ EOD;
      * @throws \Exception
      * @return Ambigous <boolean, array>
      */
-    public function selectTagIDbyPermaLink($permalink)
+    public function selectTagIDbyPermaLink($permalink, $language)
     {
         try {
-            $SQL = "SELECT `tag_id` FROM `".self::$table_name."` WHERE `tag_permalink`='$permalink'";
+            $SQL = "SELECT `tag_id` FROM `".self::$table_name."` WHERE `tag_permalink`='$permalink' AND `language`='$language'";
             $result = $this->app['db']->fetchColumn($SQL);
             return ($result > 0) ? $result : false;
         } catch (\Doctrine\DBAL\DBALException $e) {

@@ -32,14 +32,17 @@ class PermaLinkResponse
             if (null == ($link = $app['request']->get('link'))) {
                 throw new \Exception('Missing the GET parameter `link`!');
             }
+            if (null == ($language = $app['request']->get('lang'))) {
+                throw new \Exception('Missing the GET parameter `lang`!');
+            }
 
             // create the permalink
             $perma = $app['utils']->sanitizeLink($link);
 
             $ContentData = new ContentData($app);
-            if ($ContentData->existsPermaLink($perma)) {
+            if ($ContentData->existsPermaLink($perma, $language)) {
                 // this permalink is already in use!
-                $count = $ContentData->countPermaLinksLikeThis($perma);
+                $count = $ContentData->countPermaLinksLikeThis($perma, $language);
                 $count++;
                 // add a counter to the new permanet link
                 $perma = sprintf('%s-%d', $perma, $count);
@@ -65,14 +68,17 @@ class PermaLinkResponse
             if (null == ($link = $app['request']->get('link'))) {
                 throw new \Exception('Missing the GET parameter `link`!');
             }
+            if (null == ($language = $app['request']->get('lang'))) {
+                throw new \Exception('Missing the GET parameter `lang`!');
+            }
 
             // create the permalink
             $perma = $app['utils']->sanitizeLink($link);
 
             $CategoryTypeData = new CategoryTypeData($app);
-            if ($CategoryTypeData->existsPermaLink($perma)) {
+            if ($CategoryTypeData->existsPermaLink($perma, $language)) {
                 // this permalink is already in use!
-                $count = $CategoryTypeData->countPermaLinksLikeThis($perma);
+                $count = $CategoryTypeData->countPermaLinksLikeThis($perma, $language);
                 $count++;
                 // add a counter to the new permanet link
                 $perma = sprintf('%s-%d', $perma, $count);
@@ -98,18 +104,20 @@ class PermaLinkResponse
             if (null == ($link = $app['request']->get('link'))) {
                 throw new \Exception('Missing the GET parameter `link`!');
             }
+            if (null == ($language = $app['request']->get('lang'))) {
+                throw new \Exception('Missing the GET parameter `lang`!');
+            }
 
             // create the permalink
             $perma = $app['utils']->sanitizeLink($link);
 
             $TagTypeData = new TagTypeData($app);
-            if ($TagTypeData->existsPermaLink($perma)) {
+            if ($TagTypeData->existsPermaLink($perma, $language)) {
                 // this permalink is already in use!
-                /*
-                $count = $TagTypeData->countPermaLinksLikeThis($perma);
+                $count = $TagTypeData->countPermaLinksLikeThis($perma, $language);
                 $count++;
                 // add a counter to the new permanet link
-                $perma = sprintf('%s-%d', $perma, $count);*/
+                $perma = sprintf('%s-%d', $perma, $count);
             }
 
             // return JSON response

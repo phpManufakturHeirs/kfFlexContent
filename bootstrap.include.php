@@ -74,6 +74,8 @@ $app->get('/admin/flexcontent/about',
 
 $app->get('/admin/flexcontent/edit',
     'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerEdit');
+$app->post('/admin/flexcontent/edit/language/check',
+    'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerLanguageCheck');
 $app->get('/admin/flexcontent/edit/id/{content_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerEdit');
 $app->post('/admin/flexcontent/edit/check',
@@ -105,6 +107,8 @@ $app->get('/admin/flexcontent/tag/list/page/{page}',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerList');
 $app->get('/admin/flexcontent/tag/create',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerEdit');
+$app->post('/admin/flexcontent/tag/language/check',
+    'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerLanguageCheck');
 $app->get('/admin/flexcontent/tag/edit/id/{tag_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerEdit');
 $app->post('/admin/flexcontent/tag/edit/check',
@@ -120,6 +124,8 @@ $app->get('/admin/flexcontent/category/list/page/{page}',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerList');
 $app->get('/admin/flexcontent/category/create',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerEdit');
+$app->post('/admin/flexcontent/category/language/check',
+    'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerLanguageCheck');
 $app->get('/admin/flexcontent/category/edit/id/{category_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerEdit');
 $app->post('/admin/flexcontent/category/edit/check',

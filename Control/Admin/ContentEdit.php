@@ -29,6 +29,7 @@ class ContentEdit extends Admin
     protected $TagTypeData = null;
     protected $CategoryTypeData = null;
     protected $CategoryData = null;
+    protected static $language = null;
 
     /**
      * (non-PHPdoc)
@@ -44,6 +45,8 @@ class ContentEdit extends Admin
         $this->TagTypeData = new TagType($app);
         $this->CategoryData = new Category($app);
         $this->CategoryTypeData = new CategoryType($app);
+
+        self::$language = $this->app['request']->get('form[language]', self::$config['content']['language']['default'], true);
     }
 
     /**
@@ -88,21 +91,23 @@ class ContentEdit extends Admin
             $secondary_categories = null;
         }
 
-        $languages = array();
-        foreach (self::$config['content']['languages'] as $language) {
-            $languages[$language['code']] = $language['name'];
+        $categories = $this->CategoryTypeData->getListForSelect(self::$language);
+        if (empty($categories)) {
+            $this->setAlert('No category available for the language %language%, please create a category first!',
+                array('%language%' => $this->app['translator']->trans(self::$language)), self::ALERT_TYPE_WARNING);
         }
+
+        // show the permalink URL
+        $permalink_url = CMS_URL.'/';
+        $permalink_url .= (isset($data['language'])) ? strtolower($data['language']) : strtolower(self::$language);
+        $permalink_url .= self::$config['content']['permalink']['directory'].'/';
 
         $form = $this->app['form.factory']->createBuilder('form')
         ->add('content_id', 'hidden', array(
             'data' => isset($data['content_id']) ? $data['content_id'] : -1
         ))
-        ->add('language', 'choice', array(
-            'choices' => $languages,
-            'empty_value' => '- please select -',
-            'expanded' => false,
-            'required' => self::$config['content']['field']['language']['required'],
-            'data' => isset($data['language']) ? $data['language'] : strtoupper($this->app['translator']->getLocale()),
+        ->add('language', 'hidden', array(
+            'data' => isset($data['language']) ? $data['language'] : self::$language,
         ))
         ->add('title', 'text', array(
             'data' => isset($data['title']) ? $data['title'] : '',
@@ -115,11 +120,6 @@ class ContentEdit extends Admin
         ->add('keywords', 'textarea', array(
             'data' => isset($data['keywords']) ? $data['keywords'] : '',
             'required' => self::$config['content']['field']['keywords']['required']
-        ))
-        ->add('permalink', 'text', array(
-            'data' => isset($data['permalink']) ? $data['permalink'] : '',
-            'required' => self::$config['content']['field']['permalink']['required'],
-            'label' => 'Permalink'
         ))
         ->add('publish_from', 'text', array(
             'required' => self::$config['content']['field']['publish_from']['required'],
@@ -153,7 +153,7 @@ class ContentEdit extends Admin
             'data' => isset($data['permalink']) ? $data['permalink'] : ''
         ))
         ->add('permalink_url', 'hidden', array(
-            'data' => CMS_URL.self::$config['content']['permalink']['directory'].'/'
+            'data' => $permalink_url
         ))
         ->add('redirect_url', 'text', array(
             'required' => self::$config['content']['field']['redirect_url']['required'],
@@ -163,14 +163,14 @@ class ContentEdit extends Admin
             'data' => isset($data['teaser_image']) ? $data['teaser_image'] : ''
         ))
         ->add('primary_category', 'choice', array(
-            'choices' => $this->CategoryTypeData->getListForSelect(),
+            'choices' => $categories,
             'empty_value' => '- please select -',
             'expanded' => false,
             'required' => true,
             'data' => $primary_category
         ))
         ->add('secondary_categories', 'choice', array(
-            'choices' => $this->CategoryTypeData->getListForSelect(),
+            'choices' => $categories,
             'empty_value' => '- please select -',
             'required' => false,
             'multiple' => true,
@@ -376,13 +376,13 @@ class ContentEdit extends Admin
                     case 'language':
                         // ignore property 'required'!
                         $language_checked = false;
-                        foreach (self::$config['content']['languages'] as $language) {
+                        foreach (self::$config['content']['language']['support'] as $language) {
                             if ($content[$name] == $language['code']) {
                                 $language_checked = true;
                                 break;
                             }
                         }
-                        $data[$name] = $language_checked ? $content[$name] : 'EN';
+                        $data[$name] = $language_checked ? $content[$name] : self::$config['content']['language']['default'];
                         break;
                     case 'primary_category':
                         // ignore the property 'required'
@@ -575,16 +575,17 @@ class ContentEdit extends Admin
                         // insert a new key
                         $tag_id = -1;
                         $permalink = $this->app['utils']->sanitizeLink($value);
-                        if ($this->TagTypeData->existsPermaLink($permalink)) {
+                        if ($this->TagTypeData->existsPermaLink($permalink, self::$language)) {
                             // this permalink is already in use - add a counter
-                            $count = $this->TagTypeData->countPermaLinksLikeThis($permalink);
+                            $count = $this->TagTypeData->countPermaLinksLikeThis($permalink, self::$language);
                             $count++;
                             // add a counter to the new permanet link
                             $permalink = sprintf('%s-%d', $permalink, $count);
                         }
                         $data = array(
                             'tag_name' => $value,
-                            'tag_permalink' => $permalink
+                            'tag_permalink' => $permalink,
+                            'language' => self::$language
                         );
                         // create a new TAG ID
                         $this->TagTypeData->insert($data, $tag_id);
@@ -640,6 +641,80 @@ class ContentEdit extends Admin
     }
 
     /**
+     * Create the form to select the language desired to the flexContent
+     *
+     * @param array $data
+     */
+    protected function getLanguageForm($data=array())
+    {
+        $languages = array();
+        foreach (self::$config['content']['language']['support'] as $language) {
+            $languages[$language['code']] = $language['name'];
+        }
+
+        return $this->app['form.factory']->createBuilder('form')
+        ->add('language', 'choice', array(
+            'choices' => $languages,
+            'empty_value' => '- please select -',
+            'expanded' => false,
+            'required' => self::$config['content']['field']['language']['required'],
+            'data' => isset($data['language']) ? $data['language'] : self::$language,
+        ))
+        ->getForm();
+    }
+
+    /**
+     * Select a language for the flexContent
+     *
+     * @return string dialog
+     */
+    protected function selectLanguage()
+    {
+        $form = $this->getLanguageForm();
+
+        $this->setAlert('Please select the language for the new flexContent.');
+
+        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+            '@phpManufaktur/flexContent/Template', 'admin/select.language.twig'),
+            array(
+                'usage' => self::$usage,
+                'toolbar' => $this->getToolbar('edit'),
+                'alert' => $this->getAlert(),
+                'form' => $form->createView(),
+                'config' => self::$config,
+                'action' => '/admin/flexcontent/edit/language/check'
+            ));
+    }
+
+    /**
+     * Controller to check the selected language and show the flexContent dialog
+     *
+     * @param Application $app
+     */
+    public function ControllerLanguageCheck(Application $app)
+    {
+        $this->initialize($app);
+
+        // get the form
+        $form = $this->getLanguageForm();
+        // get the requested data
+        $form->bind($this->app['request']);
+
+        if ($form->isValid()) {
+            // the form is valid
+            $data = $form->getData();
+            self::$language = $data['language'];
+        }
+        else {
+            // general error (timeout, CSFR ...)
+            $this->setAlert('The form is not valid, please check your input and try again!', array(), self::ALERT_TYPE_DANGER);
+        }
+
+        $form = $this->getContentForm($data);
+        return $this->renderContentForm($form);
+    }
+
+    /**
      * Controller to create or edit contents
      *
      * @param Application $app
@@ -651,6 +726,11 @@ class ContentEdit extends Admin
 
         if (!is_null($content_id)) {
             self::$content_id = $content_id;
+        }
+
+        if ((self::$content_id < 1) && self::$config['content']['language']['select']) {
+            // language selection is active - select language first!
+            return $this->selectLanguage();
         }
 
         $data = array();

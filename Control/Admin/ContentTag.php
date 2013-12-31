@@ -30,6 +30,7 @@ class ContentTag extends Admin
     protected static $current_page = null;
     protected static $max_pages = null;
     protected static $config = null;
+    protected static $language = null;
 
     /**
      * (non-PHPdoc)
@@ -68,6 +69,8 @@ class ContentTag extends Admin
 
         $Configuration = new Configuration($app);
         self::$config = $Configuration->getConfiguration();
+
+        self::$language = $this->app['request']->get('form[language]', self::$config['content']['language']['default'], true);
     }
 
     /**
@@ -120,6 +123,11 @@ class ContentTag extends Admin
      */
     protected function getTagTypeForm($data = array())
     {
+        // show the permalink URL
+        $permalink_url = CMS_URL.'/';
+        $permalink_url .= (isset($data['language'])) ? strtolower($data['language']) : strtolower(self::$language);
+        $permalink_url .= self::$config['content']['permalink']['directory'].'/tag/';
+
         $form = $this->app['form.factory']->createBuilder('form')
         ->add('tag_id', 'hidden', array(
             'data' => isset($data['tag_id']) ? $data['tag_id'] : -1
@@ -127,9 +135,15 @@ class ContentTag extends Admin
         ->add('tag_name', 'text', array(
             'data' => isset($data['tag_name']) ? $data['tag_name'] : ''
         ))
+        ->add('language', 'hidden', array(
+            'data' => isset($data['language']) ? $data['language'] : self::$language
+        ))
         ->add('tag_permalink', 'text', array(
             'data' => isset($data['tag_permalink']) ? $data['tag_permalink'] : '',
             'label' => 'Permalink'
+        ))
+        ->add('permalink_url', 'hidden', array(
+            'data' => $permalink_url
         ))
         ->add('tag_image', 'hidden', array(
             'data' => isset($data['tag_image']) ? $data['tag_image'] : ''
@@ -207,7 +221,7 @@ class ContentTag extends Admin
             }
 
             // check if the tag already exists
-            if ((self::$tag_id < 1) && $this->TagTypeData->existsName($tag['tag_name'])) {
+            if ((self::$tag_id < 1) && $this->TagTypeData->existsName($tag['tag_name'], $tag['language'])) {
                 $this->setAlert('The tag type %tag% already exists and can not inserted!',
                     array('%tag%' => $tag['tag_name']), self::ALERT_TYPE_WARNING);
                 return false;
@@ -215,6 +229,7 @@ class ContentTag extends Admin
 
             $data['tag_name'] = $tag['tag_name'];
             $data['tag_description'] = !empty($tag['tag_description']) ? $tag['tag_description'] : '';
+            $data['language'] = $tag['language'];
 
             if (self::$tag_id < 1) {
                 // create a new tag type record
@@ -240,6 +255,80 @@ class ContentTag extends Admin
     }
 
     /**
+     * Create the form to select the language desired to the flexContent
+     *
+     * @param array $data
+     */
+    protected function getLanguageForm($data=array())
+    {
+        $languages = array();
+        foreach (self::$config['content']['language']['support'] as $language) {
+            $languages[$language['code']] = $language['name'];
+        }
+
+        return $this->app['form.factory']->createBuilder('form')
+        ->add('language', 'choice', array(
+            'choices' => $languages,
+            'empty_value' => '- please select -',
+            'expanded' => false,
+            'required' => self::$config['content']['field']['language']['required'],
+            'data' => isset($data['language']) ? $data['language'] : self::$language,
+        ))
+        ->getForm();
+    }
+
+    /**
+     * Select a language for the flexContent
+     *
+     * @return string dialog
+     */
+    protected function selectLanguage()
+    {
+        $form = $this->getLanguageForm();
+
+        $this->setAlert('Please select the language for the new flexContent.');
+
+        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+            '@phpManufaktur/flexContent/Template', 'admin/select.language.twig'),
+            array(
+                'usage' => self::$usage,
+                'toolbar' => $this->getToolbar('edit'),
+                'alert' => $this->getAlert(),
+                'form' => $form->createView(),
+                'config' => self::$config,
+                'action' => '/admin/flexcontent/tag/language/check'
+            ));
+    }
+
+    /**
+     * Controller to check the selected language and show the flexContent dialog
+     *
+     * @param Application $app
+     */
+    public function ControllerLanguageCheck(Application $app)
+    {
+        $this->initialize($app);
+
+        // get the form
+        $form = $this->getLanguageForm();
+        // get the requested data
+        $form->bind($this->app['request']);
+
+        if ($form->isValid()) {
+            // the form is valid
+            $data = $form->getData();
+            self::$language = $data['language'];
+        }
+        else {
+            // general error (timeout, CSFR ...)
+            $this->setAlert('The form is not valid, please check your input and try again!', array(), self::ALERT_TYPE_DANGER);
+        }
+
+        $form = $this->getTagTypeForm($data);
+        return $this->renderTagTypeForm($form);
+    }
+
+    /**
      * Controller to create or edit a Tag Type record
      *
      * @param Application $app
@@ -251,6 +340,10 @@ class ContentTag extends Admin
 
         if (!is_null($tag_id)) {
             self::$tag_id = $tag_id;
+        }
+
+        if ((self::$tag_id < 1) && self::$config['content']['language']['select']) {
+            return $this->selectLanguage();
         }
 
         $data = array();

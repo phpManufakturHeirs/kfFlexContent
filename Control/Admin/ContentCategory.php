@@ -33,6 +33,7 @@ class ContentCategory extends Admin
     protected static $current_page = null;
     protected static $max_pages = null;
     protected static $config = null;
+    protected static $language = null;
 
     /**
      * (non-PHPdoc)
@@ -73,6 +74,8 @@ class ContentCategory extends Admin
 
         $Configuration = new Configuration($app);
         self::$config = $Configuration->getConfiguration();
+
+        self::$language = $this->app['request']->get('form[language]', self::$config['content']['language']['default'], true);
     }
 
     /**
@@ -130,9 +133,17 @@ class ContentCategory extends Admin
             $links[$link['complete_link']] = $link['complete_link'];
         }
 
+        // show the permalink URL
+        $permalink_url = CMS_URL.'/';
+        $permalink_url .= (isset($data['language'])) ? strtolower($data['language']) : strtolower(self::$language);
+        $permalink_url .= self::$config['content']['permalink']['directory'].'/category/';
+
         $form = $this->app['form.factory']->createBuilder('form')
         ->add('category_id', 'hidden', array(
             'data' => isset($data['category_id']) ? $data['category_id'] : -1
+        ))
+        ->add('language', 'hidden', array(
+            'data' => isset($data['language']) ? $data['language'] : self::$language
         ))
         ->add('category_name', 'text', array(
             'label' => 'Name',
@@ -141,6 +152,9 @@ class ContentCategory extends Admin
         ->add('category_permalink', 'text', array(
             'label' => 'Permalink',
             'data' => isset($data['category_permalink']) ? $data['category_permalink'] : ''
+        ))
+        ->add('permalink_url', 'hidden', array(
+            'data' => $permalink_url
         ))
         ->add('target_url', 'choice', array(
             'choices' => $links,
@@ -227,7 +241,7 @@ class ContentCategory extends Admin
             }
 
             // check if the category already exists
-            if ((self::$category_id < 1) && $this->CategoryTypeData->existsName($category['category_name'])) {
+            if ((self::$category_id < 1) && $this->CategoryTypeData->existsName($category['category_name'], $category['language'])) {
                 $this->setAlert('The category type %category% already exists and can not inserted!',
                     array('%category%' => $category['category_name']), self::ALERT_TYPE_WARNING);
                 return false;
@@ -239,14 +253,14 @@ class ContentCategory extends Admin
             }
             $permalink = $this->app['utils']->sanitizeLink($category['category_permalink']);
 
-            if (self::$category_id < 1 && $this->CategoryTypeData->existsPermaLink($permalink)) {
+            if (self::$category_id < 1 && $this->CategoryTypeData->existsPermaLink($permalink, $category['language'])) {
                 // this PermaLink already exists!
                 $this->setAlert('The permalink %permalink% is already in use, please select another one!',
                     array('%permalink%' => $permalink), self::ALERT_TYPE_WARNING);
                 return false;
             }
             elseif ((self::$category_id > 0) &&
-                (false !== ($used_by = $this->CategoryTypeData->selectCategoryIDbyPermaLink($permalink))) &&
+                (false !== ($used_by = $this->CategoryTypeData->selectCategoryIDbyPermaLink($permalink, $category['language']))) &&
                 ($used_by != self::$category_id)) {
                 $this->setAlert('The permalink %permalink% is already in use by the category type record %id%, please select another one!',
                     array('%permalink%' => $permalink, '%id%' => $used_by), self::ALERT_TYPE_WARNING);
@@ -254,6 +268,7 @@ class ContentCategory extends Admin
             }
 
             $data['category_name'] = $category['category_name'];
+            $data['language'] = $category['language'];
             $data['category_permalink'] = $permalink;
             $data['category_description'] = !empty($category['category_description']) ? $category['category_description'] : '';
             $data['target_url'] = $category['target_url'];
@@ -318,6 +333,81 @@ class ContentCategory extends Admin
     }
 
     /**
+     * Create the form to select the language desired to the flexContent
+     *
+     * @param array $data
+     */
+    protected function getLanguageForm($data=array())
+    {
+        $languages = array();
+        foreach (self::$config['content']['language']['support'] as $language) {
+            $languages[$language['code']] = $language['name'];
+        }
+
+        return $this->app['form.factory']->createBuilder('form')
+        ->add('language', 'choice', array(
+            'choices' => $languages,
+            'empty_value' => '- please select -',
+            'expanded' => false,
+            'required' => self::$config['content']['field']['language']['required'],
+            'data' => isset($data['language']) ? $data['language'] : self::$language,
+        ))
+        ->getForm();
+    }
+
+    /**
+     * Select a language for the flexContent
+     *
+     * @return string dialog
+     */
+    protected function selectLanguage()
+    {
+        $form = $this->getLanguageForm();
+
+        $this->setAlert('Please select the language for the new flexContent.');
+
+        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+            '@phpManufaktur/flexContent/Template', 'admin/select.language.twig'),
+            array(
+                'usage' => self::$usage,
+                'toolbar' => $this->getToolbar('edit'),
+                'alert' => $this->getAlert(),
+                'form' => $form->createView(),
+                'config' => self::$config,
+                'action' => '/admin/flexcontent/category/language/check'
+            ));
+    }
+
+    /**
+     * Controller to check the selected language and show the flexContent dialog
+     *
+     * @param Application $app
+     */
+    public function ControllerLanguageCheck(Application $app)
+    {
+        $this->initialize($app);
+
+        // get the form
+        $form = $this->getLanguageForm();
+        // get the requested data
+        $form->bind($this->app['request']);
+
+        if ($form->isValid()) {
+            // the form is valid
+            $data = $form->getData();
+            self::$language = $data['language'];
+        }
+        else {
+            // general error (timeout, CSFR ...)
+            $this->setAlert('The form is not valid, please check your input and try again!', array(), self::ALERT_TYPE_DANGER);
+        }
+
+        $form = $this->getCategoryTypeForm($data);
+        return $this->renderCategoryTypeForm($form);
+    }
+
+
+    /**
      * Controller to create or edit a Category Type record
      *
      * @param Application $app
@@ -331,6 +421,10 @@ class ContentCategory extends Admin
             self::$category_id = $category_id;
         }
 
+        if ((self::$category_id < 1) && self::$config['content']['language']['select']) {
+            // language selection is active - select language first!
+            return $this->selectLanguage();
+        }
         $data = array();
         if ((self::$category_id > 0) && (false === ($data = $this->CategoryTypeData->select(self::$category_id)))) {
             $this->setAlert('The Category Type record with the ID %id% does not exists!',

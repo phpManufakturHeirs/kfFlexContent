@@ -29,8 +29,12 @@ class TagResponse
             throw new \Exception('Missing the GET parameter `term`!');
         }
 
+        if (null == ($language = $app['request']->query->get('lang'))) {
+            throw new \Exception('Missing the GET parameter `lang`!');
+        }
+
         $TagType = new TagType($app);
-        $results = $TagType->selectLikeName($search);
+        $results = $TagType->selectLikeName($search, $language);
 
         $result = array();
         foreach ($results as $tag) {

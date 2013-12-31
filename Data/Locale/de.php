@@ -95,6 +95,8 @@ return array(
         => 'Nächster Artikel',
     'NL'
         => 'Niederländisch',
+    'No category available for the language %language%, please create a category first!'
+        => 'Es existiert keine Kategorie für die Sprache %language%, bitte erstellen Sie zunächst eine Kategorie!',
 
     'Overview'
         => 'Übersicht',
@@ -107,6 +109,8 @@ return array(
         => 'Legen Sie bitte Schlüsselwörter für den Inhalt fest!',
     'Please fill in all requested fields before submitting the form!'
         => 'Bitte füllen Sie zunächst alle Pflichtfelder aus!',
+    'Please select the language for the new flexContent.'
+        => 'Bitte wählen Sie die Sprache, die dem neuen flexContent zugeordnet werden soll.',
     'Please type in a name for the category type.'
         => 'Bitte geben Sie eine Bezeichnung für die Kategorie an.',
     'Please type in a name for the tag type.'
@@ -165,7 +169,7 @@ return array(
     'The category type %category% already exists and can not inserted!'
         => 'Die Kategorie <b>%category%</b> existiert bereits und kann nicht erneut eingefügt werden!',
     'The category type %category% was successfull deleted.'
-        => 'Die Kategory <b>%category%</b> wurde erfolgreich gelöscht.',
+        => 'Die Kategorie <b>%category%</b> wurde erfolgreich gelöscht.',
     'The category type list for flexContent is empty, please create the first category!'
         => 'Es existieren noch keine Kategorien, erstellen Sie die erste Kategorie!',
     'The category type name %category% contains the forbidden character %char%, please change the name.'

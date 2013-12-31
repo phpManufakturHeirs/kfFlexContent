@@ -43,14 +43,14 @@ class CategoryType
         $SQL = <<<EOD
     CREATE TABLE IF NOT EXISTS `$table` (
         `category_id` INT(11) NOT NULL AUTO_INCREMENT,
+        `language` VARCHAR(2) NOT NULL DEFAULT 'EN',
         `category_name` VARCHAR(64) NOT NULL DEFAULT '',
         `category_permalink` VARCHAR(255) NOT NULL DEFAULT '',
         `category_description` TEXT NOT NULL DEFAULT '',
         `category_image` TEXT NOT NULL,
         `target_url` TEXT NOT NULL,
         `timestamp` TIMESTAMP,
-        PRIMARY KEY (`category_id`),
-        UNIQUE INDEX (`category_name`, `category_permalink`)
+        PRIMARY KEY (`category_id`)
         )
     COMMENT='The category types used by the flexContent records'
     ENGINE=InnoDB
@@ -202,11 +202,12 @@ EOD;
      * @throws \Exception
      * @return boolean
      */
-    public function existsName($category_name)
+    public function existsName($category_name, $language)
     {
         try {
             $SQL = "SELECT `category_name` FROM `".self::$table_name."` WHERE LOWER(`category_name`) = '".
-                $this->app['utils']->sanitizeVariable(strtolower($category_name))."'";
+                $this->app['utils']->sanitizeVariable(strtolower($category_name))."' ".
+                "AND `language`='$language'";
             $category = $this->app['db']->fetchColumn($SQL);
             return !empty($category);
         } catch (\Doctrine\DBAL\DBALException $e) {
@@ -272,10 +273,10 @@ EOD;
      * @throws \Exception
      * @return multitype:NULL
      */
-    public function getListForSelect()
+    public function getListForSelect($language)
     {
         try {
-            $SQL = "SELECT `category_id`, `category_name` FROM `".self::$table_name."` ORDER BY `category_name` ASC";
+            $SQL = "SELECT `category_id`, `category_name` FROM `".self::$table_name."` WHERE `language`='$language' ORDER BY `category_name` ASC";
             $results = $this->app['db']->fetchAll($SQL);
             $categories = array();
             foreach ($results as $category) {
@@ -294,10 +295,10 @@ EOD;
      * @throws \Exception
      * @return boolean
      */
-    public function existsPermaLink($permalink)
+    public function existsPermaLink($permalink, $language)
     {
         try {
-            $SQL = "SELECT `category_permalink` FROM `".self::$table_name."` WHERE `category_permalink`='$permalink'";
+            $SQL = "SELECT `category_permalink` FROM `".self::$table_name."` WHERE `category_permalink`='$permalink' AND `language`='$language'";
             $result = $this->app['db']->fetchColumn($SQL);
             return ($result == $permalink);
         } catch (\Doctrine\DBAL\DBALException $e) {
@@ -311,10 +312,11 @@ EOD;
      * @param string $this
      * @throws \Exception
      */
-    public function countPermaLinksLikeThis($permalink)
+    public function countPermaLinksLikeThis($permalink, $language)
     {
         try {
-            $SQL = "SELECT COUNT(`category_permalink`) FROM `".self::$table_name."` WHERE `category_permalink` LIKE '$permalink%'";
+            $SQL = "SELECT COUNT(`category_permalink`) FROM `".self::$table_name."` WHERE ".
+                "`language`='$language' AND `category_permalink` LIKE '$permalink%'";
             return $this->app['db']->fetchColumn($SQL);
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
@@ -328,10 +330,11 @@ EOD;
      * @throws \Exception
      * @return Ambigous <boolean, array>
      */
-    public function selectCategoryIDbyPermaLink($permalink)
+    public function selectCategoryIDbyPermaLink($permalink, $language)
     {
         try {
-            $SQL = "SELECT `category_id` FROM `".self::$table_name."` WHERE `category_permalink`='$permalink'";
+            $SQL = "SELECT `category_id` FROM `".self::$table_name."` WHERE `category_permalink`='$permalink' ".
+                "AND `language`='$language'";
             $result = $this->app['db']->fetchColumn($SQL);
             return ($result > 0) ? $result : false;
         } catch (\Doctrine\DBAL\DBALException $e) {

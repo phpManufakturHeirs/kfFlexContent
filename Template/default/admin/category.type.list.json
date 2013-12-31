@@ -1,6 +1,7 @@
 {
   "columns":[
     "category_id",
+    "language",
     "category_name",
     "category_description",
     "used_by_content_id"

@@ -40,6 +40,7 @@
       {{ form_errors(form) }}
       {{ form_row(form._token) }}
       {{ form_row(form.category_id) }}
+      {{ form_row(form.language) }}
       
       <div class="row">
         <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
@@ -49,7 +50,7 @@
             {{ form_widget(form.category_name, {'attr':{'class':'form-control input-sm'}}) }}
           </div>
           <div class="form-group">
-            {{ form_label(form.category_permalink) }}&nbsp;-&nbsp;<span class="text-muted small">{{ CMS_URL ~ config.content.permalink.directory ~ '/category/' }}</span>
+            {{ form_label(form.category_permalink) }}&nbsp;({{ form.language.vars.value|trans }})&nbsp;-&nbsp;<span class="text-muted small">{{ form.permalink_url.vars.value }}</span>
             {{ form_widget(form.category_permalink, {'attr':{'class':'form-control input-sm'}}) }}
           </div>
           <div class="form-group">
@@ -111,9 +112,9 @@
           var name = $('#form_category_name').val();
                     
           if (permalink.length < 1) { 
-            // no permalink defined, use the page title as propose ...
+            // no permalink defined, use the category name as propose ...
             $.ajax({
-              url:"{{ FRAMEWORK_URL }}/admin/flexcontent/permalink/create/category",
+              url:"{{ FRAMEWORK_URL }}/admin/flexcontent/permalink/create/category?lang={{ form.language.vars.value }}",
               type: "POST",
               dataType: "json",
               data: {

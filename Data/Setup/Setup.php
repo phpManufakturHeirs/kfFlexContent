@@ -56,7 +56,7 @@ class Setup
             $subdirectory = '';
         }
 
-        foreach ($config['content']['languages'] as $language) {
+        foreach ($config['content']['language']['support'] as $language) {
             $app['filesystem']->mkdir(CMS_PATH.'/'.strtolower($language['code']).$config['content']['permalink']['directory']);
             if (false === ($include = file_get_contents(MANUFAKTUR_PATH.'/flexContent/Data/Setup/PermaLink/.htaccess'))) {
                 throw new \Exception('Missing /flexContent/Data/Setup/PermaLink/.htaccess!');

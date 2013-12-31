@@ -36,7 +36,7 @@ class Configuration
      *
      * @return array
      */
-    public static function getDefaultConfigArray()
+    public function getDefaultConfigArray()
     {
         return array(
             'content' => array(
@@ -109,18 +109,18 @@ class Configuration
                         'select' => '/media/public/content/teaser'
                      )
                 ),
-                'languages' => array(
-                    'DE' => array(
-                        'code' => 'DE',
-                        'name' => 'German'
-                    ),
-                    'EN' => array(
-                        'code' => 'EN',
-                        'name' => 'English'
-                    ),
-                    'NL' => array(
-                        'code' => 'NL',
-                        'name' => 'Dutch'
+                'language' => array(
+                    'select' => false,
+                    'default' => strtoupper($this->app['translator']->getLocale()),
+                    'support' => array(
+                        'DE' => array(
+                            'code' => 'DE',
+                            'name' => 'German'
+                        ),
+                        'EN' => array(
+                            'code' => 'EN',
+                            'name' => 'English'
+                        )
                     )
                 )
             ),
