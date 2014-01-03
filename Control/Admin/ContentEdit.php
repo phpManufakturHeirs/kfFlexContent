@@ -56,6 +56,11 @@ class ContentEdit extends Admin
      */
     protected function getContentForm($data=array())
     {
+        if (isset($data['language'])) {
+            // set the language property from the content data
+            self::$language = $data['language'];
+        }
+
         if (!isset($data['publish_from']) || ($data['publish_from'] == '0000-00-00 00:00:00')) {
             $dt = Carbon::create();
             $dt->addHours(self::$config['content']['field']['publish_from']['add']['hours']);
@@ -98,16 +103,15 @@ class ContentEdit extends Admin
         }
 
         // show the permalink URL
-        $permalink_url = CMS_URL.'/';
-        $permalink_url .= (isset($data['language'])) ? strtolower($data['language']) : strtolower(self::$language);
-        $permalink_url .= self::$config['content']['permalink']['directory'].'/';
+        $language = (isset($data['language'])) ? $data['language'] : self::$language;
+        $permalink_url = CMS_URL.str_ireplace('{language}', strtolower($language), self::$config['content']['permalink']['directory']).'/';
 
         $form = $this->app['form.factory']->createBuilder('form')
         ->add('content_id', 'hidden', array(
             'data' => isset($data['content_id']) ? $data['content_id'] : -1
         ))
         ->add('language', 'hidden', array(
-            'data' => isset($data['language']) ? $data['language'] : self::$language,
+            'data' => $language,
         ))
         ->add('title', 'text', array(
             'data' => isset($data['title']) ? $data['title'] : '',

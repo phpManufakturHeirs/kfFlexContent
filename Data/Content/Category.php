@@ -264,6 +264,26 @@ EOD;
     }
 
     /**
+     * Select the target URL for the given Category ID
+     *
+     * @param integer $category_id
+     * @throws \Exception
+     * @return Ambigous <boolean, string>
+     */
+    public function selectTargetURLbyCategoryID($category_id)
+    {
+        try {
+            $type_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category_type';
+            $SQL = "SELECT `target_url` FROM $type_table WHERE category_id='$category_id'";
+            $target_url = $this->app['db']->fetchColumn($SQL);
+            return (!empty($target_url)) ? $target_url : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+
+    /**
      * Select all categories and type information for the given flexContent ID
      *
      * @param integer $content_id

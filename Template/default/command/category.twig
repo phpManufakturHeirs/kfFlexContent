@@ -1,0 +1,38 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2014 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+{% spaceless %}
+{% include '@phpManufaktur/flexContent/Template/default/command/command.header.twig' %}        
+<div class="flexcontent-container">
+  <div class="container">    
+      
+    {{ basic.alert }}
+
+    {% if parameter.category_description and category.category_description|length > 0 %}
+      <div class="media">
+        {% if parameter.category_image and category.category_image|length > 0 %}
+          {% set img = image(category.category_image, 100, 150) %}
+          <img class="media-object pull-right" src="{{ img.src }}" width="{{ img.width }}" height="{{ img.height }}" alt="{{ category.category_name }}" title="{{ category.category_name }}" />
+        {% endif %}
+        <div class="media-body">
+          {% if parameter.category_name %}
+            <h{{ parameter.title_level|default('1') }} class="media-heading">{{ category.category_name|default('') }}</h{{ parameter.title_level|default('1') }}>
+          {% endif %}
+          {{ category.category_description|default('') }}
+        </div>
+      </div>
+    {% elseif parameter.category_name %}
+      <h{{ parameter.title_level|default('1') }}>{{ category.category_name|default('') }}</h{{ parameter.title_level|default('1') }}>
+    {% endif %}
+      <p>TEST</p>
+  </div>
+  
+</div>
+{% include '@phpManufaktur/flexContent/Template/default/command/command.footer.twig' %}        
+{% endspaceless %}

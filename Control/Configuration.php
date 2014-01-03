@@ -101,7 +101,7 @@ class Configuration
                     )
                 ),
                 'permalink' => array(
-                    'directory' => '/content'
+                    'directory' => '/{language}/content'
                 ),
                 'images' => array(
                     'directory' => array(
@@ -146,6 +146,13 @@ class Configuration
                             'control' => true,
                             'author' => true,
                             'date' => true
+                        ),
+                        'category' => array(
+                            'css' => true,
+                            'title_level' => 1,
+                            'category_name' => true,
+                            'category_description' => true,
+                            'category_image' => true,
                         )
                     )
                 )

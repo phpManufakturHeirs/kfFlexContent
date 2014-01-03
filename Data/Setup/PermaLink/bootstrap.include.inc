@@ -9,7 +9,22 @@
  * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 
-$app->get('%subdirectory%/{language}/content/{name}',
-    'phpManufaktur\flexContent\Control\PermanentLink::ControllerName');
-$app->get('%subdirectory%/{language}/content/id/{content_id}',
-    'phpManufaktur\flexContent\Control\PermanentLink::ControllerContentID');
+// permalink route to a content
+$app->get('%subdirectory%%permalink%/{name}',
+    'phpManufaktur\flexContent\Control\PermanentLink::ControllerContentName')
+    ->value('language', '%default_language%');
+
+// permalink route to a category
+$app->get('%subdirectory%%permalink%/category/{name}',
+    'phpManufaktur\flexContent\Control\PermanentLink::ControllerCategoryName')
+    ->value('language', '%default_language%');
+
+// permalink route to a tag
+$app->get('%subdirectory%%permalink%/tag/{name}',
+    'phpManufaktur\flexContent\Control\PermanentLink::ControllerTagName')
+    ->value('language', '%default_language%');
+
+// permalink route to a list (content, category, tag ...)
+$app->get('%subdirectory%%permalink%/list/{name}',
+    'phpManufaktur\flexContent\Control\PermanentLink::ControllerListName')
+    ->value('language', '%default_language%');

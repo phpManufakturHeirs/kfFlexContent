@@ -25,10 +25,15 @@ class Update
     public function Controller(Application $app)
     {
         $this->app = $app;
+
+
         $Setup = new Setup();
 
-        // update subdirectory routes
-        $Setup->addSubdirectoryRoutes($app);
+        // create the configured permalink routes
+        $Setup->createPermalinkRoutes($app);
+
+        // install .htaccess files for the configured languages
+        $Setup->createPermalinkDirectories($app);
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

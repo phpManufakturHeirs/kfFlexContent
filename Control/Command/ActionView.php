@@ -28,7 +28,8 @@ class ActionView extends Basic
 
     protected static $parameter = null;
     protected static $config = null;
-    protected static $locale = null;
+    protected static $language = null;
+    protected static $use_iframe = null;
 
     protected static $view_array = array('content', 'teaser');
     protected static $allowed_status_array = array('PUBLISHED', 'BREAKING', 'HIDDEN', 'ARCHIVED');
@@ -49,7 +50,34 @@ class ActionView extends Basic
         $ConfigurationData = new Configuration($app);
         self::$config = $ConfigurationData->getConfiguration();
 
-        self::$locale = strtoupper($this->getCMSlocale());
+        self::$use_iframe = $app['request']->query->get('use_iframe', true);
+
+        self::$language = strtoupper($this->getCMSlocale());
+    }
+
+    /**
+     * (non-PHPdoc)
+     * @see \phpManufaktur\Basic\Control\Pattern\Alert::promptAlert()
+     */
+    public function promptAlert()
+    {
+        if (self::$use_iframe) {
+            // we can use the default Bootstrap 3 alert response
+            return parent::promptAlert();
+        }
+        else {
+            // we must render the iframe free content template
+            if (!isset(self::$parameter['css'])) {
+                $parameter['css'] = self::$config['kitcommand']['parameter']['action']['view']['css'];
+            }
+            return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+                '@phpManufaktur/flexContent/Template', 'command/alert.twig',
+                $this->getPreferredTemplateStyle()),
+                array(
+                    'basic' => $this->getBasicSettings(),
+                    'parameter' => self::$parameter
+                ));
+        }
     }
 
     /**
@@ -83,42 +111,22 @@ class ActionView extends Basic
         return true;
     }
 
+    /**
+     * Show the content assigned to the specified content ID
+     *
+     * @return \phpManufaktur\Basic\Control\Pattern\rendered
+     */
     protected function showID()
     {
-        if (false === ($content = $this->ContentData->select(self::$parameter['id'], self::$locale))) {
+        if (false === ($content = $this->ContentData->select(self::$parameter['content_id'], self::$language))) {
             $this->setAlert('The flexContent record with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!',
-                array('%id%' => self::$parameter['id'], '%language%' => self::$locale),
+                array('%id%' => self::$parameter['content_id'], '%language%' => self::$language),
                 self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
-            if (self::$parameter['use_iframe']) {
-                // we can use the default Bootstrap 3 alert response
-                return $this->promptAlert();
-            }
-            else {
-                // we must render the iframe free content template
-                return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-                    '@phpManufaktur/flexContent/Template', 'command/alert.twig',
-                    $this->getPreferredTemplateStyle()),
-                    array(
-                        'basic' => $this->getBasicSettings(),
-                        'parameter' => self::$parameter
-                    ));
-            }
+            return $this->promptAlert();
         }
 
         if (!$this->canShowContent($content)) {
-            if (self::$parameter['use_iframe']) {
-                return $this->promptAlert();
-            }
-            else {
-                // we must render the iframe free content template
-                return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-                    '@phpManufaktur/flexContent/Template', 'command/alert.twig',
-                    $this->getPreferredTemplateStyle()),
-                    array(
-                        'basic' => $this->getBasicSettings(),
-                        'parameter' => self::$parameter
-                    ));
-            }
+            return $this->promptAlert();
         }
 
         // ok - gather the content ...
@@ -127,17 +135,17 @@ class ActionView extends Basic
         $this->setPageKeywords($content['keywords']);
 
         // get the categories for this content ID
-        $categories = $this->CategoryData->selectCategoriesByContentID(self::$parameter['id']);
+        $categories = $this->CategoryData->selectCategoriesByContentID(self::$parameter['content_id']);
 
         // get the tags for this content ID
-        $tags = $this->TagData->selectTagArrayForContentID(self::$parameter['id']);
+        $tags = $this->TagData->selectTagArrayForContentID(self::$parameter['content_id']);
 
         // select the previous and the next content
-        $previous_content = $this->ContentData->selectPreviousContentForID(self::$parameter['id'], self::$locale);
-        $next_content = $this->ContentData->selectNextContentForID(self::$parameter['id'], self::$locale);
+        $previous_content = $this->ContentData->selectPreviousContentForID(self::$parameter['content_id'], self::$language);
+        $next_content = $this->ContentData->selectNextContentForID(self::$parameter['content_id'], self::$language);
 
         // get the primary category
-        $primary_category_id = $this->CategoryData->selectPrimaryCategoryIDbyContentID(self::$parameter['id']);
+        $primary_category_id = $this->CategoryData->selectPrimaryCategoryIDbyContentID(self::$parameter['content_id']);
         $primary_category = $this->CategoryTypeData->select($primary_category_id);
 
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
@@ -150,7 +158,7 @@ class ActionView extends Basic
                 'parameter' => self::$parameter,
                 'categories' => $categories,
                 'tags' => $tags,
-                'permalink_base_url' => CMS_URL.self::$config['content']['permalink']['directory'],
+                'permalink_base_url' => CMS_URL.str_ireplace('{language}', strtolower(self::$language), self::$config['content']['permalink']['directory']),
                 'control' => array(
                     'previous' => $previous_content,
                     'next' => $next_content,
@@ -173,8 +181,9 @@ class ActionView extends Basic
         // get the kitCommand parameters
         self::$parameter = $this->getCommandParameters();
 
-        // use a iframe to show the content?
-        self::$parameter['use_iframe'] = $app['request']->query->get('use_iframe', true);
+        // access the default parameters for action -> view from the configuration
+        $default_parameter = self::$config['kitcommand']['parameter']['action']['view'];
+
 
         // check the CMS GET parameters
         $GET = $this->getCMSgetParameters();
@@ -187,24 +196,22 @@ class ActionView extends Basic
             $this->setCommandParameters(self::$parameter);
         }
 
+
         self::$parameter['view'] = (isset(self::$parameter['view'])) ? strtolower(self::$parameter['view']) : 'content';
 
         if (!in_array(self::$parameter['view'], self::$view_array)) {
             // unknown value for the view[] parameter
             $this->setAlert('The parameter <code>%parameter%[%value%]</code> for the kitCommand <code>~~ %command% ~~</code> is unknown, '.
                 'please check the parameter and the given value!',
-                array('%parameter%' => 'view', '%value%' => self::$view, '%command%' => 'flexContent'), self::ALERT_TYPE_DANGER,
+                array('%parameter%' => 'view', '%value%' => self::$parameter['view'], '%command%' => 'flexContent'), self::ALERT_TYPE_DANGER,
                 true, array(__METHOD__, __LINE__));
             return $this->promptAlert();
         }
 
-        // access the default parameters for action -> view from the configuration
-        $default_parameter = self::$config['kitcommand']['parameter']['action']['view'];
-
-        self::$parameter['id'] = (isset(self::$parameter['id']) && is_numeric(self::$parameter['id'])) ? self::$parameter['id'] : -1;
-
         // check wether to use the flexcontent.css or not (only needed if self::$parameter['use_iframe'] == false)
         self::$parameter['css'] = (isset(self::$parameter['css']) && ((self::$parameter['css'] == 0) || (strtolower(self::$parameter['css']) == 'false'))) ? false : $default_parameter['css'];
+
+        self::$parameter['content_id'] = (isset(self::$parameter['content_id']) && is_numeric(self::$parameter['content_id'])) ? self::$parameter['content_id'] : -1;
 
         // set the title above the content?
         self::$parameter['title'] = (isset(self::$parameter['title']) && ((self::$parameter['title'] == 0) || (strtolower(self::$parameter['title']) == 'false'))) ? false : $default_parameter['title'];
@@ -233,11 +240,13 @@ class ActionView extends Basic
         // show publish_from as date?
         self::$parameter['date'] = (isset(self::$parameter['date']) && ((self::$parameter['date'] == 0) || (strtolower(self::$parameter['date']) == 'false'))) ? false : $default_parameter['date'];
 
-        if (self::$parameter['id'] > 0) {
+        if (self::$parameter['content_id'] > 0) {
             return $this->showID();
         }
 
-        return __METHOD__;
+        // Ooops ...
+        $this->setAlert('Fatal error: Missing the content ID!', array(), self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
+        return $this->promptAlert();
     }
 
 

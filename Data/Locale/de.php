@@ -32,6 +32,8 @@ return array(
     'Breaking to'
         => 'Hervorheben bis',
 
+    'Can not handle the requested redirect at this place - use the <a href="%permalink%" target="_blank">permanent link</a> instead!'
+        => 'Die angeforderte Weiterleitung kann an dieser Stelle nicht ausgeführt werden - nutzen Sie diesen <a href="%permakink%" target="_blank">permanenten Link</a>!',
     'category_description'
         => 'Beschreibung',
     'category_id'
@@ -67,6 +69,10 @@ return array(
     'English'
         => 'Englisch',
 
+    'Fatal error: Missing the category ID!'
+        => 'Fataler Fehler: die Kategorie ID wurde nicht übergeben!',
+    'Fatal error: Missing the content ID!'
+        => 'Fataler Fehler: die flexContent ID wurde nicht übergeben!',
     'FR'
         => 'Französisch',
     'French'
@@ -95,6 +101,8 @@ return array(
         => 'Nächster Artikel',
     'NL'
         => 'Niederländisch',
+    'No active content available!'
+        => 'Kein aktiver Inhalt verfügbar!',
     'No category available for the language %language%, please create a category first!'
         => 'Es existiert keine Kategorie für die Sprache %language%, bitte erstellen Sie zunächst eine Kategorie!',
 
@@ -176,6 +184,8 @@ return array(
         => 'Der Kategorie Bezeichner <b>%category%</b> enthält das verbotene Zeichen %char%, bitte ändern Sie die Bezeichnung.',
     'The Category Type record with the ID %id% does not exists!'
         => 'Es existiert kein Kategorie Datensatz mit der ID %id%!',
+    'The Category with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!'
+        => 'Die Kategorie mit der <strong>ID %id%</strong> existiert nicht für die Sprache <strong>%language%</strong>!',
     'The description should have a length between %minimum% and %maximum% characters (actual: %length%).'
         => 'Die Beschreibung sollte eine Länge zwischen %minimum% und %maximum% Zeichen haben, zur Zeit sind es %length% Zeichen.',
     'The flexContent record with the ID %id% does not exists!'

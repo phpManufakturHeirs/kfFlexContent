@@ -383,7 +383,7 @@ EOD;
             }
 
             $SQL = "SELECT * FROM $category_table, $content_table WHERE $category_table.content_id=$content_table.content_id AND $content_table.content_id != '$content_id' AND ".
-                "category_id='$category_id' AND is_primary=1 AND '$published_from' $select `publish_from` AND (status !='UNPUBLISHED' OR status != 'DELETED') ".
+                "category_id='$category_id' AND is_primary=1 AND '$published_from' $select `publish_from` AND status !='UNPUBLISHED' AND status != 'DELETED' ".
                 "AND `language`='$language' ORDER BY publish_from $direction LIMIT 1";
 
             $result = $this->app['db']->fetchAssoc($SQL);

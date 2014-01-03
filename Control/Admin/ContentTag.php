@@ -121,12 +121,16 @@ class ContentTag extends Admin
      *
      * @param array $data
      */
-    protected function getTagTypeForm($data = array())
+    protected function getTagTypeForm($data=array())
     {
+        if (isset($data['language'])) {
+            // set the language property from the tag type data
+            self::$language = $data['language'];
+        }
+
         // show the permalink URL
-        $permalink_url = CMS_URL.'/';
-        $permalink_url .= (isset($data['language'])) ? strtolower($data['language']) : strtolower(self::$language);
-        $permalink_url .= self::$config['content']['permalink']['directory'].'/tag/';
+        $language = (isset($data['language'])) ? $data['language'] : self::$language;
+        $permalink_url = CMS_URL.str_ireplace('{language}', strtolower($language), self::$config['content']['permalink']['directory']).'/tag/';
 
         $form = $this->app['form.factory']->createBuilder('form')
         ->add('tag_id', 'hidden', array(
@@ -136,7 +140,7 @@ class ContentTag extends Admin
             'data' => isset($data['tag_name']) ? $data['tag_name'] : ''
         ))
         ->add('language', 'hidden', array(
-            'data' => isset($data['language']) ? $data['language'] : self::$language
+            'data' => $language
         ))
         ->add('tag_permalink', 'text', array(
             'data' => isset($data['tag_permalink']) ? $data['tag_permalink'] : '',
@@ -227,9 +231,31 @@ class ContentTag extends Admin
                 return false;
             }
 
+            // check the permalink
+            if (empty($tag['tag_permalink'])) {
+                $tag['tag_permalink'] = $tag['tag_name'];
+            }
+
+            $permalink = $this->app['utils']->sanitizeLink($tag['tag_permalink']);
+
+            if (self::$tag_id < 1 && $this->TagTypeData->existsPermaLink($permalink, $tag['language'])) {
+                // this PermaLink already exists!
+                $this->setAlert('The permalink %permalink% is already in use, please select another one!',
+                    array('%permalink%' => $permalink), self::ALERT_TYPE_WARNING);
+                return false;
+            }
+            elseif ((self::$tag_id > 0) &&
+                (false !== ($used_by = $this->TagTypeData->selectTagIDbyPermaLink($permalink, $tag['language']))) &&
+                ($used_by != self::$tag_id)) {
+                $this->setAlert('The permalink %permalink% is already in use by the tag type record %id%, please select another one!',
+                    array('%permalink%' => $permalink, '%id%' => $used_by), self::ALERT_TYPE_WARNING);
+                return false;
+            }
+
             $data['tag_name'] = $tag['tag_name'];
             $data['tag_description'] = !empty($tag['tag_description']) ? $tag['tag_description'] : '';
             $data['language'] = $tag['language'];
+            $data['tag_permalink'] = $tag['tag_permalink'];
 
             if (self::$tag_id < 1) {
                 // create a new tag type record

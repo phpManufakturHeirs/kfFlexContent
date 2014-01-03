@@ -82,10 +82,18 @@
 }
 
 .flexcontent-container .description {
+  position: relative;
   font-size: smaller;
   font-style: italic;
   margin: 0 0 15px 0;
   padding: 0;
+  height: auto;
+}
+.flexcontent-container .description:before {
+  clear: both;
+}
+.flexcontent-container .description:after {
+  clear: both;
 }
 
 .flexcontent-container .content.author,

@@ -1,0 +1,49 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2014 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+{% if parameter.css %}
+  <script type="text/javascript">  
+    (function() {
+      if (!window.jQuery) {
+        alert("{{'flexContent is missing jQuery - please add the parameter library[jquery/jquery/1.10.2/jquery.min.js] to the kitCommand at this page.'|trans }}");
+      }
+      else {
+        var jq = document.createElement('script');
+        jq.setAttribute('type', 'text/javascript');
+        jq.setAttribute('src', '{{ LIBRARY_URL ~ '/bootstrap/3.0.3/js/bootstrap.min.js'}}');
+        document.getElementsByTagName('head')[0].appendChild(jq);
+      }
+
+      var css = document.createElement('link');
+      css.setAttribute('rel', 'stylesheet');
+      css.setAttribute('type', 'text/css');
+      css.setAttribute('media', 'all');
+      css.setAttribute('href', '{{ LIBRARY_URL ~ '/bootstrap/3.0.3/css/bootstrap.min.css' }}');
+      document.getElementsByTagName('head')[0].appendChild(css); 
+
+      var css = document.createElement('link');
+      css.setAttribute('rel', 'stylesheet');
+      css.setAttribute('type', 'text/css');
+      css.setAttribute('media', 'all');
+      css.setAttribute('href', '{{ LIBRARY_URL ~ '/font-awesome/4.0.3/css/font-awesome.min.css' }}');
+      document.getElementsByTagName('head')[0].appendChild(css); 
+
+      var css = document.createElement('link');
+      css.setAttribute('rel', 'stylesheet');
+      css.setAttribute('type', 'text/css');
+      css.setAttribute('media', 'all');
+      {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.bootstrap.css') %}
+        css.setAttribute('href', '{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.bootstrap.css' }}');
+      {% else %}
+        css.setAttribute('href', '{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/flexcontent.bootstrap.css' }}');
+      {% endif %}      
+      document.getElementsByTagName('head')[0].appendChild(css);              
+    })();  
+  </script> 
+{% endif %}

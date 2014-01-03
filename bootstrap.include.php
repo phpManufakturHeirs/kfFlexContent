@@ -38,19 +38,17 @@ $app->get('/flexcontent/cms/{cms_information}', function ($cms_information) use 
 });
 
 /**
- * The PermanentLink for flexContent uses the route /content.
- * Setup will create the directory /content in the CMS root and place a
- * .htaccess file which redirect to /content.
+ * The PermanentLink for flexContent uses configurable routes.
+ * Setup will create the needed directories in the CMS root and place a
+ * .htaccess file which redirect to the routes.
  */
-$app->get('/{language}/content/{name}',
-    'phpManufaktur\flexContent\Control\PermanentLink::ControllerName');
-$app->get('/{language}/content/id/{content_id}',
-    'phpManufaktur\flexContent\Control\PermanentLink::ControllerContentID');
-
 if (file_exists(MANUFAKTUR_PATH.'/flexContent/bootstrap.include.inc')) {
-    // the PermanentLink routes must exists similiar for installations
-    // of the kitFramework in a subdirectory!
+    // the PermanentLink routes must exists and will be created by the setup routine!
     include_once MANUFAKTUR_PATH.'/flexContent/bootstrap.include.inc';
+}
+else {
+    $app['monolog']->addError('Missing the permalink routes in /flexcontent/bootstrap.include.inc!',
+        array(__FILE__, __LINE__));
 }
 
 /**

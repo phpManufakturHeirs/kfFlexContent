@@ -125,8 +125,13 @@ class ContentCategory extends Admin
      *
      * @param array $data
      */
-    protected function getCategoryTypeForm($data = array())
+    protected function getCategoryTypeForm($data=array())
     {
+        if (isset($data['language'])) {
+            // set the language property from the category type data
+            self::$language = $data['language'];
+        }
+
         $pagelist = $this->CMSPage->getPageLinkList();
         $links = array();
         foreach ($pagelist as $link) {
@@ -134,16 +139,15 @@ class ContentCategory extends Admin
         }
 
         // show the permalink URL
-        $permalink_url = CMS_URL.'/';
-        $permalink_url .= (isset($data['language'])) ? strtolower($data['language']) : strtolower(self::$language);
-        $permalink_url .= self::$config['content']['permalink']['directory'].'/category/';
+        $language = (isset($data['language'])) ? $data['language'] : self::$language;
+        $permalink_url = CMS_URL.str_ireplace('{language}', strtolower($language), self::$config['content']['permalink']['directory']).'/category/';
 
         $form = $this->app['form.factory']->createBuilder('form')
         ->add('category_id', 'hidden', array(
             'data' => isset($data['category_id']) ? $data['category_id'] : -1
         ))
         ->add('language', 'hidden', array(
-            'data' => isset($data['language']) ? $data['language'] : self::$language
+            'data' => $language
         ))
         ->add('category_name', 'text', array(
             'label' => 'Name',

@@ -24,46 +24,81 @@ class Setup
 {
     protected $app = null;
 
-    public function addSubdirectoryRoutes(Application $app)
-    {
-        // always remove an existing include
-        $app['filesystem']->remove(MANUFAKTUR_PATH.'/flexContent/bootstrap.include.inc');
-
-        $subdirectory = parse_url(CMS_URL, PHP_URL_PATH);
-        if (strlen($subdirectory) > 1) {
-            // the kitFramework is installed in a subdirectory
-            if (false === ($include = file_get_contents(MANUFAKTUR_PATH.'/flexContent/Data/Setup/PermaLink/bootstrap.include.inc'))) {
-                throw new \Exception('Missing /flexContent/Data/Setup/PermaLink/bootstrap.include.inc!');
-            }
-            $include = str_replace('%subdirectory%', $subdirectory, $include);
-            if (false === (file_put_contents(MANUFAKTUR_PATH.'/flexContent/bootstrap.include.inc', $include))) {
-                throw new \Exception("Can't create '/flexContent/bootstrap.include.inc!");
-            }
-            $app['monolog']->addDebug('Create /flexContent/bootstrap.include.inc');
-        }
-    }
-
-    public function createLanguageRoutes(Application $app)
+    /**
+     * Create the routes needed for the permanentlinks and write bootstrap.include.inc
+     *
+     * @param Application $app
+     * @throws \Exception
+     */
+    public function createPermalinkRoutes(Application $app)
     {
         $Configuration = new Configuration($app);
         $config = $Configuration->getConfiguration();
 
         $subdirectory = parse_url(CMS_URL, PHP_URL_PATH);
-        if (strlen($subdirectory) > 1) {
-            $subdirectory .= '/';
-        }
-        else {
-            $subdirectory = '';
+
+        // always remove an existing include
+        $app['filesystem']->remove(MANUFAKTUR_PATH.'/flexContent/bootstrap.include.inc');
+
+        if (false === ($include = file_get_contents(MANUFAKTUR_PATH.'/flexContent/Data/Setup/PermaLink/bootstrap.include.inc'))) {
+            throw new \Exception('Missing /flexContent/Data/Setup/PermaLink/bootstrap.include.inc!');
         }
 
-        foreach ($config['content']['language']['support'] as $language) {
-            $app['filesystem']->mkdir(CMS_PATH.'/'.strtolower($language['code']).$config['content']['permalink']['directory']);
+        $permalink = $config['content']['permalink']['directory'];
+
+        $search = array('%subdirectory%', '%permalink%', '%default_language%');
+        $replace = array($subdirectory, $permalink, strtolower($config['content']['language']['default']));
+
+        $include = str_replace($search, $replace, $include);
+
+        if (false === (file_put_contents(MANUFAKTUR_PATH.'/flexContent/bootstrap.include.inc', $include))) {
+            throw new \Exception("Can't create '/flexContent/bootstrap.include.inc!");
+        }
+        $app['monolog']->addDebug('Create /flexContent/bootstrap.include.inc');
+
+    }
+
+    /**
+     * Create the physical directories and the needed .htaccess files for the permanent links
+     *
+     * @param Application $app
+     * @throws \Exception
+     */
+    public function createPermalinkDirectories(Application $app)
+    {
+        $Configuration = new Configuration($app);
+        $config = $Configuration->getConfiguration();
+
+        $subdirectory = parse_url(CMS_URL, PHP_URL_PATH);
+
+        if ($config['content']['language']['select']) {
+            // create directories for all supported languages
+            $languages = $config['content']['language']['support'];
+        }
+        else {
+            // create a directory for the default language
+            $languages = array();
+            foreach ($config['content']['language']['support'] as $language) {
+                if ($language['code'] == $config['content']['language']['default']) {
+                    $languages[] = $language;
+                    break;
+                }
+            }
+        }
+
+        foreach ($languages as $language) {
+            $path = $config['content']['permalink']['directory'];
+            $path = str_ireplace('{language}', strtolower($language['code']), $path);
+
+            $app['filesystem']->mkdir(CMS_PATH.$path);
             if (false === ($include = file_get_contents(MANUFAKTUR_PATH.'/flexContent/Data/Setup/PermaLink/.htaccess'))) {
                 throw new \Exception('Missing /flexContent/Data/Setup/PermaLink/.htaccess!');
             }
-            $include = str_replace(array('%subdirectory%', '%language%'), array($subdirectory, strtolower($language['code'])), $include);
-            if (false === (file_put_contents(CMS_PATH.'/'.strtolower($language['code']).$config['content']['permalink']['directory'].'/.htaccess', $include))) {
-                throw new \Exception("Can't create ".'/'.strtolower($language['code']).$config['content']['permalink']['directory'].'/.htaccess!');
+            $include = str_replace(array('%subdirectory%'), array($subdirectory), $include);
+
+
+            if (false === (file_put_contents(CMS_PATH.$path.'/.htaccess', $include))) {
+                throw new \Exception("Can't create $path/.htaccess!");
             }
             $app['monolog']->addDebug('Create '.'/'.strtolower($language['code']).$config['content']['permalink']['directory'].'/.htaccess');
         }
@@ -105,11 +140,11 @@ class Setup
             $admin_tool = new InstallAdminTool($app);
             $admin_tool->exec(MANUFAKTUR_PATH.'/flexContent/extension.json', '/flexcontent/cms');
 
-            // add subdirectory routes
-            $this->addSubdirectoryRoutes($app);
+            // create the configured permalink routes
+            $this->createPermalinkRoutes($app);
 
             // install .htaccess files for the configured languages
-            $this->createLanguageRoutes($app);
+            $this->createPermalinkDirectories($app);
 
             return $app['translator']->trans('Successfull installed the extension %extension%.',
                 array('%extension%' => 'flexContent'));
