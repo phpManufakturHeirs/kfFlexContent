@@ -1,0 +1,23 @@
+<div class="media">
+  {% if parameter.content_image and content.teaser_image|length > 0 %}
+    {% set img = image(content.teaser_image, parameter.content_image_small_max_width, parameter.content_image_small_max_height) %}
+    <div class="pull-left media-object" style="min-width:{{ parameter.content_image_small_max_width }}px;min-height:{{ parameter.content_image_small_max_height }}px;">
+      <a href="{{ url }}" target="{{ target }}">
+        <img class="img-responsive" src="{{ img.src }}" alt="{{ content.title }}" title="{{ content.title }}" />
+      </a>
+    </div>
+  {% endif %}
+  <div class="media-body">
+    {% if parameter.content_title %}
+      <a href="{{ url }}" target="{{ target }}">
+        <h{{ parameter.title_level+2|default('3') }} class="media-heading">{{ content.title|default('') }}</h{{ parameter.title_level+2|default('3') }}>
+      </a>
+    {% endif %}
+    {% if parameter.content_teaser and content.teaser|length > 0 %}
+      {{ content.teaser }}
+      <div class="go-ahead">
+        <a href="{{ url }}" target="{{ target }}">{{ 'read more'|trans }} ...</a>
+      </div>
+    {% endif %}
+  </div>
+</div>

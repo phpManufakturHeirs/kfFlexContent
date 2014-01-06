@@ -16,6 +16,8 @@ use Silex\Application;
 use phpManufaktur\flexContent\Control\Configuration;
 use phpManufaktur\flexContent\Data\Content\Category;
 use phpManufaktur\flexContent\Data\Content\CategoryType;
+use phpManufaktur\flexContent\Data\Content\Content;
+use phpManufaktur\flexContent\Data\Content\Tag;
 
 class ActionCategory extends Basic
 {
@@ -27,6 +29,7 @@ class ActionCategory extends Basic
     protected $CategoryData = null;
     protected $CategoryTypeData = null;
     protected $ContentData = null;
+    protected $TagData = null;
 
     /**
      * (non-PHPdoc)
@@ -45,6 +48,25 @@ class ActionCategory extends Basic
 
         $this->CategoryData = new Category($app);
         $this->CategoryTypeData = new CategoryType($app);
+        $this->ContentData = new Content($app);
+        $this->TagData = new Tag($app);
+    }
+
+    /**
+     * Highlight a search result
+     *
+     * @param string $word
+     * @param string reference $content
+     * @return string
+     */
+    protected function highlightSearchResult($word, &$content)
+    {
+        if (!self::$config['search']['result']['highlight']) {
+            return $content;
+        }
+        $replacement = self::$config['search']['result']['replacement'];
+        $content = str_ireplace($word, str_ireplace('{word}', $word, $replacement), $content);
+        return $content;
     }
 
     /**
@@ -72,6 +94,11 @@ class ActionCategory extends Basic
         }
     }
 
+    /**
+     * Collect the category data and show the category overview
+     *
+     * @return \phpManufaktur\Basic\Control\Pattern\rendered
+     */
     protected function showCategoryID()
     {
         if (false === ($category_type = $this->CategoryTypeData->select(self::$parameter['category_id']))) {
@@ -80,7 +107,35 @@ class ActionCategory extends Basic
                 self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
             return $this->promptAlert();
         }
-//$this->setAlert('Test!');
+
+        // highlight search results?
+        if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
+            foreach (self::$parameter['highlight'] as $highlight) {
+                $this->highlightSearchResult($highlight, $category_type['category_description']);
+            }
+        }
+
+        if (false === ($contents = $this->ContentData->selectContentsByCategoryID(self::$parameter['category_id'],
+            self::$parameter['content_status'], self::$parameter['content_limit']))) {
+            $this->setAlert('The category %category_name% does not contain any active contents',
+                array('%category_name%' => $category_type['category_name']), self::ALERT_TYPE_WARNING,
+                array(__METHOD__, __LINE__));
+        }
+
+        for ($i=0; $i < sizeof($contents); $i++) {
+            $contents[$i]['categories'] = $this->CategoryData->selectCategoriesByContentID($contents[$i]['content_id']);
+            $contents[$i]['tags'] = $this->TagData->selectTagArrayForContentID($contents[$i]['content_id']);
+
+            // highlight search results?
+            if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
+                foreach (self::$parameter['highlight'] as $highlight) {
+                    $this->highlightSearchResult($highlight, $contents[$i]['teaser']);
+                    $this->highlightSearchResult($highlight, $contents[$i]['content']);
+                    $this->highlightSearchResult($highlight, $contents[$i]['description']);
+                }
+            }
+        }
+
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'command/category.twig',
             $this->getPreferredTemplateStyle()),
@@ -89,7 +144,8 @@ class ActionCategory extends Basic
                 'config' => self::$config,
                 'parameter' => self::$parameter,
                 'permalink_base_url' => CMS_URL.str_ireplace('{language}', strtolower(self::$language), self::$config['content']['permalink']['directory']),
-                'category' => $category_type
+                'category' => $category_type,
+                'contents' => $contents
             ));
     }
 
@@ -116,7 +172,7 @@ class ActionCategory extends Basic
             $this->setCommandParameters(self::$parameter);
         }
 
-        // access the default parameters for action -> view from the configuration
+        // access the default parameters for action -> category from the configuration
         $default_parameter = self::$config['kitcommand']['parameter']['action']['category'];
 
         // the category ID is always needed!
@@ -139,6 +195,71 @@ class ActionCategory extends Basic
 
         // show the category image?
         self::$parameter['category_image'] = (isset(self::$parameter['category_image']) && ((self::$parameter['category_image'] == 0) || (strtolower(self::$parameter['category_image']) == 'false'))) ? false : $default_parameter['category_image'];
+
+        // maximum size for the category image
+        self::$parameter['category_image_max_width'] = (isset(self::$parameter['category_image_max_width'])) ? intval(self::$parameter['category_image_max_width']) : $default_parameter['category_image_max_width'];
+        self::$parameter['category_image_max_height'] = (isset(self::$parameter['category_image_max_height'])) ? intval(self::$parameter['category_image_max_height']) : $default_parameter['category_image_max_height'];
+
+        // status for the contents specified?
+        if (isset(self::$parameter['content_status']) && !empty(self::$parameter['content_status'])) {
+            $status_string = strtoupper(self::$parameter['content_status']);
+            if (strpos($status_string, ',')) {
+                $explode = explode(',', $status_string);
+                $status = array();
+                foreach ($explode as $item) {
+                    $status[] = trim($item);
+                }
+                self::$parameter['content_status'] = $status;
+            }
+            else {
+                self::$parameter['content_status'] = array(trim(self::$parameter['content_status']));
+            }
+        }
+        else {
+            self::$parameter['content_status'] = $default_parameter['content_status'];
+        }
+
+        // limit for the content items
+        self::$parameter['content_limit'] = (isset(self::$parameter['content_limit'])) ? intval(self::$parameter['content_limit']) : $default_parameter['content_limit'];
+
+        // show the content image?
+        self::$parameter['content_image'] = (isset(self::$parameter['content_image']) && ((self::$parameter['content_image'] == 0) || (strtolower(self::$parameter['content_image']) == 'false'))) ? false : $default_parameter['content_image'];
+
+        // maximum size for the category image
+        self::$parameter['content_image_max_width'] = (isset(self::$parameter['content_image_max_width'])) ? intval(self::$parameter['content_image_max_width']) : $default_parameter['content_image_max_width'];
+        self::$parameter['content_image_max_height'] = (isset(self::$parameter['content_image_max_height'])) ? intval(self::$parameter['content_image_max_height']) : $default_parameter['content_image_max_height'];
+
+        // maximum size for the SMALL category image
+        self::$parameter['content_image_small_max_width'] = (isset(self::$parameter['content_image_small_max_width'])) ? intval(self::$parameter['content_image_small_max_width']) : $default_parameter['content_image_small_max_width'];
+        self::$parameter['content_image_small_max_height'] = (isset(self::$parameter['content_image_small_max_height'])) ? intval(self::$parameter['content_image_small_max_height']) : $default_parameter['content_image_small_max_height'];
+
+        // show content title?
+        self::$parameter['content_title'] = (isset(self::$parameter['content_title']) && ((self::$parameter['content_title'] == 0) || (strtolower(self::$parameter['content_title']) == 'false'))) ? false : $default_parameter['content_title'];
+
+        // show content description?
+        self::$parameter['content_description'] = (isset(self::$parameter['content_description']) && ((self::$parameter['content_description'] == 0) || (strtolower(self::$parameter['content_description']) == 'false'))) ? false : $default_parameter['content_description'];
+
+        // show content teaser?
+        self::$parameter['content_teaser'] = (isset(self::$parameter['content_teaser']) && ((self::$parameter['content_teaser'] == 0) || (strtolower(self::$parameter['content_teaser']) == 'false'))) ? false : $default_parameter['content_teaser'];
+
+        // show content description?
+        self::$parameter['content_description'] = (isset(self::$parameter['content_description']) && ((self::$parameter['content_description'] == 0) || (strtolower(self::$parameter['content_description']) == 'false'))) ? false : $default_parameter['content_description'];
+
+        // show content content?
+        self::$parameter['content_content'] = (isset(self::$parameter['content_content']) && ((self::$parameter['content_content'] == 1) || (strtolower(self::$parameter['content_content']) == 'true'))) ? true : $default_parameter['content_content'];
+
+        // show content tags?
+        self::$parameter['content_tags'] = (isset(self::$parameter['content_tags']) && ((self::$parameter['content_tags'] == 0) || (strtolower(self::$parameter['content_tags']) == 'false'))) ? false : $default_parameter['content_tags'];
+
+        // show content categories?
+        self::$parameter['content_categories'] = (isset(self::$parameter['content_categories']) && ((self::$parameter['content_categories'] == 1) || (strtolower(self::$parameter['content_categories']) == 'true'))) ? true : $default_parameter['content_categories'];
+
+        // show content author?
+        self::$parameter['content_author'] = (isset(self::$parameter['content_author']) && ((self::$parameter['content_author'] == 0) || (strtolower(self::$parameter['content_author']) == 'false'))) ? false : $default_parameter['content_author'];
+
+        // show content date?
+        self::$parameter['content_date'] = (isset(self::$parameter['content_date']) && ((self::$parameter['content_date'] == 0) || (strtolower(self::$parameter['content_date']) == 'false'))) ? false : $default_parameter['content_date'];
+
 
         if (self::$parameter['category_id'] > 0) {
             return $this->showCategoryID();

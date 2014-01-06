@@ -423,4 +423,113 @@ EOD;
         return $this->selectPreviousOrNextContentForID($content_id, false, $language);
     }
 
+    /**
+     * Select the contents for the given Category ID.
+     * Order the results by status (BREAKING, PUBLISHED ...) and publishing date descending
+     *
+     * @param integer $category_id
+     * @param array $status default = PUBLISHED, BREAKING
+     * @param number $limit default = 100
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     */
+    public function selectContentsByCategoryID($category_id, $status=array('PUBLISHED','BREAKING'), $limit=100)
+    {
+        try {
+            $content_table = self::$table_name;
+            $category_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
+            $in_status = "('".implode("','", $status)."')";
+            $SQL = "SELECT * FROM `$category_table`, `$content_table` WHERE $content_table.content_id = $category_table.content_id ".
+                "AND `category_id`=$category_id AND `status` IN $in_status ORDER BY ".
+                "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), `publish_from` DESC ".
+                "LIMIT $limit";
+            $results = $this->app['db']->fetchAll($SQL);
+            $contents = array();
+            foreach ($results as $result) {
+                $content = array();
+                foreach ($result as $key => $value) {
+                    $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                }
+                $contents[] = $content;
+            }
+            return (!empty($contents)) ? $contents : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Select content by the given TAG ID, depending by status
+     *
+     * @param integer $tag_id
+     * @param integer $status
+     * @param number $limit
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     */
+    public function selectContentsByTagID($tag_id, $status=array('PUBLISHED','BREAKING'), $limit=100)
+    {
+        try {
+            $content_table = self::$table_name;
+            $tag_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_tag';
+            $in_status = "('".implode("','", $status)."')";
+            $SQL = "SELECT * FROM `$tag_table`, `$content_table` WHERE $content_table.content_id = $tag_table.content_id ".
+                "AND `tag_id`=$tag_id AND `status` IN $in_status ORDER BY `position` ASC, ".
+                "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), `publish_from` DESC ".
+                "LIMIT $limit";
+            $results = $this->app['db']->fetchAll($SQL);
+            $contents = array();
+            foreach ($results as $result) {
+                $content = array();
+                foreach ($result as $key => $value) {
+                    $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                }
+                $contents[] = $content;
+            }
+            return (!empty($contents)) ? $contents : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    public function cmsSearch($category_id, $words, $or=true, $status)
+    {
+        try {
+            $category_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
+            $content_table = self::$table_name;
+
+            $search = '';
+            foreach ($words as $word) {
+                if (!empty($search)) {
+                    $search .= $or ? ' OR ' : ' AND ';
+                }
+                $search .= "(`title` LIKE '%$word%' OR `teaser` LIKE '%$word%' OR ".
+                    "`content` LIKE '%$word%' OR `description` LIKE '%$word%' OR `keywords` LIKE '%$word%')";
+            }
+
+            $in_status = "('".implode("','", $status)."')";
+
+            $SQL = "SELECT * FROM `$category_table`, `$content_table` WHERE ".
+                "$category_table.content_id=$content_table.content_id AND `category_id`=$category_id ".
+                "AND `is_primary`=1 AND ($search) AND `status` IN $in_status ORDER BY ".
+                "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), ".
+                "`publish_from` DESC";
+
+            $result = $this->app['db']->fetchAll($SQL);
+            $contents = array();
+            for ($i=0; $i < sizeof($result); $i++) {
+                $excerpt = strip_tags($this->app['utils']->unsanitizeText($result[$i]['title']));
+                $excerpt .= '.'.strip_tags($this->app['utils']->unsanitizeText($result[$i]['teaser']));
+                $excerpt .= '.'.strip_tags($this->app['utils']->unsanitizeText($result[$i]['content']));
+                $excerpt .= '.'.strip_tags($this->app['utils']->unsanitizeText($result[$i]['description']));
+                $excerpt .= '.'.strip_tags($this->app['utils']->unsanitizeText($result[$i]['keywords']));
+                $result[$i]['excerpt'] = $excerpt;
+                $contents[] = $result[$i];
+            }
+            return (!empty($contents)) ? $contents : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
 }

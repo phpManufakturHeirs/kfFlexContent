@@ -342,6 +342,62 @@ EOD;
         }
     }
 
+    /**
+     * Select category IDs for the given CMS target link and language
+     *
+     * @param string $target_link
+     * @param string $language
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     */
+    public function selectCategoryIDsByTargetLink($target_link, $language)
+    {
+        try {
+            $SQL = "SELECT `category_id` FROM `".self::$table_name."` WHERE `target_url`='$target_link' ".
+                "AND `language`='$language'";
+            $result = $this->app['db']->fetchAll($SQL);
+            $categories = array();
+            foreach ($result as $category) {
+                $categories[] = $category['category_id'];
+            }
+            return (!empty($categories)) ? $categories : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
 
+    /**
+     * Search for words in the given category ID and return a excert string
+     * for the CMS search.
+     *
+     * @param integer $category_id
+     * @param array $words
+     * @param boolean $or
+     * @throws \Exception
+     * @return Ambigous <boolean, string>
+     */
+    public function cmsSearch($category_id, $words, $or=true)
+    {
+        try {
+            $search = '';
+            foreach ($words as $word) {
+                if (!empty($search)) {
+                    $search .= $or ? ' OR ' : ' AND ';
+                }
+                $search .= "(`category_name` LIKE '%$word%' OR `category_description` LIKE '%$word%')";
+            }
+            $SQL = "SELECT `category_name`, `category_description` FROM `".self::$table_name."` WHERE `category_id`='$category_id' ".
+                "AND ($search)";
+            $results = $this->app['db']->fetchAll($SQL);
+            $excerpt = '';
+            foreach ($results as $result) {
+                $excerpt .= '.'.strip_tags($this->app['utils']->unsanitizeText($result['category_name']));
+                $excerpt .= '.'.strip_tags($this->app['utils']->unsanitizeText($result['category_description']));
+            }
+            return (!empty($excerpt)) ? $excerpt : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
 
 }

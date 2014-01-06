@@ -1,0 +1,53 @@
+<div class="col-sm-6">
+  <div class="thumbnail">
+    {% if parameter.content_date %}
+      <div class="content-date">
+        {{ content.publish_from|date('DATE_FORMAT'|trans) }}
+      </div>
+    {% endif %}
+    {% if parameter.content_image and content.teaser_image|length > 0 %}
+      {% set img = image(content.teaser_image, parameter.content_image_max_width, parameter.content_image_max_height) %}
+      <a href="{{ url }}" target="{{ target }}">
+        <img class="img-responsive img-rounded" src="{{ img.src }}" alt="{{ content.title }}" title="{{ content.title }}" />
+      </a>
+    {% endif %}
+    <div class="caption">
+      {% if parameter.content_categories %}
+        <div class="content-categories">
+          {% for category in content.categories %}
+            <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
+              {# attach the actual content ID with ?i= #}
+              <a href="{{ permalink_base_url ~ '/category/' ~ category.category_permalink ~ '?i=' ~ content.content_id }}" title="{{ category.category_description|ellipsis }}">{{ category.category_name }}</a>
+            </span>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% if parameter.content_title %}
+        <a href="{{ url }}" target="{{ target }}">
+          <h{{ parameter.title_level+1|default('2') }}>{{ content.title|default('') }}</h{{ parameter.title_level+1|default('1') }}>
+        </a>
+      {% endif %}
+      {% if parameter.content_description and content.description|length > 0 %}
+        <div class="well well-sm">
+          {{ content.description }}
+        </div>
+      {% endif %}  
+      {% if parameter.content_teaser and content.teaser|length > 0 %}
+        {{ content.teaser }}
+        <div class="go-ahead">
+          <a href="{{ url }}" target="{{ target }}">{{ 'read more'|trans }} ...</a>
+        </div>
+      {% endif %}
+      {% if parameter.content_tags and content.tags|length > 0 %}
+        <div class="content-tags">
+          {% for tag in content.tags %}
+            <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
+              {# attach the primary category ?c= and the actual content ID &i= #}
+              <a href="{{ permalink_base_url ~ '/tag/' ~ tag.tag_permalink ~ '?c=' ~ content.categories.0.category_id ~ '&i=' ~ content.content_id }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
+            </span>
+          {% endfor %}
+        </div> 
+      {% endif %}
+    </div>
+  </div>
+</div>  

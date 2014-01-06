@@ -112,6 +112,23 @@ class ActionView extends Basic
     }
 
     /**
+     * Highlight a search result
+     *
+     * @param string $word
+     * @param string reference $content
+     * @return string
+     */
+    protected function highlightSearchResult($word, &$content)
+    {
+        if (!self::$config['search']['result']['highlight']) {
+            return $content;
+        }
+        $replacement = self::$config['search']['result']['replacement'];
+        $content = str_ireplace($word, str_ireplace('{word}', $word, $replacement), $content);
+        return $content;
+    }
+
+    /**
      * Show the content assigned to the specified content ID
      *
      * @return \phpManufaktur\Basic\Control\Pattern\rendered
@@ -133,6 +150,15 @@ class ActionView extends Basic
         $this->setPageTitle($content['title']);
         $this->setPageDescription($content['description']);
         $this->setPageKeywords($content['keywords']);
+
+        // highlight search results?
+        if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
+            foreach (self::$parameter['highlight'] as $highlight) {
+                $this->highlightSearchResult($highlight, $content['teaser']);
+                $this->highlightSearchResult($highlight, $content['content']);
+                $this->highlightSearchResult($highlight, $content['description']);
+            }
+        }
 
         // get the categories for this content ID
         $categories = $this->CategoryData->selectCategoriesByContentID(self::$parameter['content_id']);

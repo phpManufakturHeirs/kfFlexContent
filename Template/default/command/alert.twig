@@ -8,29 +8,11 @@
   @license MIT License (MIT) http://www.opensource.org/licenses/MIT
 #}
 {% spaceless %}
+{% include '@phpManufaktur/flexContent/Template/default/command/command.header.twig' %}       
 <div class="flexcontent-container">
-  {% if parameter.css %}
-    <script type="text/javascript">
-      var fileref = document.createElement("link");
-      fileref.setAttribute("rel", "stylesheet");
-      fileref.setAttribute("type", "text/css");
-      fileref.setAttribute("media", "all");
-      {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.min.css') %}
-        fileref.setAttribute("href", '{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.min.css' }}');
-      {% else %}
-        fileref.setAttribute("href", '{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/flexcontent.min.css' }}');
-      {% endif %}      
-      document.getElementsByTagName("head")[0].appendChild(fileref);
-      var fileref = document.createElement("link");
-      fileref.setAttribute("rel", "stylesheet");
-      fileref.setAttribute("type", "text/css");
-      fileref.setAttribute("media", "all");
-      fileref.setAttribute("href", '{{ LIBRARY_URL ~ '/font-awesome/4.0.3/css/font-awesome.min.css' }}');
-      document.getElementsByTagName("head")[0].appendChild(fileref);      
-    </script>          
-  {% endif %}
-      
-  {{ basic.alert }}
-  
+  <div class="container">
+    {{ basic.alert }}
+  </div>  
 </div>
+{% include '@phpManufaktur/flexContent/Template/default/command/command.footer.twig' %}       
 {% endspaceless %}

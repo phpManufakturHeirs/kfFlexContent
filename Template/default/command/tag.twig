@@ -14,21 +14,21 @@
       
     {{ basic.alert }}
 
-    {% if parameter.category_description and category.category_description|length > 0 %}
+    {% if parameter.tag_description and tag.tag_description|length > 0 %}
       <div class="media">
-        {% if parameter.category_image and category.category_image|length > 0 %}
-          {% set img = image(category.category_image, parameter.category_image_max_width, parameter.category_image_max_height) %}
-          <img class="media-object pull-right img-thumbnail" src="{{ img.src }}" width="{{ img.width }}" height="{{ img.height }}" alt="{{ category.category_name }}" title="{{ category.category_name }}" />
+        {% if parameter.tag_image and tag.tag_image|length > 0 %}
+          {% set img = image(tag.tag_image, parameter.tag_image_max_width, parameter.tag_image_max_height) %}
+          <img class="media-object pull-right img-thumbnail" src="{{ img.src }}" width="{{ img.width }}" height="{{ img.height }}" alt="{{ tag.tag_name }}" title="{{ tag.tag_name }}" />
         {% endif %}
         <div class="media-body">
-          {% if parameter.category_name %}
-            <h{{ parameter.title_level|default('1') }} class="media-heading">{{ category.category_name|default('') }}</h{{ parameter.title_level|default('1') }}>
+          {% if parameter.tag_name %}
+            <h{{ parameter.title_level|default('1') }} class="media-heading">{{ tag.tag_name|default('') }}</h{{ parameter.title_level|default('1') }}>
           {% endif %}
-          {{ category.category_description|default('') }}
+          {{ tag.tag_description|default('') }}
         </div>
       </div>
-    {% elseif parameter.category_name %}
-      <h{{ parameter.title_level|default('1') }}>{{ category.category_name|default('') }}</h{{ parameter.title_level|default('1') }}>
+    {% elseif parameter.tag_name %}
+      <h{{ parameter.title_level|default('1') }}>{{ tag.tag_name|default('') }}</h{{ parameter.title_level|default('1') }}>
     {% endif %}
       
     {% if contents|length > 0 %}
@@ -54,6 +54,7 @@
       {# if we have only one exposed content we must close the row here ... #}
       {% if contents|length < 2 %}</div>{% endif %}
     {% endif %}  
+  
   </div>
   
 </div>

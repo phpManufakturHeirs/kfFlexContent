@@ -175,14 +175,22 @@ class PermanentLink
                     'type' => 'alert-danger'));
         }
 
-        // create the target URL and set the needed parameters
-        $target_url = CMS_URL.$target.'?'.http_build_query(array(
+        // create the parameter array
+        $parameter = array(
             'command' => 'flexcontent',
             'action' => 'view',
             'content_id' => self::$content_id,
             'set_header' => self::$content_id,
             'language' => strtolower(self::$language)
-        ));
+        );
+
+        if (null !== ($highlight = $this->app['request']->query->get('highlight'))) {
+            // add highlight search results
+            $parameter['highlight'] = $highlight;
+        }
+
+        // create the target URL and set the needed parameters
+        $target_url = CMS_URL.$target.'?'.http_build_query($parameter);
 
         return $this->cURLexec($target_url);
     }
@@ -239,14 +247,22 @@ class PermanentLink
                     'type' => 'alert-danger'));
         }
 
-        // create the target URL and set the needed parameters
-        $target_url = CMS_URL.$category['target_url'].'?'.http_build_query(array(
+        // create the parameter array
+        $parameter = array(
             'command' => 'flexcontent',
             'action' => 'category',
             'category_id' => self::$category_id,
             'content_id' => self::$content_id,
             'language' => strtolower(self::$language)
-        ));
+        );
+
+        if (null !== ($highlight = $this->app['request']->query->get('highlight'))) {
+            // add search results
+            $parameter['highlight'] = $highlight;
+        }
+
+        // create the target URL and set the needed parameters
+        $target_url = CMS_URL.$category['target_url'].'?'.http_build_query($parameter);
 
         return $this->cURLexec($target_url);
     }
@@ -324,19 +340,24 @@ class PermanentLink
                     'type' => 'alert-danger'));
         }
 
-        // create the target URL and set the needed parameters
-        $target_url = CMS_URL.$target_url.'?'.http_build_query(array(
+        $parameter = array(
             'command' => 'flexcontent',
             'action' => 'tag',
             'category_id' => self::$category_id,
             'content_id' => self::$content_id,
             'tag_id' => self::$tag_id,
             'language' => strtolower(self::$language)
-        ));
+        );
+
+        if (null !== ($highlight = $this->app['request']->query->get('highlight'))) {
+            // add search results
+            $parameter['highlight'] = $highlight;
+        }
+
+        // create the target URL and set the needed parameters
+        $target_url = CMS_URL.$target_url.'?'.http_build_query($parameter);
 
         return $this->cURLexec($target_url);
-
-        return '@todo: Tags haben keine eigene Target URL !!!';
     }
 
     /**

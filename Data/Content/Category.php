@@ -164,7 +164,7 @@ EOD;
     public function selectByContentID($content_id)
     {
         try {
-            $SQL = "SELECT * FROM `".self::$table_name."` WHERE `content_id`='$content_id' ORDER BY `category_name` ASC";
+            $SQL = "SELECT * FROM `".self::$table_name."` WHERE `content_id`='$content_id' ORDER BY `is_primary` DESC, `category_name` ASC";
             $results = $this->app['db']->fetchAll($SQL);
             $categories = array();
             foreach ($results as $result) {

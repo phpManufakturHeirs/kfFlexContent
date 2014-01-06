@@ -390,4 +390,44 @@ EOD;
         }
     }
 
+    public function cmsSearch($category_id, $words, $or, $status)
+    {
+        try {
+            $category = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
+            $content = FRAMEWORK_TABLE_PREFIX.'flexcontent_content';
+            $tag = FRAMEWORK_TABLE_PREFIX.'flexcontent_tag';
+            $tag_type = self::$table_name;
+
+            $search = '';
+            foreach ($words as $word) {
+                if (!empty($search)) {
+                    $search .= $or ? ' OR ' : ' AND ';
+                }
+                $search .= "(`tag_name` LIKE '%$word%' OR `tag_description` LIKE '%$word%')";
+            }
+
+            $in_status = "('".implode("','", $status)."')";
+
+            $SQL = "SELECT `tag_name`, `tag_description`, `tag_permalink`, ".
+                "`tag_image`, $tag_type.`tag_id` FROM `$category`, `$content`, `$tag_type`, `$tag` WHERE ".
+                "$category.content_id=$content.content_id AND `category_id`=$category_id AND ".
+                "$tag.content_id=$content.content_id AND $tag.tag_id=$tag_type.tag_id AND ".
+                "($search) AND `status` IN $in_status ORDER BY ".
+                "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), ".
+                "`publish_from` DESC";
+
+            $result = $this->app['db']->fetchAll($SQL);
+            $tags = array();
+            for ($i=0; $i < sizeof($result); $i++) {
+                $excerpt = strip_tags($this->app['utils']->unsanitizeText($result[$i]['tag_name']));
+                $excerpt .= '.'.strip_tags($this->app['utils']->unsanitizeText($result[$i]['tag_description']));
+                $result[$i]['excerpt'] = $excerpt;
+                $tags[] = $result[$i];
+            }
+            return (!empty($tags)) ? $tags : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
 }

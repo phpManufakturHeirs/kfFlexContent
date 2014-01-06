@@ -134,6 +134,13 @@ $app->get('/admin/flexcontent/category/image/check/id/{category_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerImageCheck');
 
 /**
+ * CMS Search function
+ */
+
+$app->post('/search/command/flexcontent',
+    'phpManufaktur\flexContent\Control\cmsSearch::controllerSearch');
+
+/**
  * kitCommand routes
  */
 

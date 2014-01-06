@@ -38,10 +38,10 @@
       css.setAttribute('rel', 'stylesheet');
       css.setAttribute('type', 'text/css');
       css.setAttribute('media', 'all');
-      {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.bootstrap.css') %}
-        css.setAttribute('href', '{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.bootstrap.css' }}');
+      {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.min.css') %}
+        css.setAttribute('href', '{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.min.css' }}');
       {% else %}
-        css.setAttribute('href', '{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/flexcontent.bootstrap.css' }}');
+        css.setAttribute('href', '{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/flexcontent.min.css' }}');
       {% endif %}      
       document.getElementsByTagName('head')[0].appendChild(css);              
     })();  

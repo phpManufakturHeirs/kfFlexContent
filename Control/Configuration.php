@@ -12,6 +12,7 @@
 namespace phpManufaktur\flexContent\Control;
 
 use Silex\Application;
+use phpManufaktur\Basic\Data\CMS\Settings;
 
 class Configuration
 {
@@ -38,6 +39,9 @@ class Configuration
      */
     public function getDefaultConfigArray()
     {
+        $cmsSettings = new Settings($this->app);
+        $default_language = $cmsSettings->getSetting('default_language');
+
         return array(
             'content' => array(
                 'field' => array(
@@ -111,7 +115,7 @@ class Configuration
                 ),
                 'language' => array(
                     'select' => false,
-                    'default' => strtoupper($this->app['translator']->getLocale()),
+                    'default' => $default_language,
                     'support' => array(
                         'DE' => array(
                             'code' => 'DE',
@@ -153,10 +157,92 @@ class Configuration
                             'category_name' => true,
                             'category_description' => true,
                             'category_image' => true,
+                            'category_image_max_width' => 150,
+                            'category_image_max_height' => 150,
+                            'content_limit' => 100,
+                            'content_status' => array(
+                                'BREAKING',
+                                'PUBLISHED'
+                            ),
+                            'content_image' => true,
+                            'content_image_max_width' => 350,
+                            'content_image_max_height' => 350,
+                            'content_image_small_max_width' => 100,
+                            'content_image_small_max_height' => 100,
+                            'content_title' => true,
+                            'content_description' => false,
+                            'content_teaser' => true,
+                            'content_content' => false,
+                            'content_tags' => true,
+                            'content_author' => true,
+                            'content_date' => true,
+                            'content_categories' => false
+                        ),
+                        'tag' => array(
+                            'css' => true,
+                            'title_level' => 1,
+                            'tag_name' => true,
+                            'tag_description' => true,
+                            'tag_image' => true,
+                            'tag_image_max_width' => 150,
+                            'tag_image_max_height' => 150,
+                            'content_limit' => 100,
+                            'content_status' => array(
+                                'BREAKING',
+                                'PUBLISHED'
+                            ),
+                            'content_image' => true,
+                            'content_image_max_width' => 350,
+                            'content_image_max_height' => 350,
+                            'content_image_small_max_width' => 100,
+                            'content_image_small_max_height' => 100,
+                            'content_title' => true,
+                            'content_description' => false,
+                            'content_teaser' => true,
+                            'content_content' => false,
+                            'content_tags' => true,
+                            'content_author' => true,
+                            'content_date' => true,
+                            'content_categories' => true
                         )
                     )
                 )
             ),
+            'search' => array(
+                'cms' => array(
+                    'enabled' => true,
+                    'image' => array(
+                        'enabled' => true,
+                        'max_width' => 100,
+                        'max_height' => 100
+                    )
+                ),
+                'result' => array(
+                    'highlight' => true,
+                    'replacement' => '<span class="highlight">{word}</span>'
+                ),
+                'content' => array(
+                    'status' => array('PUBLISHED', 'BREAKING', 'HIDDEN', 'ARCHIVED')
+                ),
+                'category' => array(
+                    'title' => array(
+                        'prefix' => array(
+                            'enabled' => true,
+                            'prefix' => 'Category',
+                            'replacement' => '{prefix}: {title}'
+                        )
+                    )
+                ),
+                'tag' => array(
+                    'title' => array(
+                        'prefix' => array(
+                            'enabled' => true,
+                            'prefix' => 'Tag (#tag)',
+                            'replacement' => '{prefix}: {title}'
+                        )
+                    )
+                )
+            )
         );
     }
 

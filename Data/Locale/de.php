@@ -34,6 +34,8 @@ return array(
 
     'Can not handle the requested redirect at this place - use the <a href="%permalink%" target="_blank">permanent link</a> instead!'
         => 'Die angeforderte Weiterleitung kann an dieser Stelle nicht ausgeführt werden - nutzen Sie diesen <a href="%permakink%" target="_blank">permanenten Link</a>!',
+    'Category'
+        => 'Kategorie',
     'category_description'
         => 'Beschreibung',
     'category_id'
@@ -134,6 +136,8 @@ return array(
     'PUBLISHED'
         => 'Veröffentlicht',
 
+    'read more'
+        => 'mehr',
     'Redirect url'
         => 'Umleitung auf URL',
     'Remove from list'
@@ -160,6 +164,8 @@ return array(
     'Updated the the tag type %tag%'
         => 'Die Markierung %tag% wurde aktualisiert.',
 
+    'Tag (#tag)'
+        => 'Markierung (#tag)',
     'Tag description'
         => 'Beschreibung',
     'tag_description'
@@ -202,6 +208,8 @@ return array(
         => 'Der PermanentLink wird immer benötigt und kann in den Einstellungen nicht ausgeschaltet werden. Bitte prüfen Sie die Konfiguration!',
     "The 'publish from' field is always needed and can not switched off, please check the configuration!"
         => "Das 'Veröffentlichen ab' Feld wird immer benötigt und kann in den Einstellungen nicht ausgeschaltet werden. Bitte prüfen Sie die Konfiguration!",
+    'The tag %tag_name% does not contain any active contents'
+        => "Die Markierung %tag_name% enthält keine aktiven Inhalte!",
     'The tag %tag% is no longer associated with this content.'
         => 'Die Markierung <b>%tag%</b> ist diesem flexContent Inhalt nicht mehr zugeordnet.',
     'The tag %old% was changed to %new%. This update will affect all contents.'
@@ -216,6 +224,8 @@ return array(
         => 'Die Markierung <b>%tag%</b> enthält das verbotene Zeichen <b>%char%</b>, bitte ändern Sie die Bezeichnung.',
     'The Tag Type record with the ID %id% does not exists!'
         => 'Es existiert kein Tag Type Datensatz mit der ID %id%!',
+    'The Tag with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!'
+        => 'Die Markierung mit der <strong >ID %id%</strong> existiert nicht für die Sprache <strong>%language%</strong>!',
     'The title is always needed and con not switched off, please check the configuration!'
         => 'Die Überschrift wird immer benötigt und kann nicht in den Einstellungen ausgeschaltet werden. Bitte prüfen Sie die Konfiguration!',
     'The title should have a length between %minimum% and %maximum% characters (actual: %length%).'
