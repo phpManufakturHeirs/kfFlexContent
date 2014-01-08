@@ -56,8 +56,7 @@ class Content
         `author_username` VARCHAR(64) NOT NULL DEFAULT '',
         `update_username` VARCHAR(64) NOT NULL DEFAULT '',
         `timestamp` TIMESTAMP,
-        PRIMARY KEY (`content_id`),
-        UNIQUE INDEX (`permalink`)
+        PRIMARY KEY (`content_id`)
         )
     COMMENT='The main table for flexContent'
     ENGINE=InnoDB
@@ -98,6 +97,32 @@ EOD;
     }
 
     /**
+     * Replace CMS and framework URLs with placeholders
+     *
+     * @param string reference $content
+     * @return string
+     */
+    public function replaceURLwithPlaceholder(&$content)
+    {
+        $search = array(FRAMEWORK_URL, CMS_MEDIA_URL, CMS_URL);
+        $replace = array('{flexContent:FRAMEWORK_URL}','{flexContent:CMS_MEDIA_URL}', '{flexContent:CMS_URL}');
+        return str_replace($search, $replace, $content);
+    }
+
+    /**
+     * Replace placeholders with the real CMS and framework URLs
+     *
+     * @param string reference $content
+     * @return string
+     */
+    public function replacePlaceholderWithURL(&$content)
+    {
+        $search = array('{flexContent:FRAMEWORK_URL}','{flexContent:CMS_MEDIA_URL}', '{flexContent:CMS_URL}');
+        $replace = array(FRAMEWORK_URL, CMS_MEDIA_URL, CMS_URL);
+        return str_replace($search, $replace, $content);
+    }
+
+    /**
      * Insert a new flexContent record
      *
      * @param array $data
@@ -110,7 +135,10 @@ EOD;
             $insert = array();
             foreach ($data as $key => $value) {
                 if (($key == 'content_id') || ($key == 'timestamp')) continue;
-                $insert[$this->app['db']->quoteIdentifier($key)] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
+                if (($key == 'content') || ($key == 'teaser')) {
+                    $value = $this->replaceURLwithPlaceholder($value);
+                }
+                $insert[$key] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
             }
             $this->app['db']->insert(self::$table_name, $insert);
             $content_id = $this->app['db']->lastInsertId();
@@ -132,6 +160,9 @@ EOD;
             $update = array();
             foreach ($data as $key => $value) {
                 if (($key == 'content_id') || ($key == 'timestamp')) continue;
+                if (($key == 'content') || ($key == 'teaser')) {
+                    $value = $this->replaceURLwithPlaceholder($value);
+                }
                 $update[$this->app['db']->quoteIdentifier($key)] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
             }
             $this->app['db']->update(self::$table_name, $update, array('content_id' => $content_id));
@@ -161,6 +192,9 @@ EOD;
             if (is_array($result)) {
                 foreach ($result as $key => $value) {
                     $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                    if (($key == 'content') || ($key == 'teaser')) {
+                        $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
+                    }
                 }
             }
             return (!empty($content)) ? $content : false;
@@ -240,6 +274,9 @@ EOD;
                     foreach ($result as $key => $value) {
                         if ($key == $column) {
                             $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                            if (($key == 'content') || ($key == 'teaser')) {
+                                $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
+                            }
                         }
                     }
                 }
@@ -294,10 +331,10 @@ EOD;
      * @throws \Exception
      * @return boolean
      */
-    public function existsPermaLink($permalink)
+    public function existsPermaLink($permalink, $language)
     {
         try {
-            $SQL = "SELECT `permalink` FROM `".self::$table_name."` WHERE `permalink`='$permalink'";
+            $SQL = "SELECT `permalink` FROM `".self::$table_name."` WHERE `permalink`='$permalink' AND `language`='$language'";
             $result = $this->app['db']->fetchColumn($SQL);
             return ($result == $permalink);
         } catch (\Doctrine\DBAL\DBALException $e) {
@@ -311,10 +348,10 @@ EOD;
      * @param string $this
      * @throws \Exception
      */
-    public function countPermaLinksLikeThis($permalink)
+    public function countPermaLinksLikeThis($permalink, $language)
     {
         try {
-            $SQL = "SELECT COUNT(`permalink`) FROM `".self::$table_name."` WHERE `permalink` LIKE '$permalink%'";
+            $SQL = "SELECT COUNT(`permalink`) FROM `".self::$table_name."` WHERE `permalink` LIKE '$permalink%' AND `language`='$language'";
             return $this->app['db']->fetchColumn($SQL);
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
@@ -391,6 +428,9 @@ EOD;
             if (is_array($result)) {
                 foreach ($result as $key => $value) {
                     $content[$key] = (is_string($value)) ? $this->app['utils']->unsanitizeText($value) : $value;
+                    if (($key == 'content') || ($key == 'teaser')) {
+                        $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
+                    }
                 }
             }
             return (!empty($content)) ? $content : false;
@@ -449,6 +489,9 @@ EOD;
                 $content = array();
                 foreach ($result as $key => $value) {
                     $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                    if (($key == 'content') || ($key == 'teaser')) {
+                        $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
+                    }
                 }
                 $contents[] = $content;
             }
@@ -483,6 +526,9 @@ EOD;
                 $content = array();
                 foreach ($result as $key => $value) {
                     $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                    if (($key == 'content') || ($key == 'teaser')) {
+                        $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
+                    }
                 }
                 $contents[] = $content;
             }
@@ -492,6 +538,16 @@ EOD;
         }
     }
 
+    /**
+     * CMS search response
+     *
+     * @param integer $category_id
+     * @param array $words the search words
+     * @param boolean $or combine the $words with OR or with AND
+     * @param array $status
+     * @throws \Exception
+     * @return Ambigous <boolean, multitype:string >
+     */
     public function cmsSearch($category_id, $words, $or=true, $status)
     {
         try {

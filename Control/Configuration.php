@@ -13,6 +13,7 @@ namespace phpManufaktur\flexContent\Control;
 
 use Silex\Application;
 use phpManufaktur\Basic\Data\CMS\Settings;
+use phpManufaktur\flexContent\Data\Setup\Setup;
 
 class Configuration
 {
@@ -30,6 +31,45 @@ class Configuration
         $this->app = $app;
         self::$config_path = MANUFAKTUR_PATH.'/flexContent/config.flexcontent.json';
         $this->readConfiguration();
+    }
+
+    /**
+     * Check the permalink directories and create them and the routes if needed
+     *
+     */
+    public function checkPermalinkDirectory()
+    {
+        if (self::$config['content']['language']['select']) {
+            // create directories for all supported languages
+            $languages = self::$config['content']['language']['support'];
+        }
+        else {
+            // create a directory for the default language
+            $languages = array();
+            foreach (self::$config['content']['language']['support'] as $language) {
+                if ($language['code'] == self::$config['content']['language']['default']) {
+                    $languages[] = $language;
+                    break;
+                }
+            }
+        }
+
+        $exists = true;
+        foreach ($languages as $language) {
+            $path = self::$config['content']['permalink']['directory'];
+            $path = str_ireplace('{language}', strtolower($language['code']), $path);
+            if (!$this->app['filesystem']->exists($path)) {
+                $exists = false;
+                break;
+            }
+        }
+
+        if (!$exists) {
+            // a permanent directory does not exists - create the permanent routes and directories
+            $Setup = new Setup();
+            $Setup->createPermalinkRoutes($this->app, self::$config);
+            $Setup->createPermalinkDirectories($this->app, self::$config);
+        }
     }
 
     /**
@@ -125,6 +165,14 @@ class Configuration
                             'code' => 'EN',
                             'name' => 'English'
                         )
+                    )
+                )
+            ),
+            'admin' => array(
+                'import' => array(
+                    'enabled' => true,
+                    'data' => array(
+                        'handling' => 'CLEAN_UP'
                     )
                 )
             ),
@@ -256,6 +304,8 @@ class Configuration
             $this->saveConfiguration();
         }
         self::$config = $this->app['utils']->readConfiguration(self::$config_path);
+        // check the permanent link directories ...
+        $this->checkPermalinkDirectory();
     }
 
     /**

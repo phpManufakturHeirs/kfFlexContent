@@ -19,6 +19,7 @@ use phpManufaktur\flexContent\Data\Content\Tag;
 use phpManufaktur\flexContent\Data\Content\CategoryType;
 use phpManufaktur\flexContent\Data\Content\Category;
 use phpManufaktur\flexContent\Control\Configuration;
+use phpManufaktur\flexContent\Data\Import\ImportControl;
 
 class Setup
 {
@@ -28,12 +29,15 @@ class Setup
      * Create the routes needed for the permanentlinks and write bootstrap.include.inc
      *
      * @param Application $app
+     * @param array $config load config only if needed!
      * @throws \Exception
      */
-    public function createPermalinkRoutes(Application $app)
+    public function createPermalinkRoutes(Application $app, $config=null)
     {
-        $Configuration = new Configuration($app);
-        $config = $Configuration->getConfiguration();
+        if (is_null($config)) {
+            $Configuration = new Configuration($app);
+            $config = $Configuration->getConfiguration();
+        }
 
         $subdirectory = parse_url(CMS_URL, PHP_URL_PATH);
 
@@ -62,12 +66,15 @@ class Setup
      * Create the physical directories and the needed .htaccess files for the permanent links
      *
      * @param Application $app
+     * @param array $config load config only if needed!
      * @throws \Exception
      */
-    public function createPermalinkDirectories(Application $app)
+    public function createPermalinkDirectories(Application $app, $config=null)
     {
-        $Configuration = new Configuration($app);
-        $config = $Configuration->getConfiguration();
+        if (is_null($config)) {
+            $Configuration = new Configuration($app);
+            $config = $Configuration->getConfiguration();
+        }
 
         $subdirectory = parse_url(CMS_URL, PHP_URL_PATH);
 
@@ -135,6 +142,10 @@ class Setup
             // create the Category table
             $Category = new Category($app);
             $Category->createTable();
+
+            // create the import control table
+            $ImportControl = new ImportControl($app);
+            $ImportControl->createTable();
 
             // setup kit_framework_flexcontent as Add-on in the CMS
             $admin_tool = new InstallAdminTool($app);

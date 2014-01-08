@@ -133,6 +133,20 @@ $app->post('/admin/flexcontent/category/image/select',
 $app->get('/admin/flexcontent/category/image/check/id/{category_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerImageCheck');
 
+// import functions
+$app->get('/admin/flexcontent/import/list',
+    'phpManufaktur\flexContent\Control\Admin\Import\ImportList::ControllerImportList');
+$app->post('/admin/flexcontent/import/list/select',
+    'phpManufaktur\flexContent\Control\Admin\Import\ImportList::ControllerImportSelect');
+$app->get('/admin/flexcontent/import/ignore/id/{import_id}/language/{language}/status/{status}/type/{type}',
+    'phpManufaktur\flexContent\Control\Admin\Import\ImportList::ControllerImportIgnore');
+$app->get('/admin/flexcontent/import/pending/id/{import_id}/language/{language}/status/{status}/type/{type}',
+    'phpManufaktur\flexContent\Control\Admin\Import\ImportList::ControllerImportPending');
+$app->get('/admin/flexcontent/import/id/{import_id}',
+    'phpManufaktur\flexContent\Control\Admin\Import\ImportDialog::ControllerImport');
+$app->post('/admin/flexcontent/import/execute',
+    'phpManufaktur\flexContent\Control\Admin\Import\ImportDialog::ControllerExecute');
+
 /**
  * CMS Search function
  */

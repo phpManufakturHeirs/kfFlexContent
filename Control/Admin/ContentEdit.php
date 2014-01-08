@@ -103,15 +103,14 @@ class ContentEdit extends Admin
         }
 
         // show the permalink URL
-        $language = (isset($data['language'])) ? $data['language'] : self::$language;
-        $permalink_url = CMS_URL.str_ireplace('{language}', strtolower($language), self::$config['content']['permalink']['directory']).'/';
+        $permalink_url = CMS_URL.str_ireplace('{language}', strtolower(self::$language), self::$config['content']['permalink']['directory']).'/';
 
         $form = $this->app['form.factory']->createBuilder('form')
         ->add('content_id', 'hidden', array(
             'data' => isset($data['content_id']) ? $data['content_id'] : -1
         ))
         ->add('language', 'hidden', array(
-            'data' => $language,
+            'data' => self::$language,
         ))
         ->add('title', 'text', array(
             'data' => isset($data['title']) ? $data['title'] : '',
@@ -760,6 +759,12 @@ class ContentEdit extends Admin
         $data = array();
         // check the form
         $this->checkContentForm($data);
+
+        if ((self::$content_id > 0) && (false === ($data = $this->ContentData->select(self::$content_id)))) {
+            $this->setAlert('The flexContent record with the ID %id% does not exists!',
+                array('%id%' => self::$content_id), self::ALERT_TYPE_WARNING);
+        }
+
         // get the form
         $form = $this->getContentForm($data);
         // return the form with results

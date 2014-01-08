@@ -33,9 +33,9 @@
   <div class="container">
     {% include '@phpManufaktur/flexContent/Template/default/admin/toolbar.twig' %}
     <div class="height-15"></div>
-    {% if message is defined and message|length > 0 %}
-      <div class="alert alert-info">{{ message }}</div>
-    {% endif %}
+    
+    {{ alert }}
+    
     <form id="category_edit" method="post" {{ form_enctype(form) }} role="form">
       {{ form_errors(form) }}
       {{ form_row(form._token) }}

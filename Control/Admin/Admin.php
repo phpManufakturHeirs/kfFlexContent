@@ -51,36 +51,53 @@ class Admin extends Alert
     public function getToolbar($active) {
         $toolbar_array = array(
             'list' => array(
+                'name' => 'list',
                 'text' => 'List',
                 'hint' => 'List of all flexContent articles',
                 'link' => FRAMEWORK_URL.'/admin/flexcontent/list'.self::$usage_param,
                 'active' => ($active == 'list')
             ),
             'edit' => array(
+                'name' => 'edit',
                 'text' => 'Edit',
                 'hint' => 'Create or edit a flexContent article',
                 'link' => FRAMEWORK_URL.'/admin/flexcontent/edit'.self::$usage_param,
                 'active' => ($active == 'edit')
             ),
             'tags' => array(
+                'name' => 'tags',
                 'text' => 'Tags',
                 'hint' => 'Create or edit tags',
                 'link' => FRAMEWORK_URL.'/admin/flexcontent/tag/list'.self::$usage_param,
                 'active' => ($active == 'tags')
             ),
             'categories' => array(
+                'name' => 'categories',
                 'text' => 'Categories',
                 'hint' => 'Create or edit categories',
                 'link' => FRAMEWORK_URL.'/admin/flexcontent/category/list'.self::$usage_param,
                 'active' => ($active == 'categories')
             ),
+            'import' => array(
+                'name' => 'import',
+                'text' => 'Import',
+                'hint' => 'Import WYSIWYG and Blog contents',
+                'link' => FRAMEWORK_URL.'/admin/flexcontent/import/list'.self::$usage_param,
+                'active' => ($active == 'import')
+            ),
             'about' => array(
+                'name' => 'about',
                 'text' => 'About',
                 'hint' => 'Information about the flexContent extension',
                 'link' => FRAMEWORK_URL.'/admin/flexcontent/about'.self::$usage_param,
                 'active' => ($active == 'about')
                 ),
         );
+
+        if (!self::$config['admin']['import']['enabled']) {
+            // show the import only, if enabled!
+            unset($toolbar_array['import']);
+        }
         return $toolbar_array;
     }
  }

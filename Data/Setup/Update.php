@@ -26,7 +26,6 @@ class Update
     {
         $this->app = $app;
 
-
         $Setup = new Setup();
 
         // create the configured permalink routes

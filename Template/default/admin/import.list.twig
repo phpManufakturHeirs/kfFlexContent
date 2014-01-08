@@ -1,0 +1,100 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+{% if usage == 'framework' %}
+  {% set template_namespace = '@phpManufaktur/Basic/Template' %}
+  {% set template_file = 'framework/body.twig' %}
+{% else %}
+  {% set template_namespace = '@phpManufaktur/flexContent/Template' %}
+  {% set template_file = 'admin/body.twig' %}
+{% endif %}
+{% extends getTemplateFile(template_namespace, template_file) %}
+{% block title %}{{ 'flexContent - Import control list'|trans }}{% endblock %}
+{% block stylesheet %}
+  {{ parent() }}
+  {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css') %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css' }}" media="screen, projection" />
+  {% else %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/admin.min.css' }}" media="screen, projection" />
+  {% endif %}
+{% endblock stylesheet %}
+  
+{% block content %}
+  <div class="container">
+    {% include '@phpManufaktur/flexContent/Template/default/admin/toolbar.twig' %}
+    <div class="height-15"></div>
+    
+    {{ alert }}
+    
+    <form class="form-inline" method="post" role="form" action="{{ FRAMEWORK_URL ~ route.select }}">
+      {{ form_errors(select) }}
+      {{ form_row(select._token) }}
+      
+      <div class="form-group">
+        {{ form_label(select.type) }}
+        {{ form_widget(select.type, {'attr':{'class':'form-control'}}) }}
+      </div>
+      <div class="form-group">
+        {{ form_label(select.language) }}
+        {{ form_widget(select.language, {'attr':{'class':'form-control'}}) }}
+      </div>
+      <div class="form-group">
+        {{ form_label(select.status) }}
+        {{ form_widget(select.status, {'attr':{'class':'form-control'}}) }}
+      </div>
+      <button type="submit" class="btn btn-default">{{ 'Select'|trans }}</button>
+    </form>
+    
+    <div class="height-15"></div>
+    
+    {% if list|length < 1 %}
+      {% include '@phpManufaktur/Basic/Template/default/pattern/bootstrap/alert.twig' 
+        with {content:'This selection does not contain any items!'|trans} only %}
+    {% else %}
+      <div class="table-responsive">
+        <table class="table table-striped table-condensed table-hover">
+          <thead>
+            <tr>
+              <th>{{ 'ID'|trans }}</th>
+              <th>{{ 'Action'|trans }}</th>
+              <th>{{ 'Link'|trans }}</th>
+              <th>{{ 'Title'|trans }}</th>
+              <th>{{ 'Modified'|trans }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in list %}
+              <tr>
+                <td>{{ item.import_id|format('%03d') }}</td>
+                <td>
+                  {% set route_import = route.import|replace({'{import_id}':item.import_id}) %}
+                  {% set route_ignore = route.ignore|replace({'{import_id}':item.import_id,'{language}':select.language.vars.value,'{status}':select.status.vars.value,'{type}':select.type.vars.value}) %}
+                  {% set route_pending = route.pending|replace({'{import_id}':item.import_id,'{language}':select.language.vars.value,'{status}':select.status.vars.value,'{type}':select.type.vars.value}) %}
+                  {% if item.import_status == 'PENDING' %}
+                    <a class="btn btn-default" href="{{ FRAMEWORK_URL ~ route_import }}" title="{{ 'Import now'|trans }}" role="button"><i class="fa fa-download"></i></a>
+                    <a class="btn btn-default" href="{{ FRAMEWORK_URL ~ route_ignore }}" title="{{ 'Ignore this item'|trans }}" role="button"><i class="fa fa-ban"></i></a>
+                  {% elseif item.import_status == 'IGNORE' %}
+                    <a class="btn btn-default" href="{{ FRAMEWORK_URL ~ route_import }}" title="{{ 'Import now'|trans }}" role="button"><i class="fa fa-download"></i></a>
+                    <a class="btn btn-default" href="{{ FRAMEWORK_URL ~ route_pending }}" title="{{ 'Mark as pending'|trans }}" role="button"><i class="fa fa-clock-o"></i></a>
+                  {% elseif item.import_status == 'IMPORTED' %}
+                    <a class="btn btn-default" href="{{ FRAMEWORK_URL ~ route_import }}" title="{{ 'Import again'|trans }}" role="button"><i class="fa fa-download"></i></a>
+                    <a class="btn btn-default" href="{{ FRAMEWORK_URL ~ route_pending }}" title="{{ 'Mark as pending'|trans }}" role="button"><i class="fa fa-clock-o"></i></a>
+                  {% endif %}
+                </td>
+                <td><a href="{{ item.identifier_url }}" target="_blank">{{ item.identifier_link }}</a></td>
+                <td>{{ item.identifier_title }}</td>
+                <td>{{ item.identifier_modified|date('DATETIME_FORMAT'|trans) }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -55,6 +55,14 @@ return array(
     'Created the new tag %tag% and attached it to this content.'
         => 'Die Markierung <b>%tag%</b> wurde erstellt und diesem flexContent Inhalt zugeordnet.',
 
+    'DATA_CLEAN_UP'
+        => 'behält die HTML Struktur bei, entfernt jedoch alle Klassen und Formatierungsangaben (empfohlen)',
+    'DATA_STRIP_TAGS'
+        => 'entfernt alle HTML Formatierungen und importiert den Inhalt als blanken Text',
+    'DATA_UNCHANGED'
+        => 'keine Änderung des importierten Inhalt',
+    'Data handling'
+        => 'Datenbearbeitung',
     'DE'
         => 'Deutsch',
     'delete this category type'
@@ -70,6 +78,8 @@ return array(
         => 'Englisch',
     'English'
         => 'Englisch',
+    'Execute the import'
+        => 'Import durchführen',
 
     'Fatal error: Missing the category ID!'
         => 'Fataler Fehler: die Kategorie ID wurde nicht übergeben!',

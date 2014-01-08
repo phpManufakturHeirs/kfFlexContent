@@ -1,7 +1,26 @@
 {% block toolbar %}
   <ul class="nav nav-tabs">
     {% for item in toolbar %}
-      <li{% if item.active %} class="active"{% endif %}><a href="{{ item.link }}" title="{{ item.hint|trans }}">{{ item.text|trans }}</a></li>
+      <li{% if item.active %} class="active"{% endif %}>
+        <a href="{{ item.link }}" title="{{ item.hint|trans }}">
+          {%if item.name == 'list' %}
+            <i class="fa fa-list"></i>
+          {% elseif item.name == 'edit' %}
+            <i class="fa fa-edit"></i>
+          {% elseif item.name == 'tags' %}
+            <i class="fa fa-tags"></i>
+          {% elseif item.name == 'categories' %}
+            <i class="fa fa-sitemap"></i>
+          {% elseif item.name == 'import' %}
+            <i class="fa fa-download"></i>
+          {% elseif item.name == 'about' %}
+            <i class="fa fa-question"></i>
+          {% endif %}
+          {% if item.name != 'about' %}  
+            <span class="visible-lg pull-right">&nbsp;{{ item.text|trans }}</span>  
+          {% endif %}
+        </a>
+      </li>
     {% endfor %}
   </ul>
 {% endblock toolbar %}

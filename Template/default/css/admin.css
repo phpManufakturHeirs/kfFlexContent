@@ -29,6 +29,12 @@ label.required:after {
   background-color: transparent;
   font-weight: bold;
 }
+.form-inline label {
+  margin: 0 5px 0 5px;
+}
+.form-inline button {
+  margin: 0 0 0 10px;
+}
 
 #about-wrap {
   margin: 50px 0 0 0;
@@ -70,6 +76,15 @@ select {
 }
 input {
   width: 100%;  
+}
+input[type=radio],
+input[type=checkbox] {
+  width: auto;
+}
+.checkbox,
+.radio {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 input#form_delete {
   width: 15px;
