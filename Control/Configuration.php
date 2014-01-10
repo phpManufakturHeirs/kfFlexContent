@@ -172,7 +172,19 @@ class Configuration
                 'import' => array(
                     'enabled' => true,
                     'data' => array(
-                        'handling' => 'CLEAN_UP'
+                        'handling' => 'CLEAN_UP',
+                        'htmlpurifier' => array(
+                            'enabled' => true
+                        ),
+                        'remove' => array(
+                            'nbsp' => true,
+                            'double-space' => true,
+                            'style' => true,
+                            'class' => true
+                        ),
+                        'images' => array(
+                            'move' => true
+                        )
                     )
                 )
             ),

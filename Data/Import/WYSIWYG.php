@@ -65,7 +65,7 @@ class WYSIWYG
                 "$wysiwyg.page_id=$pages.page_id AND $sections.module='wysiwyg' AND $pages.page_id = '$page_id' ".
                 "ORDER BY $sections.position ASC";
             $results = $this->app['db']->fetchAll($SQL);
-            echo $SQL;
+
             if (!isset($results[0]['page_id'])) {
                 return false;
             }
