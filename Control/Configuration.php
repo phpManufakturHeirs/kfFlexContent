@@ -183,7 +183,26 @@ class Configuration
                             'class' => true
                         ),
                         'images' => array(
-                            'move' => true
+                            'move' => true,
+                            'teaser' => array(
+                                'get_from_content' => true,
+                                'min_width' => 150,
+                                'min_height' => 150
+                             )
+                        ),
+                        'teaser' => array(
+                            'create' => true,
+                            'ellipsis' => 500,
+                            'html' => true
+                        ),
+                        'description' => array(
+                            'create' => true,
+                            'source' => 'teaser',
+                            'ellipsis' => 150
+                        ),
+                        'htaccess' => array(
+                            'create' => true,
+                            'file' => 'flexcontent.htaccess'
                         )
                     )
                 )
@@ -199,7 +218,7 @@ class Configuration
                 ),
                 'parameter' => array(
                     'action' => array(
-                        'view' => array(
+                        'content' => array(
                             'css' => true,
                             'title' => true,
                             'title_level' => 1,

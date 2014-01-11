@@ -15,6 +15,7 @@ use Silex\Application;
 use phpManufaktur\flexContent\Data\Content\Content;
 use phpManufaktur\flexContent\Control\Configuration;
 use phpManufaktur\Basic\Data\CMS\Users;
+use phpManufaktur\Basic\Data\CMS\Page;
 
 /**
  * Class to import WYSIWYG contents from the CMS WebsiteBaker,
@@ -26,7 +27,7 @@ use phpManufaktur\Basic\Data\CMS\Users;
 class WYSIWYG
 {
     protected $app = null;
-    protected static $table_name = null;
+    protected $PagesData = null;
 
     /**
      * Constructor
@@ -36,8 +37,26 @@ class WYSIWYG
     public function __construct(Application $app)
     {
         $this->app = $app;
+        $this->PagesData = new Page($app);
     }
 
+    /**
+     * Check if the WYSIWYG addon is installed
+     *
+     * @return boolean
+     */
+    public function isInstalled()
+    {
+        return $this->app['db.utils']->tableExists(CMS_TABLE_PREFIX.'mod_wysiwyg');
+    }
+
+    /**
+     * Select WYSIWYG pages for the given language
+     *
+     * @param string $language
+     * @throws \Exception
+     * @return array with the page records
+     */
     public function selectWYSIWYGpages($language)
     {
         try {
@@ -54,6 +73,13 @@ class WYSIWYG
         }
     }
 
+    /**
+     * Select the information for the given page ID
+     *
+     * @param integer $page_id
+     * @throws \Exception
+     * @return boolean|array
+     */
     public function selectPageID($page_id)
     {
         try {
@@ -82,13 +108,13 @@ class WYSIWYG
             $ContentData = new Content($this->app);
 
             // get the last part of the link (page name) as permalink
-            $permalink = substr($results[0]['link'], strrpos($results[0]['link'], '/'));
+            $permalink = substr($results[0]['link'], strrpos($results[0]['link'], '/')+1);
             if ($ContentData->existsPermaLink($permalink, $results[0]['language'])) {
                 // this permalink is already in use!
                 $count = $ContentData->countPermaLinksLikeThis($permalink, $results[0]['language']);
                 $count++;
                 // add a counter to the new permanet link
-                $perma = sprintf('%s-%d', $permalink, $count);
+                $permalink = sprintf('%s-%d', $permalink, $count);
             }
 
             $cmsUsers = new Users($this->app);
@@ -115,8 +141,8 @@ class WYSIWYG
                 'keywords' => $this->app['utils']->unsanitizeText($results[0]['keywords']),
                 'permalink' => $permalink,
                 'publish_from' => date('Y-m-d H:i:s', $results[0]['modified_when']),
-                'breaking_to' => date('Y-m-d H:i:s', $results[0]['modified_when']*((60*60)*$config['content']['field']['breaking_to']['add']['hours'])),
-                'archive_from' => date('Y-m-d H:i:s', $results[0]['modified_when']*((60*60*24)*$config['content']['field']['archive_from']['add']['days'])),
+                'breaking_to' => date('Y-m-d H:i:s', $results[0]['modified_when']+((60*60)*$config['content']['field']['breaking_to']['add']['hours'])),
+                'archive_from' => date('Y-m-d H:i:s', $results[0]['modified_when']+((60*60*24)*$config['content']['field']['archive_from']['add']['days'])),
                 'status' => 'UNPUBLISHED',
                 'teaser' => '',
                 'teaser_image' => '',
@@ -128,5 +154,21 @@ class WYSIWYG
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }
+    }
+
+    /**
+     * Get the relative page link for the given page ID
+     *
+     * @param integer $page_id
+     * @return boolean|string
+     */
+    public function getRelativePageLink($page_id)
+    {
+        if (false === ($link = $this->PagesData->getPageLinkByPageID($page_id))) {
+            return false;
+        }
+        $directory = $this->PagesData->getPageDirectory();
+        $extension = $this->PagesData->getPageExtension();
+        return $directory.$link.$extension;
     }
 }

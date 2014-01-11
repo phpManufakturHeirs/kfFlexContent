@@ -42,21 +42,24 @@
   },
   "require":{
     "framework":{
-      "release":"0.26"
+      "release":"0.27"
     },
     "extension":{
         "phpmanufaktur":{
             "Basic":{
-                "release":"0.61"
+                "release":"0.69"
+            },
+            "Library":{
+                "release":"0.11"
             },
             "CKEditor":{
-                "release":"0.19"
+                "release":"0.20"
             },
             "CommandCollection":{
-                "release":"0.28"
+                "release":"0.29"
             },
             "MediaBrowser":{
-                "release":"0.22"
+                "release":"0.25"
             }
         }
     }
@@ -73,16 +76,6 @@
   "license": {
     "name":"MIT License",
     "url":"https:\/\/github.com\/phpManufaktur\/kfFlexContent\/raw\/master\/LICENSE.md"
-  },
-  "wiki": {
-    "en": {
-      "url":"https:\/\/github.com/phpManufaktur\/kfEvent\/wiki"
-    }
-  },
-  "firststeps": {
-    "de": {
-      "url":"https:\/\/kit2.phpmanufaktur.de\/event\/firststeps"
-    }
   },
   "download":{
     "availability":"public",

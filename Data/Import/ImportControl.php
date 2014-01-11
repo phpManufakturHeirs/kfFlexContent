@@ -18,16 +18,24 @@ class ImportControl
 {
     protected $app = null;
     protected $WYSIWYG = null;
+    protected $NEWS = null;
+    protected $TOPICS = null;
 
     protected static $table_name = null;
 
-
+    /**
+     * Constructor
+     *
+     * @param Application $app
+     */
     public function __construct(Application $app)
     {
         $this->app = $app;
         self::$table_name = FRAMEWORK_TABLE_PREFIX.'flexcontent_import_control';
 
         $this->WYSIWYG = new WYSIWYG($app);
+        $this->NEWS = new News($app);
+        $this->TOPICS = new Topics($app);
     }
 
     /**
@@ -44,7 +52,9 @@ class ImportControl
         `identifier_type` ENUM('WYSIWYG','NEWS','TOPICS','UNKNOWN') DEFAULT 'UNKNOWN',
         `identifier_id` INT(11) NOT NULL DEFAULT '-1',
         `identifier_language` VARCHAR(2) NOT NULL DEFAULT 'EN',
-        `import_status` ENUM('PENDING','IGNORE','IMPORTED') DEFAULT 'PENDING',
+        `identifier_link` TEXT NOT NULL DEFAULT '',
+        `flexcontent_id` INT(11) NOT NULL DEFAULT -1,
+        `import_status` ENUM('PENDING','IGNORE','IMPORTED','DELETED') DEFAULT 'PENDING',
         `timestamp` TIMESTAMP,
         PRIMARY KEY (`import_id`),
         INDEX (`identifier_id`, `identifier_type`, `identifier_language`)
@@ -81,6 +91,9 @@ EOD;
         $enums = $this->app['db.utils']->getEnumValues(self::$table_name, 'import_status');
         $result = array();
         foreach ($enums as $enum) {
+            if ($enum == 'DELETED') {
+                continue;
+            }
             $result[$enum] = $enum;
         }
         return $result;
@@ -96,9 +109,31 @@ EOD;
         $enums = $this->app['db.utils']->getEnumValues(self::$table_name, 'identifier_type');
         $result = array();
         foreach ($enums as $enum) {
-            $result[$enum] = $enum;
+            if (($enum != 'UNKNOWN') && $this->isInstalled($enum)) {
+                $result[$enum] = $enum;
+            }
         }
         return $result;
+    }
+
+    /**
+     * Check if the submitted addon type is installed
+     *
+     * @param string $type
+     * @return boolean
+     */
+    public function isInstalled($type)
+    {
+        switch (strtoupper($type)) {
+            case 'WYSIWYG':
+                return $this->WYSIWYG->isInstalled();
+            case 'NEWS':
+                return $this->NEWS->isInstalled();
+            case 'TOPICS':
+                return $this->TOPICS->isInstalled();
+            default:
+                return false;
+        }
     }
 
     /**
@@ -209,12 +244,26 @@ EOD;
     /**
      * Select all records
      *
+     * @param string $type WYSIWYG, NEWS or TOPICS
+     * @param string $language
      * @throws \Exception
      */
-    public function selectAll()
+    public function selectAll($type=null, $language=null)
     {
         try {
-            $SQL = "SELECT * FROM `".self::$table_name."`";
+            if (!is_null($type) && !is_null($language)) {
+                $SQL = "SELECT * FROM `".self::$table_name."` WHERE `identifier_type`='$type' ".
+                    "AND `identifier_language`='$language'";
+            }
+            elseif (!is_null($type)) {
+                $SQL = "SELECT * FROM `".self::$table_name."` WHERE `identifier_type`='$type'";
+            }
+            elseif (!is_null($language)) {
+                $SQL = "SELECT * FROM `".self::$table_name."` WHERE `identifier_language`='$language'";
+            }
+            else {
+                $SQL = "SELECT * FROM `".self::$table_name."`";
+            }
             return $this->app['db']->fetchAll($SQL);
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
@@ -227,7 +276,7 @@ EOD;
      * @param string $language
      * @throws \Exception
      */
-    public function checkWYSIWYGpages($language)
+    protected function checkWYSIWYGpages($language)
     {
         try {
             $pages = $this->WYSIWYG->selectWYSIWYGpages($language);
@@ -239,23 +288,113 @@ EOD;
                     $data = array(
                         'identifier_type' => 'WYSIWYG',
                         'identifier_id' => $page['page_id'],
-                        'identifier_language' => strtoupper($page['language'])
+                        'identifier_language' => strtoupper($page['language']),
+                        'identifier_link' => $this->WYSIWYG->getRelativePageLink($page['page_id'])
                     );
                     $this->insert($data);
                 }
             }
-            $imports = $this->selectAll();
+            $imports = $this->selectAll('WYSIWYG', $language);
             foreach ($imports as $import) {
-                if (($import['identifier_type'] == 'WYSIWYG') &&
-                    (strtoupper($import['identifier_language']) == strtoupper($language)) &&
-                    !in_array($import['identifier_id'], $page_ids)) {
-                    // delete this record, the page does no longer exists!
-                    $this->delete($import['import_id']);
+                if (!in_array($import['identifier_id'], $page_ids)) {
+                    // mark the record as deleted, the page does no longer exists!
+                    $data = array(
+                        'import_status' => 'DELETED'
+                    );
+                    $this->update($import['import_id'], $data);
                 }
             }
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }
+    }
+
+    /**
+     * Check the control table for NEWS posts, add new and remove deleted
+     *
+     * @param string $language
+     * @throws \Exception
+     * @return boolean
+     */
+    protected function checkNewsPosts($language)
+    {
+        try {
+            if (!$this->NEWS->isInstalled()) {
+                return false;
+            }
+            $articles= $this->NEWS->selectNewsPosts($language);
+            $post_ids = array();
+            foreach ($articles as $article) {
+                $post_ids[] = $article['post_id'];
+                if (!$this->existsRecord('NEWS', $article['post_id'], $language)) {
+                    // insert a new record
+                    $data = array(
+                        'identifier_type' => 'NEWS',
+                        'identifier_id' => $article['post_id'],
+                        'identifier_language' => strtoupper($article['language']),
+                        'identifier_link' => $this->NEWS->getRelativePostLink($article['post_id'])
+                    );
+                    $this->insert($data);
+                }
+            }
+            $imports = $this->selectAll('NEWS', $language);
+            foreach ($imports as $import) {
+                if (!in_array($import['identifier_id'], $post_ids)) {
+                    // mark the record as deleted, the article does no longer exists!
+                    $data = array(
+                        'import_status' => 'DELETED'
+                    );
+                    $this->update($import['import_id'], $data);
+                }
+            }
+            return true;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    protected function checkTopicsPosts($language)
+    {
+        try {
+            if (!$this->TOPICS->isInstalled()) {
+                return false;
+            }
+            $topics = $this->TOPICS->selectTopicsPosts($language);
+            $topic_ids = array();
+            foreach ($topics as $topic) {
+                $topic_ids[] = $topic['topic_id'];
+                if (!$this->existsRecord('TOPICS', $topic['topic_id'], $language)) {
+                    // insert a new record
+                    $data = array(
+                        'identifier_type' => 'TOPICS',
+                        'identifier_id' => $topic['topic_id'],
+                        'identifier_language' => strtoupper($topic['language']),
+                        'identifier_link' => $this->TOPICS->getRelativeTopicLink($topic['topic_id'])
+                    );
+                    $this->insert($data);
+                }
+            }
+            $imports = $this->selectAll('TOPICS', $language);
+            foreach ($imports as $import) {
+                if (!in_array($import['identifier_id'], $topic_ids)) {
+                    // mark the record as deleted, the article does no longer exists!
+                    $data = array(
+                        'import_status' => 'DELETED'
+                    );
+                    $this->update($import['import_id'], $data);
+                }
+            }
+            return true;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    public function checkExternals($language)
+    {
+        $this->checkWYSIWYGpages($language);
+        $this->checkNewsPosts($language);
+        $this->checkTopicsPosts($language);
     }
 
     /**
@@ -272,20 +411,17 @@ EOD;
             $import = self::$table_name;
             $pages = CMS_TABLE_PREFIX.'pages';
             $SQL = "SELECT `import_id`,`import_status`,`identifier_type`,`identifier_id`,`identifier_language`,`timestamp`,".
-                "`link` AS `identifier_link`,`page_title` AS `identifier_title`, `modified_when` AS `identifier_modified` ".
+                "`identifier_link`,`page_title` AS `identifier_title`, `modified_when` AS `identifier_modified` ".
                 "FROM `$import`, `$pages` WHERE `identifier_language`='$language' AND `import_status`='$status' AND ".
                 "identifier_id=page_id ORDER BY `link` ASC";
             $results = $this->app['db']->fetchAll($SQL);
-            $Page = new Page($this->app);
-            $page_directory = $Page->getPageDirectory();
-            $page_extension = $Page->getPageExtension();
             $list = array();
             foreach ($results as $result) {
                 $item = array();
                 foreach ($result as $key => $value) {
                     if ($key == 'identifier_link') {
-                        $item[$key] = $page_directory.$value.$page_extension;
-                        $item['identifier_url'] = CMS_URL.$page_directory.$value.$page_extension;
+                        $item[$key] = $value;
+                        $item['identifier_url'] = CMS_URL.$value;
                     }
                     elseif ($key == 'identifier_modified') {
                         $item[$key] = date('Y-m-d H:i:s', $value);
@@ -303,6 +439,96 @@ EOD;
     }
 
     /**
+     * Select the NEWS import control list for the given language and status
+     *
+     * @param string $language
+     * @param string $status
+     * @throws \Exception
+     * @return array
+     */
+    protected function selectNewsImportControlList($language, $status)
+    {
+        try {
+            if (!$this->NEWS->isInstalled()) {
+                return array();
+            }
+            $import = self::$table_name;
+            $news = CMS_TABLE_PREFIX.'mod_news_posts';
+            $SQL = "SELECT `import_id`, `import_status`,`identifier_type`,`identifier_id`,`identifier_language`,`timestamp`,".
+                "`identifier_link`,`title` AS `identifier_title`, `posted_when` AS `identifier_modified` ".
+                "FROM `$import`, `$news` WHERE `identifier_language`='$language' AND `import_status`='$status' AND ".
+                "identifier_id=post_id ORDER BY `link` ASC";
+            $results = $this->app['db']->fetchAll($SQL);
+            $list = array();
+            foreach ($results as $result) {
+                $item = array();
+                foreach ($result as $key => $value) {
+                    if ($key == 'identifier_link') {
+                        $item[$key] = $value;
+                        $item['identifier_url'] = CMS_URL.$value;
+                    }
+                    elseif ($key == 'identifier_modified') {
+                        $item[$key] = date('Y-m-d H:i:s', $value);
+                    }
+                    else {
+                        $item[$key] = (is_string($value)) ? $this->app['utils']->unsanitizeText($value) : $value;
+                    }
+                }
+                $list[] = $item;
+            }
+            return $list;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Select the TOPICS import control list for the given language and status
+     *
+     * @param string $language
+     * @param string $status
+     * @throws \Exception
+     * @return array
+     */
+    protected function selectTopicsImportControlList($language, $status)
+    {
+        try {
+            if (!$this->TOPICS->isInstalled()) {
+                return array();
+            }
+            $import = self::$table_name;
+            $topics = CMS_TABLE_PREFIX.'mod_topics';
+            $SQL = "SELECT `import_id`, `import_status`,`identifier_type`,`identifier_id`,`identifier_language`,`timestamp`,".
+                "`identifier_link`,`title` AS `identifier_title`, `posted_modified` AS `identifier_modified` ".
+                "FROM `$import`, `$topics` WHERE `identifier_language`='$language' AND `import_status`='$status' AND ".
+                "identifier_id=topic_id ORDER BY `link` ASC";
+            $results = $this->app['db']->fetchAll($SQL);
+            $list = array();
+            foreach ($results as $result) {
+                $item = array();
+                foreach ($result as $key => $value) {
+                    if ($key == 'identifier_link') {
+                        $item[$key] = $value;
+                        $item['identifier_url'] = CMS_URL.$value;
+                    }
+                    elseif ($key == 'identifier_modified') {
+                        $item[$key] = date('Y-m-d H:i:s', $value);
+                    }
+                    else {
+                        $item[$key] = (is_string($value)) ? $this->app['utils']->unsanitizeText($value) : $value;
+                    }
+                }
+                $list[] = $item;
+            }
+            return $list;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+
+
+    /**
      * Select the import control list for the given language, type and status
      *
      * @param string $language
@@ -317,9 +543,9 @@ EOD;
             case 'WYSIWYG':
                 return $this->selectWYSIWYGimportControlList($language, $status);
             case 'NEWS':
-                return array();
+                return $this->selectNewsImportControlList($language, $status);
             case 'TOPICS':
-                return array();
+                return $this->selectTopicsImportControlList($language, $status);
             case 'UNKNOWN':
                 return array();
             default:
@@ -338,16 +564,45 @@ EOD;
     public function selectContentData($import_id)
     {
         if (false === ($import = $this->select($import_id))) {
+            // import ID does not exists!
             return false;
         }
+
         switch ($import['identifier_type']) {
             case 'WYSIWYG':
                 // return WYSIWYG content
-                $WYSIWYG = new WYSIWYG($this->app);
-                return $WYSIWYG->selectPageID($import['identifier_id']);
+                return $this->WYSIWYG->selectPageID($import['identifier_id']);
+            case 'NEWS':
+                // return NEWS content
+                return $this->NEWS->selectPostID($import['identifier_id']);
+            case 'TOPICS':
+                // return TOPICS content
+                return $this->TOPICS->selectTopicID($import['identifier_id']);
             default:
                 // unknown type ...
                 throw new \UnexpectedValueException("The type ".$import['identifier_type']." is not supported for the import control list!");
+        }
+    }
+
+    /**
+     * Select all existing indentifier links, permalinks and language to enable
+     * the creation of an .htaccess redirection file
+     *
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     */
+    public function selectRedirects()
+    {
+        try {
+            $import = self::$table_name;
+            $content = FRAMEWORK_TABLE_PREFIX.'flexcontent_content';
+            $SQL = "SELECT `identifier_link`, `permalink`, `language` FROM `$import`, `$content` WHERE ".
+                "`flexcontent_id`=`content_id` AND `import_status`='IMPORTED' AND ".
+                "`identifier_link`!='' AND `flexcontent_id`>0 ORDER BY `identifier_link` ASC";
+            $result = $this->app['db']->fetchAll($SQL);
+            return (!empty($result)) ? $result : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
         }
     }
 

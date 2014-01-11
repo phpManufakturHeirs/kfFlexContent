@@ -38,11 +38,11 @@ class ImportList extends Admin
         // check the import control table
         if (self::$config['content']['language']['select']) {
             foreach (self::$config['content']['language']['support'] as $language) {
-                $this->ImportControlData->checkWYSIWYGpages($language);
+                $this->ImportControlData->checkExternals($language);
             }
         }
         else {
-            $this->ImportControlData->checkWYSIWYGpages(self::$config['content']['language']['default']);
+            $this->ImportControlData->checkExternals(self::$config['content']['language']['default']);
         }
     }
 

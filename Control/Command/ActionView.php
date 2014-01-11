@@ -25,6 +25,7 @@ class ActionView extends Basic
     protected $CategoryData = null;
     protected $CategoryTypeData = null;
     protected $TagData = null;
+    protected $Tools = null;
 
     protected static $parameter = null;
     protected static $config = null;
@@ -46,6 +47,7 @@ class ActionView extends Basic
         $this->CategoryData = new Category($app);
         $this->CategoryTypeData = new CategoryType($app);
         $this->TagData = new Tag($app);
+        $this->Tools = new Tools($app);
 
         $ConfigurationData = new Configuration($app);
         self::$config = $ConfigurationData->getConfiguration();
@@ -111,22 +113,6 @@ class ActionView extends Basic
         return true;
     }
 
-    /**
-     * Highlight a search result
-     *
-     * @param string $word
-     * @param string reference $content
-     * @return string
-     */
-    protected function highlightSearchResult($word, &$content)
-    {
-        if (!self::$config['search']['result']['highlight']) {
-            return $content;
-        }
-        $replacement = self::$config['search']['result']['replacement'];
-        $content = str_ireplace($word, str_ireplace('{word}', $word, $replacement), $content);
-        return $content;
-    }
 
     /**
      * Show the content assigned to the specified content ID
@@ -154,11 +140,15 @@ class ActionView extends Basic
         // highlight search results?
         if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
             foreach (self::$parameter['highlight'] as $highlight) {
-                $this->highlightSearchResult($highlight, $content['teaser']);
-                $this->highlightSearchResult($highlight, $content['content']);
-                $this->highlightSearchResult($highlight, $content['description']);
+                $this->Tools->highlightSearchResult($highlight, $content['teaser']);
+                $this->Tools->highlightSearchResult($highlight, $content['content']);
+                $this->Tools->highlightSearchResult($highlight, $content['description']);
             }
         }
+
+        // create links for the tags
+        $this->Tools->linkTags($content['teaser']);
+        $this->Tools->linkTags($content['content']);
 
         // get the categories for this content ID
         $categories = $this->CategoryData->selectCategoriesByContentID(self::$parameter['content_id']);

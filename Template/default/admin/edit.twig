@@ -22,9 +22,9 @@
 {% endblock jquery %}
 {% block stylesheet %}
   {{ parent() }}  
-  <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/ui/1.10.3/themes/smoothness/jquery-ui.min.css" media="screen, projection" />
-  <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/timepicker/1.4.3/jquery-ui-timepicker-addon.min.css" media="screen, projection" />
-  <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/tagedit/1.5.1/css/jquery.tagedit.css" media="all"/>
+  <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/ui/latest/themes/smoothness/jquery-ui.min.css" media="screen, projection" />
+  <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/timepicker/latest/jquery-ui-timepicker-addon.min.css" media="screen, projection" />
+  <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/tagedit/latest/css/jquery.tagedit.css" media="all"/>
   {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css') %}
     <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css' }}" media="screen, projection" />
   {% else %}
@@ -201,14 +201,14 @@
 
  {% block footer_jquery %}
   {{ parent() }}
-  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/ui/1.10.3/ui/minified/jquery-ui.min.js"></script>
-  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/ui/1.10.3/ui/minified//i18n/jquery-ui-i18n.min.js"></script>
-  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/timepicker/1.4.3/jquery-ui-timepicker-addon.min.js"></script>
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/ui/latest/ui/minified/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/ui/latest/ui/minified//i18n/jquery-ui-i18n.min.js"></script>
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/timepicker/latest/jquery-ui-timepicker-addon.min.js"></script>
   {% if app.translator.locale == 'de' %}
-    <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/timepicker/1.4.3/i18n/jquery-ui-timepicker-de.js"></script>
+    <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/timepicker/latest/i18n/jquery-ui-timepicker-de.js"></script>
   {% endif %}
-  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/tagedit/1.5.1/js/jquery.autoGrowInput.js"></script>
-  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/tagedit/1.5.1/js/jquery.tagedit.js"></script>
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/tagedit/latest/js/jquery.autoGrowInput.js"></script>
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/tagedit/latest/js/jquery.tagedit.js"></script>
 {% endblock footer_jquery %}
    
 {% block footer %}

@@ -15,6 +15,11 @@ use phpManufaktur\flexContent\Control\Admin\Admin;
 use Silex\Application;
 use phpManufaktur\flexContent\Data\Import\ImportControl as ImportControlData;
 use phpManufaktur\Basic\Data\CMS\Page;
+use phpManufaktur\flexContent\Data\Content\Content;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+
+require_once EXTENSION_PATH.'/htmlpurifier/latest/library/HTMLPurifier.auto.php';
 
 class ImportDialog extends Admin
 {
@@ -70,6 +75,10 @@ class ImportDialog extends Admin
      */
     protected function prepareContent($content)
     {
+        if (empty($content)) {
+            return $content;
+        }
+
         $cmsPages = new Page($this->app);
         $page_directory = $cmsPages->getPageDirectory();
         $page_extension = $cmsPages->getPageExtension();
@@ -80,9 +89,8 @@ class ImportDialog extends Admin
 
         $DOM->preserveWhiteSpace = false;
 
-        // enshure the correct encoding of the content
-        $encoding_str = '<?xml encoding="UTF-8">';
-        if (!$DOM->loadHTML($encoding_str.$content)) {
+        // need a hack to properly handle UTF-8 encoding
+        if (!$DOM->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', "UTF-8"))) {
             foreach (libxml_get_errors() as $error) {
                 // handle errors here
                 $this->app['monolog']->addError('[flexContent] '.$error->message, array(__METHOD__, __LINE__));
@@ -121,9 +129,7 @@ class ImportDialog extends Admin
             foreach ($DOM->getElementsByTagName('img') as $image) {
                 $src = $image->getAttribute('src');
                 $src = urldecode($src);
-
                 $src = str_ireplace($search, $replace, $src);
-echo "??<br>";
                 if (strpos($src, CMS_MEDIA_URL) == 0) {
                     $path = substr($src, strlen(CMS_MEDIA_URL));
                     // copy the image to the framework /media directory
@@ -133,19 +139,11 @@ echo "??<br>";
                     $image->setAttribute('src', $src);
                 }
             }
-
-
         }
 
-        // we need only the <body> content of the document!
-        $newDom = new \DOMDocument;
-        $body = $DOM->getElementsByTagName('body')->item(0);
-        foreach ($body->childNodes as $child){
-            $newDom->appendChild($newDom->importNode($child, true));
-        }
-        $content = $newDom->saveHTML();
-
-        return $content;
+        $XPath = new \DOMXPath($DOM);
+        // get only the body tag with its contents, then trim the body tag itself to get only the original content
+        return mb_substr($DOM->saveXML($XPath->query('//body')->item(0)), 6, -7, "UTF-8");
     }
 
     /**
@@ -156,6 +154,10 @@ echo "??<br>";
      */
     protected function cleanupContent($content)
     {
+        if (empty($content)) {
+            return $content;
+        }
+
         if (self::$config['admin']['import']['data']['remove']['nbsp']) {
             // replace &nbsp; with a regular space
             $content = str_ireplace('&nbsp;', ' ', $content);
@@ -169,7 +171,6 @@ echo "??<br>";
 
         if (self::$config['admin']['import']['data']['htmlpurifier']['enabled']) {
             // cleanup the HTML with HTML Purifier
-            require_once EXTENSION_PATH.'/htmlpurifier/latest/library/HTMLPurifier.auto.php';
             $config = \HTMLPurifier_Config::createDefault();
             $config->set('URI.Base', 'http://www.example.com');
             $config->set('URI.MakeAbsolute', true);
@@ -183,9 +184,8 @@ echo "??<br>";
 
         $DOM->preserveWhiteSpace = false;
 
-        // enshure the correct encoding of the content
-        $encoding_str = '<?xml encoding="UTF-8">';
-        if (!$DOM->loadHTML($encoding_str.$content)) {
+        // need a hack to properly handle UTF-8 encoding
+        if (!$DOM->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', "UTF-8"))) {
             foreach (libxml_get_errors() as $error) {
                 // handle errors here
                 $this->app['monolog']->addError('[flexContent] '.$error->message, array(__METHOD__, __LINE__));
@@ -215,15 +215,138 @@ echo "??<br>";
             }
         }
 
-        // we need only the <body> content of the document!
-        $newDom = new \DOMDocument;
-        $body = $DOM->getElementsByTagName('body')->item(0);
-        foreach ($body->childNodes as $child){
-            $newDom->appendChild($newDom->importNode($child, true));
-        }
-        $content = $newDom->saveHTML();
-        return $content;
+        $XPath = new \DOMXPath($DOM);
+        // get only the body tag with its contents, then trim the body tag itself to get only the original content
+        return mb_substr($DOM->saveXML($XPath->query('//body')->item(0)), 6, -7, "UTF-8");
     }
+
+    /**
+     * Try to get a teaser image from the given content
+     *
+     * @param string $content
+     * @return mixed <boolean|string>
+     */
+    protected function getTeaserImage($content)
+    {
+        if (!self::$config['admin']['import']['data']['images']['teaser']['get_from_content']) {
+            return false;
+        }
+
+        $min_width = self::$config['admin']['import']['data']['images']['teaser']['min_width'];
+        $min_height = self::$config['admin']['import']['data']['images']['teaser']['min_height'];
+
+        $DOM = new \DOMDocument();
+
+        // enable internal error handling
+        libxml_use_internal_errors(true);
+
+        if (!$DOM->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', "UTF-8"))) {
+            foreach (libxml_get_errors() as $error) {
+                // handle errors here
+                $this->app['monolog']->addError('[flexContent] '.$error->message, array(__METHOD__, __LINE__));
+                libxml_clear_errors();
+                return self::$content;
+            }
+        }
+        libxml_clear_errors();
+
+        foreach ($DOM->getElementsByTagName('img') as $image) {
+
+            $width = null;
+            $height = null;
+
+            $style_str = $image->getAttribute('style');
+            if (!empty($style_str)) {
+                // it is possible that the width and height are set as CSS style information
+                $style_array = (strpos($style_str, ';')) ? explode(';', $style_str) : array(trim($style_str));
+                foreach ($style_array as $item) {
+                    if (strpos($item, ':')) {
+                        list($key, $value) = explode(':', $item);
+                        if ((strtolower(trim($key)) == 'width') || (strtolower(trim($key)) == 'height')) {
+                            if (strtolower(trim($key)) == 'width') {
+                                $width = trim($value);
+                            }
+                            else {
+                                $height = trim($value);
+                            }
+                        }
+                    }
+                }
+
+                if (!is_null($width)) {
+                    // set the width attribute
+                    $image->setAttribute('width', trim(str_ireplace('px', '', $width)));
+                }
+                if (!is_null($height)) {
+                    // set the height attribute
+                    $image->setAttribute('height', trim(str_ireplace('px', '', $height)));
+                }
+            }
+
+            $width = $image->getAttribute('width');
+            $height = $image->getAttribute('height');
+
+            if ((false !== (strpos($width, '%'))) || (false !== (strpos($height, '%')))) {
+                // do not handle percentage image sizes
+                continue;
+            }
+
+            if (($width >= $min_width) && ($height >= $min_height)) {
+                $src = $image->getAttribute('src');
+                if (strpos($src, CMS_URL) === 0) {
+                    // take this image!
+                    return (strpos($src, FRAMEWORK_URL) === 0) ? substr($src, strlen(FRAMEWORK_URL)) : substr($src, strlen(CMS_URL));
+                }
+            }
+        }
+
+        // no hit
+        return false;
+    }
+
+    /**
+     * Create a sample .htaccess files with Redirects for all imported pages and articles
+     *
+     * @return boolean
+     */
+    protected function createAccessFile()
+    {
+        if (!self::$config['admin']['import']['data']['htaccess']['create']) {
+            return false;
+        }
+
+        $ImportControlData = new ImportControlData($this->app);
+        if (false === ($redirects = $ImportControlData->selectRedirects())) {
+            return false;
+        }
+
+        $lines = array();
+        $lines[] = "# flexContent";
+        $lines[] = '# Copy the following redirects into the .htaccess of your website';
+        $lines[] = '';
+
+        foreach ($redirects as $redirect) {
+            $permalink = CMS_URL.str_ireplace('{language}', strtolower($redirect['language']), self::$config['content']['permalink']['directory']);
+            $permalink .= '/'.$redirect['permalink'];
+            $lines[] = 'Redirect 301 '.$redirect['identifier_link'].' '.$permalink;
+        }
+
+        if (!file_put_contents(CMS_PATH.'/'.self::$config['admin']['import']['data']['htaccess']['file'],
+            implode("\n", $lines) . "\n")) {
+            $error = error_get_last();
+            if (is_array($error)) {
+                $this->app['monolog']->addError("[flexContent] ".$error['message'], array($error['file'], $error['line']));
+            }
+            else {
+                $this->app['monolog']->addError('[flexContent] Can not put contents to file '.
+                    self::$config['admin']['import']['data']['htaccess']['file'], array(__METHOD__, __LINE__));
+            }
+            return false;
+        }
+        $this->app['monolog']->addDebug('Created the '.self::$config['admin']['import']['data']['htaccess']['file']. ' file');
+        return true;
+    }
+
 
     /**
      * Execute the import
@@ -232,9 +355,21 @@ echo "??<br>";
      */
     protected function executeImport()
     {
-        // get the import control recored
+        $ContentData = new Content($this->app);
+
         $ImportControlData = new ImportControlData($this->app);
-        $import_control = $ImportControlData->select(self::$import_id);
+        $control = $ImportControlData->select(self::$import_id);
+
+        // check if the content was already imported
+        if ($control['flexcontent_id'] > 0) {
+            // mark this flexContent record as deleted
+            $data = array(
+                'status' => 'DELETED'
+            );
+            $ContentData->update($data, $control['flexcontent_id']);
+            $this->app['monolog']->addDebug('Mark flexContent record with ID '.$control['flexcontent_id'].
+                ' as DELETED before again importing data for the identifier ID '.$control['identifier_id']);
+        }
 
         if (false === ($content = $ImportControlData->selectContentData(self::$import_id))) {
             $this->setAlert("Can't read the content data from the given import ID %import_id%.",
@@ -244,19 +379,70 @@ echo "??<br>";
 
         // replace placeholders with content
         $content['content'] = $this->prepareContent($content['content']);
+        $content['teaser'] = $this->prepareContent($content['teaser']);
 
         if (self::$data_handling == 'CLEAN_UP') {
             $content['content'] = $this->cleanupContent($content['content']);
+            $content['teaser'] = $this->cleanupContent($content['teaser']);
         }
         elseif (self::$data_handling == 'STRIP_TAGS') {
             $content['content'] = strip_tags($content['content']);
+            $content['teaser'] = strip_tags($content['teaser']);
         }
 
-        $teaser = $this->app['utils']->Ellipsis($content['content'], 500, false, true);
+        // create the teaser
+        if (empty($content['teaser']) && self::$config['admin']['import']['data']['teaser']['create']) {
+            $content['teaser'] = $this->app['utils']->Ellipsis($content['content'],
+                self::$config['admin']['import']['data']['teaser']['ellipsis'],
+                !self::$config['admin']['import']['data']['teaser']['html'],
+                self::$config['admin']['import']['data']['teaser']['html']);
+        }
 
-        echo $content['content']."<br>";
-        //print_r($content);
-        return __METHOD__;
+        if (empty($content['teaser_image'])) {
+            $content['teaser_image'] = (false !== ($img = $this->getTeaserImage($content['content']))) ? $img : '';
+        }
+        else {
+            $image_path  = substr($content['teaser_image'], strlen(CMS_URL));
+            if ($this->app['filesystem']->exists(CMS_PATH.$image_path)) {
+                $this->app['filesystem']->copy(CMS_PATH.$image_path, FRAMEWORK_PATH.$image_path);
+                $content['teaser_image'] = $image_path;
+            }
+            else {
+                $content['teaser_image'] = '';
+            }
+        }
+
+        // create the description
+        if (empty($content['description']) && self::$config['admin']['import']['data']['description']['create']) {
+            if ((self::$config['admin']['import']['data']['description']['source'] == 'teaser') && !empty($content['teaser'])) {
+                // get the description from the teaser
+                $content['description'] = $this->app['utils']->Ellipsis($content['teaser'],
+                    self::$config['admin']['import']['data']['description']['ellipsis'], false, true);
+            }
+            else {
+                // get the description from the content
+                $content['description'] = $this->app['utils']->Ellipsis($content['content'],
+                    self::$config['admin']['import']['data']['description']['ellipsis'], true, false);
+            }
+        }
+
+        // create the flexContent record
+        $content_id = $ContentData->insert($content);
+
+        // update import control
+        $data = array(
+            'flexcontent_id' => $content_id,
+            'import_status' => 'IMPORTED'
+        );
+        $ImportControlData->update(self::$import_id, $data);
+
+        // create a access file
+        $this->createAccessFile();
+
+        // show the new flexContent record
+        $subRequest = Request::create('/admin/flexcontent/edit/id/'.$content_id,
+            'GET', array('usage' => self::$usage));
+        return $this->app->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
 
     /**

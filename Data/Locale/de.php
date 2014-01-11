@@ -96,6 +96,10 @@ return array(
     'HIDDEN'
         => 'Versteckt',
 
+    'IGNORE'
+        => 'Ignorieren',
+    'IMPORTED'
+        => 'Importiert',
     'Information about the flexContent extension'
         => 'Information über die flexContent Erweiterung',
 
@@ -208,6 +212,8 @@ return array(
         => 'Es existiert kein flexContent Datensatz mit der ID %id%!',
     'The flexContent record with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!'
         => 'Es existiert kein flexContent Datensatz mit der <strong>ID %id%</strong> für die Sprache <strong>%language%</strong>!',
+    'The flexContent list is empty, please create your first content!'
+        => 'Es existieren noch keine flexContent Inhalte, erstellen Sie einen ersten Artikel!',
     'The image %image% was successfull inserted.'
         => 'Das Bild %image% wurde dem Datensatz hinzugefügt.',
     'The permalink %permalink% is already in use, please select another one!'

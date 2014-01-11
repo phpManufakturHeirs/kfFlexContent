@@ -102,11 +102,12 @@ EOD;
      * @param string reference $content
      * @return string
      */
-    public function replaceURLwithPlaceholder(&$content)
+    protected function replaceURLwithPlaceholder(&$content)
     {
         $search = array(FRAMEWORK_URL, CMS_MEDIA_URL, CMS_URL);
         $replace = array('{flexContent:FRAMEWORK_URL}','{flexContent:CMS_MEDIA_URL}', '{flexContent:CMS_URL}');
-        return str_replace($search, $replace, $content);
+        $content = str_replace($search, $replace, $content);
+        return $content;
     }
 
     /**
@@ -115,11 +116,12 @@ EOD;
      * @param string reference $content
      * @return string
      */
-    public function replacePlaceholderWithURL(&$content)
+    protected function replacePlaceholderWithURL(&$content)
     {
         $search = array('{flexContent:FRAMEWORK_URL}','{flexContent:CMS_MEDIA_URL}', '{flexContent:CMS_URL}');
         $replace = array(FRAMEWORK_URL, CMS_MEDIA_URL, CMS_URL);
-        return str_replace($search, $replace, $content);
+        $content = str_replace($search, $replace, $content);
+        return $content;
     }
 
     /**
@@ -128,20 +130,29 @@ EOD;
      * @param array $data
      * @param integer reference $content_id
      * @throws \Exception
+     * @return integer $content_id
      */
-    public function insert($data, &$content_id)
+    public function insert($data, &$content_id=-1)
     {
         try {
             $insert = array();
             foreach ($data as $key => $value) {
-                if (($key == 'content_id') || ($key == 'timestamp')) continue;
+                if (($key == 'content_id') || ($key == 'timestamp')) {
+                    continue;
+                }
                 if (($key == 'content') || ($key == 'teaser')) {
+                    // replace all internal URL's with a placeholder
                     $value = $this->replaceURLwithPlaceholder($value);
+                }
+                if (($key == 'title') || ($key == 'description') || ($key == 'keywords')) {
+                    // remove HTML tags
+                    $value = trim(strip_tags($value));
                 }
                 $insert[$key] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
             }
             $this->app['db']->insert(self::$table_name, $insert);
             $content_id = $this->app['db']->lastInsertId();
+            return $content_id;
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }
@@ -159,9 +170,15 @@ EOD;
         try {
             $update = array();
             foreach ($data as $key => $value) {
-                if (($key == 'content_id') || ($key == 'timestamp')) continue;
+                if (($key == 'content_id') || ($key == 'timestamp')) {
+                    continue;
+                }
                 if (($key == 'content') || ($key == 'teaser')) {
                     $value = $this->replaceURLwithPlaceholder($value);
+                }
+                if (($key == 'title') || ($key == 'description') || ($key == 'keywords')) {
+                    // remove HTML tags
+                    $value = trim(strip_tags($value));
                 }
                 $update[$this->app['db']->quoteIdentifier($key)] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
             }
