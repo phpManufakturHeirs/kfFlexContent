@@ -51,3 +51,11 @@
 .media {
   margin-bottom: 20px;
 }
+.tag.invalid {
+  color: #ff6633;
+  font-weight: bold;
+}
+.tag.unassigned {
+  color: #9966ff;
+  font-weight: bold;
+}

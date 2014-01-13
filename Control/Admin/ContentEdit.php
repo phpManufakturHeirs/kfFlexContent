@@ -281,7 +281,7 @@ class ContentEdit extends Admin
                         $permalink = !is_null($content[$name]) ? strtolower($content[$name]) : '';
                         $permalink = $this->app['utils']->sanitizeLink($permalink);
 
-                        if ((self::$content_id < 1) && $this->ContentData->existsPermaLink($permalink)) {
+                        if ((self::$content_id < 1) && $this->ContentData->existsPermaLink($permalink, self::$language)) {
                             // this PermaLink already exists!
                             $this->setAlert('The permalink %permalink% is already in use, please select another one!',
                                     array('%permalink%' => $permalink), self::ALERT_TYPE_WARNING);
@@ -631,6 +631,10 @@ class ContentEdit extends Admin
      */
     protected function renderContentForm($form)
     {
+        // set content ID and language as session - i.e. for the CKEditor dialogs
+        $this->app['session']->set('FLEXCONTENT_EDIT_CONTENT_ID', self::$content_id);
+        $this->app['session']->set('FLEXCONTENT_EDIT_CONTENT_LANGUAGE', self::$language);
+
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'admin/edit.twig'),
             array(

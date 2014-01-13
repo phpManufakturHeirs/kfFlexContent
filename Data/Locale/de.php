@@ -23,7 +23,7 @@ return array(
     'ARCHIVED'
         => 'Archiviert',
     'Associated the tag %tag% to this flexContent.'
-        => 'Die Markierung <b>%tag%</b> wurde diesem flexContent Inhalt zugeordnet.',
+        => 'Der Hashtag <b>%tag%</b> wurde diesem flexContent Inhalt zugeordnet.',
     'At least must it exists some text within the teaser or the content, at the moment the Teaser and the Content are empty!'
         => 'Es muss zumindest im Anreisser oder im Inhalt ein Text vorhanden sein, momentan sind beide Felder leer!',
 
@@ -49,11 +49,11 @@ return array(
     'content_id'
         => 'ID',
     'Create a new tag'
-        => 'Eine neue Markierung erstellen',
+        => 'Einen neuen Hashtag erstellen',
     'Create or edit a flexContent article'
         => 'Erstellen oder Bearbeiten Sie einen flexContent Artikel',
     'Created the new tag %tag% and attached it to this content.'
-        => 'Die Markierung <b>%tag%</b> wurde erstellt und diesem flexContent Inhalt zugeordnet.',
+        => 'Der Hashtag <b>%tag%</b> wurde erstellt und diesem flexContent Inhalt zugeordnet.',
 
     'DATA_CLEAN_UP'
         => 'behält die HTML Struktur bei, entfernt jedoch alle Klassen und Formatierungsangaben (empfohlen)',
@@ -68,7 +68,7 @@ return array(
     'delete this category type'
         => 'diese Kategorie löschen',
     'delete this tag type'
-        => 'diese Markierung löschen',
+        => 'diesen Hashtag löschen',
     'description'
         => 'Beschreibung',
     'Dutch'
@@ -138,7 +138,7 @@ return array(
     'Please type in a name for the category type.'
         => 'Bitte geben Sie eine Bezeichnung für die Kategorie an.',
     'Please type in a name for the tag type.'
-        => 'Bitte geben Sie eine Bezeichnung für die Markierung an.',
+        => 'Bitte geben Sie eine Bezeichnung für den Hashtag an.',
     'Previous article'
         => 'Vorheriger Artikel',
     'Primary category'
@@ -172,14 +172,14 @@ return array(
     'Successfull create the new category type %category%.'
         => 'Die Kategorie <b>%category%</b> wurde erfolgreich erstellt.',
     'Successfull create the new tag type %tag%.'
-        => 'Die Markierung %tag% wurde neu erstellt.',
+        => 'Der Hashtag %tag% wurde neu erstellt.',
     'Succesfull updated the flexContent record with the ID %id%'
         => 'Der flexContent Datensatz mit der ID %id% wurde aktualisiert.',
     'Updated the the tag type %tag%'
-        => 'Die Markierung %tag% wurde aktualisiert.',
+        => 'Der Hashtag %tag% wurde aktualisiert.',
 
     'Tag (#tag)'
-        => 'Markierung (#tag)',
+        => 'Hashtag (#hashtag)',
     'Tag description'
         => 'Beschreibung',
     'tag_description'
@@ -225,23 +225,23 @@ return array(
     "The 'publish from' field is always needed and can not switched off, please check the configuration!"
         => "Das 'Veröffentlichen ab' Feld wird immer benötigt und kann in den Einstellungen nicht ausgeschaltet werden. Bitte prüfen Sie die Konfiguration!",
     'The tag %tag_name% does not contain any active contents'
-        => "Die Markierung %tag_name% enthält keine aktiven Inhalte!",
+        => "Der Hashtag %tag_name% enthält keine aktiven Inhalte!",
     'The tag %tag% is no longer associated with this content.'
-        => 'Die Markierung <b>%tag%</b> ist diesem flexContent Inhalt nicht mehr zugeordnet.',
+        => 'Der Hashtag <b>%tag%</b> ist diesem flexContent Inhalt nicht mehr zugeordnet.',
     'The tag %old% was changed to %new%. This update will affect all contents.'
-        => 'Die Markierung <b>%old%</b> wurde zu <b>%new%</b> geändert. Diese Aktualisierung wirkt sich auf alle flexContent Inhalte aus.',
+        => 'Der Hashtag <b>%old%</b> wurde zu <b>%new%</b> geändert. Diese Aktualisierung wirkt sich auf alle flexContent Inhalte aus.',
     'The tag %tag% was successfull deleted and removed from all content.'
-        => 'Die Markierung <b>%tag%</b> wurde gelöscht und bestehende Zuordnungen zu flexContent Inhalten entfernt.',
+        => 'Der Hashtag <b>%tag%</b> wurde gelöscht und bestehende Zuordnungen zu flexContent Inhalten entfernt.',
     'The tag type %tag% already exists and can not inserted!'
-        => 'Die Markierung <b>%tag%</b> existiert bereits und kann nicht zusätzlich eingefügt werden!',
+        => 'Die Hashtag <b>%tag%</b> existiert bereits und kann nicht zusätzlich eingefügt werden!',
     'The tag type list for flexContent is empty, please create a tag!'
-        => 'Es existieren noch keine Markierungen für flexContent, bitte legen Sie eine Markierung an!',
+        => 'Es existieren noch keine Hashtags für flexContent, bitte legen Sie einen Hashtag an!',
     'The tag type name %tag% contains the forbidden character %char%, please change the name.'
-        => 'Die Markierung <b>%tag%</b> enthält das verbotene Zeichen <b>%char%</b>, bitte ändern Sie die Bezeichnung.',
+        => 'Der Hashtag <b>%tag%</b> enthält das verbotene Zeichen <b>%char%</b>, bitte ändern Sie die Bezeichnung.',
     'The Tag Type record with the ID %id% does not exists!'
         => 'Es existiert kein Tag Type Datensatz mit der ID %id%!',
     'The Tag with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!'
-        => 'Die Markierung mit der <strong >ID %id%</strong> existiert nicht für die Sprache <strong>%language%</strong>!',
+        => 'Der Hashtag mit der <strong >ID %id%</strong> existiert nicht für die Sprache <strong>%language%</strong>!',
     'The title is always needed and con not switched off, please check the configuration!'
         => 'Die Überschrift wird immer benötigt und kann nicht in den Einstellungen ausgeschaltet werden. Bitte prüfen Sie die Konfiguration!',
     'The title should have a length between %minimum% and %maximum% characters (actual: %length%).'
@@ -254,7 +254,7 @@ return array(
     'Updated the category type %category%'
         => 'Die Kategorie <b>%category%</b> wurde aktualisiert.',
     'Updated the tag type %tag%'
-        => 'Die Markierung <b>%tag%</b> wurde aktualisiert.',
+        => 'Der Hashtag <b>%tag%</b> wurde aktualisiert.',
     'used_by_content_id'
         => 'Verwendet in flexContent ID',
 );

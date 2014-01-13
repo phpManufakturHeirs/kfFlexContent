@@ -8,11 +8,13 @@ CKEDITOR.editorConfig = function( config ) {
     // For the complete reference:
     // http://docs.ckeditor.com/#!/api/CKEDITOR.config
 
-    // The toolbar groups arrangement, optimized for two toolbar rows.
+    
+    
+  // The toolbar groups arrangement, optimized for two toolbar rows.
     config.toolbar = [
           { name: 'clipboard', groups: [ 'clipboard', 'undo' ], items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },
           { name: 'editing', groups: [ 'find', 'selection' ] },
-          { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+          { name: 'links', items: [ 'Link', 'hashtaglink', 'flexcontentlink', 'cmspagelink', 'Unlink', 'Anchor'] },
           { name: 'insert', items: [ 'Image', 'Table', 'SpecialChar' ] },
           { name: 'tools', items: [ 'Maximize' ] },
           { name: 'others', items: [ '-' ] },

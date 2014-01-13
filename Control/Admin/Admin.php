@@ -66,8 +66,8 @@ class Admin extends Alert
             ),
             'tags' => array(
                 'name' => 'tags',
-                'text' => 'Tags',
-                'hint' => 'Create or edit tags',
+                'text' => 'Hashtags',
+                'hint' => 'Create or edit hashtags',
                 'link' => FRAMEWORK_URL.'/admin/flexcontent/tag/list'.self::$usage_param,
                 'active' => ($active == 'tags')
             ),

@@ -147,8 +147,8 @@ class ActionView extends Basic
         }
 
         // create links for the tags
-        $this->Tools->linkTags($content['teaser']);
-        $this->Tools->linkTags($content['content']);
+        $this->Tools->linkTags($content['teaser'], self::$language);
+        $this->Tools->linkTags($content['content'], self::$language);
 
         // get the categories for this content ID
         $categories = $this->CategoryData->selectCategoriesByContentID(self::$parameter['content_id']);
@@ -174,7 +174,7 @@ class ActionView extends Basic
                 'parameter' => self::$parameter,
                 'categories' => $categories,
                 'tags' => $tags,
-                'permalink_base_url' => CMS_URL.str_ireplace('{language}', strtolower(self::$language), self::$config['content']['permalink']['directory']),
+                'permalink_base_url' => $this->Tools->getPermalinkBaseURL(self::$language),
                 'control' => array(
                     'previous' => $previous_content,
                     'next' => $next_content,

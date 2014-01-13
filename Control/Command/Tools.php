@@ -13,10 +13,14 @@ namespace phpManufaktur\flexContent\Control\Command;
 
 use Silex\Application;
 use phpManufaktur\flexContent\Control\Configuration;
+use phpManufaktur\flexContent\Data\Content\TagType;
+use phpManufaktur\flexContent\Data\Content\Tag;
 
 class Tools
 {
     protected $app = null;
+    protected $TagType = null;
+    protected $Tag = null;
     protected static $config = null;
 
     /**
@@ -27,8 +31,22 @@ class Tools
     public function __construct(Application $app)
     {
         $this->app = $app;
+        $this->TagType = new TagType($app);
+        $this->Tag = new Tag($app);
+
         $Configuration = new Configuration($app);
         self::$config = $Configuration->getConfiguration();
+    }
+
+    /**
+     * Get the permanent link base URL for the given language
+     *
+     * @param string $language
+     * @return string
+     */
+    public function getPermalinkBaseURL($language)
+    {
+        return CMS_URL.str_ireplace('{language}', strtolower($language), self::$config['content']['permalink']['directory']);
     }
 
     /**
@@ -48,51 +66,44 @@ class Tools
         return $content;
     }
 
-    protected function replaceTags(\DOMNode $DOM, $excludeParents=array())
+    public function linkTags(&$content, $language)
     {
-        if (!empty($DOM->childNodes)) {
-            foreach ($DOM->childNodes as $node) {
-                if ($node instanceof \DOMText &&
-                    !in_array($node->parentNode->nodeName, $excludeParents)) {
-
-                    $node->nodeValue = $node->nodeValue;
-                    //$node->nodeValue = preg_replace($regex, $replacement, $node->nodeValue);
-                }
-                else {
-                    $this->replaceTags($DOM, $excludeParents);
-                }
-            }
-        }
-    }
-
-    public function linkTags(&$content)
-    {
-        if (empty($content)) {
+        if (!self::$config['content']['tag']['auto-link']['enabled'] || empty($content)) {
             return $content;
         }
 
-        $DOM = new \DOMDocument();
-        // loadXml needs properly formatted documents, so it's better to use loadHtml, but it needs a hack to properly handle UTF-8 encoding
-        $DOM->loadHtml(mb_convert_encoding($content, 'HTML-ENTITIES', "UTF-8"));
+        $link_replacement = self::$config['content']['tag']['auto-link']['replacement']['link'];
+        $invalid_replacement = self::$config['content']['tag']['auto-link']['replacement']['invalid'];
+        $unassigned_replacement = self::$config['content']['tag']['auto-link']['replacement']['unassigned'];
+        $remove_sharp = self::$config['content']['tag']['auto-link']['remove-sharp'];
+        $ellipsis = self::$config['content']['tag']['auto-link']['ellipsis'];
 
-        $XPath = new \DOMXPath($DOM);
-
-        foreach($XPath->query('//text()[not(ancestor::a)]') as $node) {
-            preg_match_all('/\x23([\w-]{1,64})/i', $node->wholeText, $matches, PREG_SET_ORDER);
-            foreach ($matches as $match) {
-                // $match[0] = #tag
-                // $match[1] = tag
-                 
-                /*
-                $replaced = str_ireplace('match this text', 'MATCH', $node->wholeText);
-                $newNode  = $DOM->createDocumentFragment();
-                $newNode->appendXML($replaced);
-                $node->parentNode->replaceChild($newNode, $node);
-                */
+        //preg_match_all('/\B#(\w{2,64}(?!")\b)/i', $content, $matches, PREG_SET_ORDER);
+        preg_match_all('%(?!<a[^>]*?>)(\B#(\w{2,64}(?!")\b))(?![^<]*?</a>)%i', $content, $matches, PREG_SET_ORDER);
+        foreach ($matches as $match) {
+            $tag_name = str_replace('_', ' ', $match[2]);
+            if (false !== ($tag = $this->TagType->selectByName($tag_name, $language))) {
+                if ($this->Tag->isAssigned($tag['tag_id'])) {
+                    // replace #tag with a link
+                    $search = array('{link}','{description}','{tag}');
+                    $replace = array(
+                        $this->getPermalinkBaseURL($language).'/tag/'.$tag['tag_permalink'],
+                        (!empty($tag['tag_description'])) ? $this->app['utils']->Ellipsis($tag['tag_description'], $ellipsis) : $tag['tag_name'],
+                        ($remove_sharp) ? $tag['tag_name'] : '#'.$tag['tag_name']
+                    );
+                    $tag_link = str_ireplace($search, $replace, $link_replacement);
+                }
+                else {
+                    // this #tag is not assigned with any content
+                    $tag_link = str_ireplace('{tag}', '#'.$tag_name, $unassigned_replacement);
+                }
             }
+            else {
+                // invalid #tag
+                $tag_link = str_ireplace('{tag}', '#'.$tag_name, $invalid_replacement);
+            }
+            $content = str_replace($match[0], $tag_link, $content);
         }
-
-        $content = mb_substr($DOM->saveXML($XPath->query('//body')->item(0)), 6, -7, "UTF-8");
         return $content;
     }
 

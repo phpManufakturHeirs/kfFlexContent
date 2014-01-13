@@ -338,6 +338,32 @@ EOD;
     }
 
     /**
+     * Select the record by the given TAG Name and language
+     *
+     * @param string $tag_name
+     * @param string $language
+     * @throws \Exception
+     * @return boolean|array
+     */
+    public function selectByName($tag_name, $language)
+    {
+        try {
+            $SQL = "SELECT * FROM `".self::$table_name."` WHERE LOWER(`tag_name`) = '".
+                $this->app['utils']->sanitizeVariable(strtolower($tag_name))."' AND `language`='$language'";
+            $result = $this->app['db']->fetchAssoc($SQL);
+            $tag = array();
+            if (is_array($result)) {
+                foreach ($result as $key => $value) {
+                    $tag[$key] = (is_string($value)) ? $this->app['utils']->unsanitizeText($value) : $value;
+                }
+            }
+            return (isset($tag['tag_id'])) ? $tag : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
      * Check if a permalink already exists
      *
      * @param link $permalink
@@ -430,4 +456,35 @@ EOD;
         }
     }
 
+    public function selectHashtagLinkList($language=null, $status=array('PUBLISHED','BREAKING','HIDDEN','ARCHIVED'))
+    {
+        try {
+            $tagtype = self::$table_name;
+            $tag = FRAMEWORK_TABLE_PREFIX.'flexcontent_tag';
+            $content = FRAMEWORK_TABLE_PREFIX.'flexcontent_content';
+            $in_status = "('".implode("','", $status)."')";
+            if (is_null($language)) {
+                $SQL = "SELECT DISTINCT $tagtype.tag_id, `tag_name`, `tag_permalink`, `tag_description`, $tagtype.`language` ".
+                    "FROM `$tagtype`,`$tag`,`$content` WHERE $tagtype.tag_id=$tag.tag_id AND `status` IN $in_status ".
+                    "AND $tag.content_id=$content.content_id ORDER BY `tag_name` ASC";
+            }
+            else {
+                $SQL = "SELECT DISTINCT $tagtype.tag_id, `tag_name`, `tag_permalink`, `tag_description`, $tagtype.`language` ".
+                    "FROM `$tagtype`,`$tag`,`$content` WHERE $tagtype.tag_id=$tag.tag_id AND `status` IN $in_status ".
+                    "AND $tag.content_id=$content.content_id AND $tagtype.`language`='$language' ORDER BY `tag_name` ASC";
+            }
+            $results = $this->app['db']->fetchAll($SQL);
+            $list = array();
+            foreach ($results as $result) {
+                $item = array();
+                foreach ($result as $key => $value) {
+                    $item[$key] = (is_string($value)) ? $this->app['utils']->unsanitizeText($value) : $value;
+                }
+                $list[] = $item;
+            }
+            return (!empty($list)) ? $list : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
 }

@@ -284,4 +284,22 @@ EOD;
             throw new \Exception($e);
         }
     }
+
+    /**
+     * Check if the given TAG ID is assigned to any content
+     *
+     * @param integer $tag_id
+     * @throws \Exception
+     * @return boolean
+     */
+    public function isAssigned($tag_id)
+    {
+        try {
+            $SQL = "SELECT `tag_id` FROM `".self::$table_name."` WHERE `tag_id`=$tag_id";
+            $result = $this->app['db']->fetchColumn($SQL);
+            return ($result == $tag_id);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
 }

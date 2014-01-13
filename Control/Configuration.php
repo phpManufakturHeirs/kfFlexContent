@@ -166,6 +166,18 @@ class Configuration
                             'name' => 'English'
                         )
                     )
+                ),
+                'tag' => array(
+                    'auto-link' => array(
+                        'enabled' => true,
+                        'remove-sharp' => false,
+                        'replacement' => array(
+                            'link' => '<a class="tag auto-link" href="{link}" title="{description}">{tag}</a>',
+                            'invalid' => '<span class="tag invalid" title="The hashtag {tag} does not exist!"><i class="fa fa-ban"></i> {tag}</span>',
+                            'unassigned' => '<span class="tag unassigned" title="The hashtag {tag} exists but is not assigend to any content!"><i class="fa fa-chain-broken"></i> {tag}</span>'
+                        ),
+                        'ellipsis' => 64
+                    )
                 )
             ),
             'admin' => array(
@@ -218,7 +230,7 @@ class Configuration
                 ),
                 'parameter' => array(
                     'action' => array(
-                        'content' => array(
+                        'view' => array(
                             'css' => true,
                             'title' => true,
                             'title_level' => 1,
