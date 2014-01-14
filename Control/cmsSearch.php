@@ -99,7 +99,7 @@ class cmsSearch
             }
 
             // highlight the search results?
-            $highlight = self::$config['search']['result']['highlight'] ? '?'.http_build_query(array('highlight' => $search['words'])) : '';
+            $highlight = self::$config['search']['result']['highlight'] ? '?'.http_build_query(array('highlight' => $search['words']), '', '&') : '';
 
             $permanent_link_base_url = CMS_URL.str_ireplace('{language}', strtolower($language), self::$config['content']['permalink']['directory']);
 

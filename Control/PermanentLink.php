@@ -92,7 +92,7 @@ class PermanentLink
         }
         if (!curl_errno($ch)) {
             $info = curl_getinfo($ch);
-            if ($info['http_code'] > 308) {
+            if ($info['http_code'] > 299) {
                 // bad request
                 $error = 'Error - HTTP Status Code: '.$info['http_code'].' - '.$url;
                 $this->app['monolog']->addError($error, array(__METHOD__, __LINE__));
@@ -190,7 +190,7 @@ class PermanentLink
         }
 
         // create the target URL and set the needed parameters
-        $target_url = CMS_URL.$target.'?'.http_build_query($parameter);
+        $target_url = CMS_URL.$target.'?'.http_build_query($parameter, '', '&');
 
         return $this->cURLexec($target_url);
     }
@@ -262,7 +262,7 @@ class PermanentLink
         }
 
         // create the target URL and set the needed parameters
-        $target_url = CMS_URL.$category['target_url'].'?'.http_build_query($parameter);
+        $target_url = CMS_URL.$category['target_url'].'?'.http_build_query($parameter, '', '&');
 
         return $this->cURLexec($target_url);
     }
@@ -355,7 +355,7 @@ class PermanentLink
         }
 
         // create the target URL and set the needed parameters
-        $target_url = CMS_URL.$target_url.'?'.http_build_query($parameter);
+        $target_url = CMS_URL.$target_url.'?'.http_build_query($parameter, '', '&');
 
         return $this->cURLexec($target_url);
     }

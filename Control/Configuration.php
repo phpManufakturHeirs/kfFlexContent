@@ -39,7 +39,8 @@ class Configuration
      */
     public function checkPermalinkDirectory()
     {
-        if (self::$config['content']['language']['select']) {
+        if (isset(self::$config['content']['language']['select']) &&
+            self::$config['content']['language']['select']) {
             // create directories for all supported languages
             $languages = self::$config['content']['language']['support'];
         }
