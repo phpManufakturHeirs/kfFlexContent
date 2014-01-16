@@ -184,8 +184,25 @@ class PermanentLink
             'language' => strtolower(self::$language)
         );
 
-        if (null !== ($highlight = $this->app['request']->query->get('highlight'))) {
-            // add highlight search results
+        if (self::$config['search']['result']['highlight'] &&
+            (null !== ($searchresult = $this->app['request']->query->get('searchresult'))) &&
+            (null !== ($sstring = $this->app['request']->query->get('sstring')))) {
+            // create a highlight array
+            $highlight = array();
+            if ($searchresult == 1) {
+                if (false !== strpos($sstring, '+')) {
+                    $words = explode('+', $sstring);
+                    foreach ($words as $word) {
+                        $highlight[] = $word;
+                    }
+                }
+                else {
+                    $highlight[] = $sstring;
+                }
+            }
+            else {
+                $highlight[] = str_replace('_', ' ', $sstring);
+            }
             $parameter['highlight'] = $highlight;
         }
 

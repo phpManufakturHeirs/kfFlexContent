@@ -55,15 +55,16 @@ class Tools
      * @param string $word
      * @param string reference $content
      * @return string
+     * @todo does not work proper - function disabled!
      */
     public function highlightSearchResult($word, &$content)
     {
+        // does not work proper !!!
+        return $content;
+
         if (!self::$config['search']['result']['highlight']) {
             return $content;
         }
-        $replacement = self::$config['search']['result']['replacement'];
-        $content = str_ireplace($word, str_ireplace('{word}', $word, $replacement), $content);
-        return $content;
     }
 
     public function linkTags(&$content, $language)
@@ -78,31 +79,42 @@ class Tools
         $remove_sharp = self::$config['content']['tag']['auto-link']['remove-sharp'];
         $ellipsis = self::$config['content']['tag']['auto-link']['ellipsis'];
 
-        //preg_match_all('/\B#(\w{2,64}(?!")\b)/i', $content, $matches, PREG_SET_ORDER);
-        preg_match_all('%(?!<a[^>]*?>)(\B#(\w{2,64}(?!")\b))(?![^<]*?</a>)%i', $content, $matches, PREG_SET_ORDER);
+        $ignore_hashtags = array();
+        preg_match_all('%(?!<a[^>]*?>)((\B##(\w{2,64}\b))|(\B#(\w{2,64}\b)))(?![^<]*?</a>)%i', $content, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
-            $tag_name = str_replace('_', ' ', $match[2]);
-            if (false !== ($tag = $this->TagType->selectByName($tag_name, $language))) {
-                if ($this->Tag->isAssigned($tag['tag_id'])) {
-                    // replace #tag with a link
-                    $search = array('{link}','{description}','{tag}');
-                    $replace = array(
-                        $this->getPermalinkBaseURL($language).'/tag/'.$tag['tag_permalink'],
-                        (!empty($tag['tag_description'])) ? $this->app['utils']->Ellipsis($tag['tag_description'], $ellipsis) : $tag['tag_name'],
-                        ($remove_sharp) ? $tag['tag_name'] : '#'.$tag['tag_name']
-                    );
-                    $tag_link = str_ireplace($search, $replace, $link_replacement);
-                }
-                else {
-                    // this #tag is not assigned with any content
-                    $tag_link = str_ireplace('{tag}', '#'.$tag_name, $unassigned_replacement);
-                }
+            if (isset($match[5])) {
+              if (in_array($match[0], $ignore_hashtags)) {
+                // ignore this already processed hashtag!
+                continue;
+              }
+              $tag_name = str_replace('_', ' ', $match[5]);
+              if (false !== ($tag = $this->TagType->selectByName($tag_name, $language))) {
+                  if ($this->Tag->isAssigned($tag['tag_id'])) {
+                      // replace #tag with a link
+                      $search = array('{link}','{description}','{tag}');
+                      $replace = array(
+                          $this->getPermalinkBaseURL($language).'/tag/'.$tag['tag_permalink'],
+                          (!empty($tag['tag_description'])) ? $this->app['utils']->Ellipsis($tag['tag_description'], $ellipsis) : $tag['tag_name'],
+                          ($remove_sharp) ? $tag['tag_name'] : '#'.$tag['tag_name']
+                      );
+                      $tag_link = str_ireplace($search, $replace, $link_replacement);
+                  }
+                  else {
+                      // this #tag is not assigned with any content
+                      $tag_link = str_ireplace('{tag}', '#'.$tag_name, $unassigned_replacement);
+                  }
+              }
+              else {
+                  // invalid #tag
+                  $tag_link = str_ireplace('{tag}', '#'.$tag_name, $invalid_replacement);
+              }
+              $content = str_replace($match[0], $tag_link, $content);
             }
             else {
-                // invalid #tag
-                $tag_link = str_ireplace('{tag}', '#'.$tag_name, $invalid_replacement);
+              // this is a ## marked item which has to be ignored - so we remove only the first # ...
+              $ignore_hashtags[] = substr($match[0], 1);
+              $content = str_replace($match[0], substr($match[0], 1), $content);
             }
-            $content = str_replace($match[0], $tag_link, $content);
         }
         return $content;
     }
