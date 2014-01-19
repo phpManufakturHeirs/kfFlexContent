@@ -17,10 +17,29 @@ global $app;
 $roles = $app['security.role_hierarchy'];
 if (!in_array('ROLE_FLEXCONTENT_ADMIN', $roles)) {
     $roles['ROLE_ADMIN'][] = 'ROLE_FLEXCONTENT_ADMIN';
-    $roles['ROLE_EVENT_ADMIN'][] = 'ROLE_FLEXCONTENT_EDIT';
+    $roles['ROLE_FLEXCONTENT_ADMIN'][] = 'ROLE_FLEXCONTENT_EDITOR';
     $app['security.role_hierarchy'] = $roles;
 }
 
+$access_rules = $app['security.access_rules'];
+if (!in_array('^/flexcontent/editor', $access_rules)) {
+    $access_rules[] = array('^/flexcontent/editor', 'ROLE_FLEXCONTENT_EDITOR');
+    $app['security.access_rules'] = $access_rules;
+}
+
+$entry_points = $app['security.role_entry_points'];
+if (!in_array('ROLE_FLEXCONTENT_EDITOR', $entry_points)) {
+    $entry_points['ROLE_FLEXCONTENT_EDITOR'] = array(
+        'route' => '/flexcontent/editor',
+        'name' => 'flexContent',
+        'info' => '',
+        'icon' => array(
+            'path' => MANUFAKTUR_PATH.'/flexContent/extension.jpg',
+            'url' => MANUFAKTUR_URL.'/flexContent/extension.jpg'
+        )
+    );
+    $app['security.role_entry_points'] = $entry_points;
+}
 
 // scan the /Locale directory and add all available languages
 $app['utils']->addLanguageFiles(MANUFAKTUR_PATH.'/flexContent/Data/Locale');
@@ -34,7 +53,7 @@ $app['utils']->addLanguageFiles(MANUFAKTUR_PATH.'/flexContent/Data/Locale/Custom
  */
 $app->get('/flexcontent/cms/{cms_information}', function ($cms_information) use ($app) {
     $administration = new EmbeddedAdministration($app);
-    return $administration->route('/admin/flexcontent/about', $cms_information);
+    return $administration->route('/flexcontent/editor/about', $cms_information, 'ROLE_FLEXCONTENT_EDITOR');
 });
 
 /**
@@ -65,86 +84,91 @@ $app->get('/admin/flexcontent/uninstall',
     // uninstall routine for flexContent
     'phpManufaktur\flexContent\Data\Setup\Uninstall::Controller');
 
-$app->get('/admin/flexcontent',
+
+/**
+ * EDITOR routes (was: /admin/flexcontent)
+ */
+
+$app->get('/flexcontent/editor',
     'phpManufaktur\flexContent\Control\Admin\About::Controller');
-$app->get('/admin/flexcontent/about',
+$app->get('/flexcontent/editor/about',
     'phpManufaktur\flexContent\Control\Admin\About::Controller');
 
-$app->get('/admin/flexcontent/edit',
+$app->get('/flexcontent/editor/edit',
     'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerEdit');
-$app->post('/admin/flexcontent/edit/language/check',
+$app->post('/flexcontent/editor/edit/language/check',
     'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerLanguageCheck');
-$app->get('/admin/flexcontent/edit/id/{content_id}',
+$app->get('/flexcontent/editor/edit/id/{content_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerEdit');
-$app->post('/admin/flexcontent/edit/check',
+$app->post('/flexcontent/editor/edit/check',
     'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerEditCheck');
-$app->post('/admin/flexcontent/edit/image/select',
+$app->post('/flexcontent/editor/edit/image/select',
     'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerImage');
-$app->get('/admin/flexcontent/edit/image/check/id/{content_id}',
+$app->get('/flexcontent/editor/edit/image/check/id/{content_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerImageCheck');
 
-$app->match('/admin/flexcontent/permalink/create',
+$app->match('/flexcontent/editor/permalink/create',
     'phpManufaktur\flexContent\Control\Admin\PermaLinkResponse::ControllerPermaLink');
-$app->match('/admin/flexcontent/permalink/create/category',
+$app->match('/flexcontent/editor/permalink/create/category',
     'phpManufaktur\flexContent\Control\Admin\PermaLinkResponse::ControllerPermaLinkCategory');
-$app->match('/admin/flexcontent/permalink/create/tag',
+$app->match('/flexcontent/editor/permalink/create/tag',
     'phpManufaktur\flexContent\Control\Admin\PermaLinkResponse::ControllerPermaLinkTag');
 
-$app->get('/admin/flexcontent/list',
+$app->get('/flexcontent/editor/list',
     'phpManufaktur\flexContent\Control\Admin\ContentList::ControllerList');
-$app->get('/admin/flexcontent/list/page/{page}',
+$app->get('/flexcontent/editor/list/page/{page}',
     'phpManufaktur\flexContent\Control\Admin\ContentList::ControllerList');
-$app->post('/admin/flexcontent/search',
+$app->post('/flexcontent/editor/search',
     'phpManufaktur\flexContent\Control\Admin\ContentSearch::ControllerSearch');
 
-$app->get('/admin/flexcontent/tag/autocomplete',
+$app->get('/flexcontent/editor/tag/autocomplete',
     'phpManufaktur\flexContent\Control\Admin\TagResponse::ControllerAutocomplete');
-$app->get('/admin/flexcontent/tag/list',
+$app->get('/flexcontent/editor/tag/list',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerList');
-$app->get('/admin/flexcontent/tag/list/page/{page}',
+$app->get('/flexcontent/editor/tag/list/page/{page}',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerList');
-$app->get('/admin/flexcontent/tag/create',
+$app->get('/flexcontent/editor/tag/create',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerEdit');
-$app->post('/admin/flexcontent/tag/language/check',
+$app->post('/flexcontent/editor/tag/language/check',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerLanguageCheck');
-$app->get('/admin/flexcontent/tag/edit/id/{tag_id}',
+$app->get('/flexcontent/editor/tag/edit/id/{tag_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerEdit');
-$app->post('/admin/flexcontent/tag/edit/check',
+$app->post('/flexcontent/editor/tag/edit/check',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerEditCheck');
-$app->post('/admin/flexcontent/tag/image/select',
+$app->post('/flexcontent/editor/tag/image/select',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerImage');
-$app->get('/admin/flexcontent/tag/image/check/id/{tag_id}',
+$app->get('/flexcontent/editor/tag/image/check/id/{tag_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerImageCheck');
 
-$app->get('/admin/flexcontent/category/list',
+$app->get('/flexcontent/editor/category/list',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerList');
-$app->get('/admin/flexcontent/category/list/page/{page}',
+$app->get('/flexcontent/editor/category/list/page/{page}',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerList');
-$app->get('/admin/flexcontent/category/create',
+$app->get('/flexcontent/editor/category/create',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerEdit');
-$app->post('/admin/flexcontent/category/language/check',
+$app->post('/flexcontent/editor/category/language/check',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerLanguageCheck');
-$app->get('/admin/flexcontent/category/edit/id/{category_id}',
+$app->get('/flexcontent/editor/category/edit/id/{category_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerEdit');
-$app->post('/admin/flexcontent/category/edit/check',
+$app->post('/flexcontent/editor/category/edit/check',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerEditCheck');
-$app->post('/admin/flexcontent/category/image/select',
+$app->post('/flexcontent/editor/category/image/select',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerImage');
-$app->get('/admin/flexcontent/category/image/check/id/{category_id}',
+$app->get('/flexcontent/editor/category/image/check/id/{category_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerImageCheck');
 
 // import functions
-$app->get('/admin/flexcontent/import/list',
+$app->get('/flexcontent/editor/import/list',
     'phpManufaktur\flexContent\Control\Admin\Import\ImportList::ControllerImportList');
-$app->post('/admin/flexcontent/import/list/select',
+$app->post('/flexcontent/editor/import/list/select',
     'phpManufaktur\flexContent\Control\Admin\Import\ImportList::ControllerImportSelect');
-$app->get('/admin/flexcontent/import/ignore/id/{import_id}/language/{language}/status/{status}/type/{type}',
+$app->get('/flexcontent/editor/import/ignore/id/{import_id}/language/{language}/status/{status}/type/{type}',
     'phpManufaktur\flexContent\Control\Admin\Import\ImportList::ControllerImportIgnore');
-$app->get('/admin/flexcontent/import/pending/id/{import_id}/language/{language}/status/{status}/type/{type}',
+$app->get('/flexcontent/editor/import/pending/id/{import_id}/language/{language}/status/{status}/type/{type}',
     'phpManufaktur\flexContent\Control\Admin\Import\ImportList::ControllerImportPending');
-$app->get('/admin/flexcontent/import/id/{import_id}',
+$app->get('/flexcontent/editor/import/id/{import_id}',
     'phpManufaktur\flexContent\Control\Admin\Import\ImportDialog::ControllerImport');
-$app->post('/admin/flexcontent/import/execute',
+$app->post('/flexcontent/editor/import/execute',
     'phpManufaktur\flexContent\Control\Admin\Import\ImportDialog::ControllerExecute');
 
 /**

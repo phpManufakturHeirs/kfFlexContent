@@ -61,10 +61,10 @@ class ContentTag extends Admin
         }
         self::$current_page = 1;
         self::$route =  array(
-            'pagination' => '/admin/flexcontent/tag/list/page/{page}?order={order}&direction={direction}&usage='.self::$usage,
-            'edit' => '/admin/flexcontent/tag/edit/id/{tag_id}?usage='.self::$usage,
-            'create' => '/admin/flexcontent/tag/create?usage='.self::$usage,
-            'edit_content' => '/admin/flexcontent/edit/id/{content_id}?usage='.self::$usage
+            'pagination' => '/flexcontent/editor/tag/list/page/{page}?order={order}&direction={direction}&usage='.self::$usage,
+            'edit' => '/flexcontent/editor/tag/edit/id/{tag_id}?usage='.self::$usage,
+            'create' => '/flexcontent/editor/tag/create?usage='.self::$usage,
+            'edit_content' => '/flexcontent/editor/edit/id/{content_id}?usage='.self::$usage
         );
 
         $Configuration = new Configuration($app);
@@ -322,7 +322,7 @@ class ContentTag extends Admin
                 'alert' => $this->getAlert(),
                 'form' => $form->createView(),
                 'config' => self::$config,
-                'action' => '/admin/flexcontent/tag/language/check'
+                'action' => '/flexcontent/editor/tag/language/check'
             ));
     }
 
@@ -427,7 +427,7 @@ class ContentTag extends Admin
         $subRequest = Request::create('/admin/mediabrowser', 'GET', array(
             'usage' => self::$usage,
             'start' => self::$config['content']['images']['directory']['start'],
-            'redirect' => '/admin/flexcontent/tag/image/check/id/'.self::$tag_id,
+            'redirect' => '/flexcontent/editor/tag/image/check/id/'.self::$tag_id,
             'mode' => 'public',
             'directory' => self::$config['content']['images']['directory']['select']
         ));

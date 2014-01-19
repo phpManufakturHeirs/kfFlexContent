@@ -22,6 +22,12 @@
       {% block stylesheet %}
         {# Bootstrap #}
         <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/bootstrap/latest/css/bootstrap.min.css" />
+        {% if usage != 'WebsiteBaker' %}
+          <style type="text/css">
+            {# the bootstrap container should use all available space #}
+            .container {width: 100%;}
+          </style>
+        {% endif %}
         <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/font-awesome/latest/css/font-awesome.min.css" />
       {% endblock stylesheet %}
       {% block jquery %}

@@ -62,7 +62,7 @@ class ImportDialog extends Admin
                 'alert' => $this->getAlert(),
                 'form' => $form->createView(),
                 'route' => array(
-                    'action' => '/admin/flexcontent/import/execute'.self::$usage_param,
+                    'action' => '/flexcontent/editor/import/execute'.self::$usage_param,
                 )
             ));
     }
@@ -130,7 +130,7 @@ class ImportDialog extends Admin
                 $src = $image->getAttribute('src');
                 $src = urldecode($src);
                 $src = str_ireplace($search, $replace, $src);
-                if (strpos($src, CMS_MEDIA_URL) == 0) {
+                if (strpos($src, CMS_MEDIA_URL) === 0) {
                     $path = substr($src, strlen(CMS_MEDIA_URL));
                     // copy the image to the framework /media directory
                     $this->app['filesystem']->copy(CMS_MEDIA_PATH.$path, FRAMEWORK_MEDIA_PATH.$path);
@@ -440,7 +440,7 @@ class ImportDialog extends Admin
         $this->createAccessFile();
 
         // show the new flexContent record
-        $subRequest = Request::create('/admin/flexcontent/edit/id/'.$content_id,
+        $subRequest = Request::create('/flexcontent/editor/edit/id/'.$content_id,
             'GET', array('usage' => self::$usage));
         return $this->app->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }

@@ -33,15 +33,15 @@
   <div class="container">
     {% include '@phpManufaktur/flexContent/Template/default/admin/toolbar.twig' %}
     <div class="height-15"></div>
-    
+
     {{ alert }}
-    
+
     <form id="category_edit" method="post" {{ form_enctype(form) }} role="form">
       {{ form_errors(form) }}
       {{ form_row(form._token) }}
       {{ form_row(form.category_id) }}
       {{ form_row(form.language) }}
-      
+
       <div class="row">
         <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
           {# form contents at the left column #}
@@ -73,9 +73,9 @@
           </div>
           <div class="form-group">
             <label>&nbsp;</label>
-            <input class="form-control btn btn-default" type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/category/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
+            <input class="form-control btn btn-default" type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/category/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
           </div>
-          
+
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 height-category-dialog">
           <div class="height-30"></div>
@@ -83,7 +83,7 @@
             <img class="img-rounded img-responsive" src="{{ FRAMEWORK_URL ~ form.category_image.vars.value }}" />
           {% endif %}
           <div class="height-15"></div>
-          <input class="form-control btn btn-default" type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/admin/flexcontent/category/image/select?usage={{ usage }}');" value="{{ 'Select category type image'|trans }}" />  
+          <input class="form-control btn btn-default" type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/category/image/select?usage={{ usage }}');" value="{{ 'Select category type image'|trans }}" />
         </div>
       </div>
       {#{ form_rest(form) }#}
@@ -105,16 +105,16 @@
           $('#category_edit').submit();
         }
       }
-      
+
       $(document).ready(function() {
         $("#form_category_name").change(function () {
           var permalink = $('#form_category_permalink').val();
           var name = $('#form_category_name').val();
-                    
-          if (permalink.length < 1) { 
+
+          if (permalink.length < 1) {
             // no permalink defined, use the category name as propose ...
             $.ajax({
-              url:"{{ FRAMEWORK_URL }}/admin/flexcontent/permalink/create/category?lang={{ form.language.vars.value }}",
+              url:"{{ FRAMEWORK_URL }}/flexcontent/editor/permalink/create/category?lang={{ form.language.vars.value }}",
               type: "POST",
               dataType: "json",
               data: {
@@ -123,7 +123,7 @@
               complete: function (XMLHttpRequest, textStatus) {
                 var result = $.parseJSON(XMLHttpRequest.responseText);
                 $('#form_category_permalink').val(result);
-              },  
+              },
               error: function(jqXHR, textStatus, errorThrown) {
                 alert('Error creating PermaLink:'+textStatus);
               }
@@ -134,4 +134,3 @@
     }
   </script>
 {% endblock footer %}
-  

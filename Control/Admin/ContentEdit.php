@@ -689,7 +689,7 @@ class ContentEdit extends Admin
                 'alert' => $this->getAlert(),
                 'form' => $form->createView(),
                 'config' => self::$config,
-                'action' => '/admin/flexcontent/edit/language/check'
+                'action' => '/flexcontent/editor/edit/language/check'
             ));
     }
 
@@ -799,7 +799,7 @@ class ContentEdit extends Admin
         $subRequest = Request::create('/admin/mediabrowser', 'GET', array(
             'usage' => self::$usage,
             'start' => self::$config['content']['images']['directory']['start'],
-            'redirect' => '/admin/flexcontent/edit/image/check/id/'.self::$content_id,
+            'redirect' => '/flexcontent/editor/edit/image/check/id/'.self::$content_id,
             'mode' => 'public',
             'directory' => self::$config['content']['images']['directory']['select']
         ));

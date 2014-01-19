@@ -97,10 +97,10 @@ class ImportList extends Admin
                 'select' => $select->createView(),
                 'list' => $list,
                 'route' => array(
-                    'select' => '/admin/flexcontent/import/list/select'.self::$usage_param,
-                    'import' => '/admin/flexcontent/import/id/{import_id}'.self::$usage_param,
-                    'ignore' => '/admin/flexcontent/import/ignore/id/{import_id}/language/{language}/status/{status}/type/{type}'.self::$usage_param,
-                    'pending' => '/admin/flexcontent/import/pending/id/{import_id}/language/{language}/status/{status}/type/{type}'.self::$usage_param
+                    'select' => '/flexcontent/editor/import/list/select'.self::$usage_param,
+                    'import' => '/flexcontent/editor/import/id/{import_id}'.self::$usage_param,
+                    'ignore' => '/flexcontent/editor/import/ignore/id/{import_id}/language/{language}/status/{status}/type/{type}'.self::$usage_param,
+                    'pending' => '/flexcontent/editor/import/pending/id/{import_id}/language/{language}/status/{status}/type/{type}'.self::$usage_param
                 )
             ));
     }

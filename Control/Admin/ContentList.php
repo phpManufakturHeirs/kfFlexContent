@@ -57,9 +57,9 @@ class ContentList extends Admin
         }
         self::$current_page = 1;
         self::$route =  array(
-            'pagination' => '/admin/flexcontent/list/page/{page}?order={order}&direction={direction}&usage='.self::$usage,
-            'edit' => '/admin/flexcontent/edit/id/{content_id}?usage='.self::$usage,
-            'search' => '/admin/flexcontent/search?usage='.self::$usage
+            'pagination' => '/flexcontent/editor/list/page/{page}?order={order}&direction={direction}&usage='.self::$usage,
+            'edit' => '/flexcontent/editor/edit/id/{content_id}?usage='.self::$usage,
+            'search' => '/flexcontent/editor/search?usage='.self::$usage
         );
     }
 
