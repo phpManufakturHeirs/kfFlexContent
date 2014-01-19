@@ -14,6 +14,7 @@ use phpManufaktur\Basic\Control\CMS\EmbeddedAdministration;
 // not really needed but make error control more easy ...
 global $app;
 
+// grant the ROLE hierarchy for the flexContent ROLES
 $roles = $app['security.role_hierarchy'];
 if (!in_array('ROLE_FLEXCONTENT_ADMIN', $roles)) {
     $roles['ROLE_ADMIN'][] = 'ROLE_FLEXCONTENT_ADMIN';
@@ -21,12 +22,14 @@ if (!in_array('ROLE_FLEXCONTENT_ADMIN', $roles)) {
     $app['security.role_hierarchy'] = $roles;
 }
 
+// add a protected area and access rules
 $access_rules = $app['security.access_rules'];
 if (!in_array('^/flexcontent/editor', $access_rules)) {
     $access_rules[] = array('^/flexcontent/editor', 'ROLE_FLEXCONTENT_EDITOR');
     $app['security.access_rules'] = $access_rules;
 }
 
+// add a access point for flexContent
 $entry_points = $app['security.role_entry_points'];
 if (!in_array('ROLE_FLEXCONTENT_EDITOR', $entry_points)) {
     $entry_points['ROLE_FLEXCONTENT_EDITOR'] = array(
@@ -39,6 +42,21 @@ if (!in_array('ROLE_FLEXCONTENT_EDITOR', $entry_points)) {
         )
     );
     $app['security.role_entry_points'] = $entry_points;
+}
+
+// add all ROLES provided and used by flexContent
+$roles = array(
+    'ROLE_FLEXCONTENT_ADMIN',
+    'ROLE_FLEXCONTENT_EDITOR'
+);
+$roles_provided = $app['security.roles_provided'];
+if (!in_array($roles, $roles_provided)) {
+    foreach ($roles as $role) {
+        if (!in_array($role, $roles_provided)) {
+            $roles_provided[] = $role;
+        }
+    }
+    $app['security.roles_provided'] = $roles_provided;
 }
 
 // scan the /Locale directory and add all available languages
