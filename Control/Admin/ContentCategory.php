@@ -295,7 +295,7 @@ class ContentCategory extends Admin
         }
         else {
             // general error (timeout, CSFR ...)
-            $this->setMessage('The form is not valid, please check your input and try again!', array(), self::ALERT_TYPE_DANGER);
+            $this->setAlert('The form is not valid, please check your input and try again!', array(), self::ALERT_TYPE_DANGER);
         }
         return false;
     }
