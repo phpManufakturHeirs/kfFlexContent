@@ -20,6 +20,7 @@ use phpManufaktur\flexContent\Data\Content\CategoryType;
 use phpManufaktur\flexContent\Data\Content\Category;
 use phpManufaktur\flexContent\Control\Configuration;
 use phpManufaktur\flexContent\Data\Import\ImportControl;
+use phpManufaktur\Basic\Control\CMS\InstallPageSection;
 
 class Setup
 {
@@ -150,6 +151,10 @@ class Setup
             // setup kit_framework_flexcontent as Add-on in the CMS
             $admin_tool = new InstallAdminTool($app);
             $admin_tool->exec(MANUFAKTUR_PATH.'/flexContent/extension.json', '/flexcontent/cms');
+
+            // setup kit_framework_flexcontent_section_access
+            $section_access = new InstallPageSection($app);
+            $section_access->exec(MANUFAKTUR_PATH.'/flexContent/extension.json', '/flexcontent/cms');
 
             // create the configured permalink routes
             $this->createPermalinkRoutes($app);
