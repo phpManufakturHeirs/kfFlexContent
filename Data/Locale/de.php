@@ -122,6 +122,8 @@ return array(
     'No category available for the language %language%, please create a category first!'
         => 'Es existiert keine Kategorie für die Sprache %language%, bitte erstellen Sie zunächst eine Kategorie!',
 
+    'Organize and present contents in a flexible way'
+        => 'Inhalte flexible organisieren und präsentieren',
     'Overview'
         => 'Übersicht',
 

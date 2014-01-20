@@ -33,12 +33,14 @@ if (!in_array('^/flexcontent/editor', $access_rules)) {
 $entry_points = $app['security.role_entry_points'];
 if (!in_array('ROLE_FLEXCONTENT_EDITOR', $entry_points)) {
     $entry_points['ROLE_FLEXCONTENT_EDITOR'] = array(
-        'route' => '/flexcontent/editor',
-        'name' => 'flexContent',
-        'info' => '',
-        'icon' => array(
-            'path' => MANUFAKTUR_PATH.'/flexContent/extension.jpg',
-            'url' => MANUFAKTUR_URL.'/flexContent/extension.jpg'
+        array(
+            'route' => '/flexcontent/editor',
+            'name' => 'flexContent',
+            'info' => 'Organize and present contents in a flexible way',
+            'icon' => array(
+                'path' => '/extension/phpmanufaktur/phpManufaktur/flexContent/extension.jpg',
+                'url' => MANUFAKTUR_URL.'/flexContent/extension.jpg'
+            )
         )
     );
     $app['security.role_entry_points'] = $entry_points;
