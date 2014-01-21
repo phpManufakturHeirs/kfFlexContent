@@ -821,7 +821,7 @@ class ContentEdit extends Admin
 
         // get the selected image
         if (null == ($image = $app['request']->get('file'))) {
-            $this->setAlert('There was no image selected.', self::ALERT_TYPE_INFO);
+            $this->setAlert('There was no image selected.', array(), self::ALERT_TYPE_INFO);
         }
         else {
             // udate the flexContent record
