@@ -34,8 +34,14 @@
         {% endif %}
       {% endif %}
           
-      {# the full content text #}    
-      {{ content.content|default('') }}    
+      {# the full content text #} 
+      {% if config.kitcommand.content.kitcommand.enabled %}  
+        {# enable kitCommands in config.flexcontent.json if you want to execute 
+           kitCommands within the flexContent main content ... #}
+        {{ kitCommandParser(content.content|default('')) }}
+      {% else %}
+        {{ content.content|default('') }}
+      {% endif %}             
           
       {% if parameter.author is defined and parameter.author %}
         <div class="small text-right text-muted">
@@ -50,6 +56,13 @@
           {{ content.publish_from|date('DATE_FORMAT'|trans) }}    
         </div>  
       {% endif %}  
+      
+      {% if parameter.rating %}    
+        <div class="content-rating">  
+          {% set rating = config.kitcommand.parameter.action.view.rating %}
+          {{ kitCommand('rating', {'id':content.content_id,'type':'flexContent','maximum_rate':rating.maximum_rate,'size':rating.size,'stars':rating.stars,'step':rating.step,'template':rating.template}) }}  
+        </div>
+      {% endif %}
           
       {% if parameter.tags is defined and parameter.tags %}
         <div class="content-tags">
@@ -95,6 +108,13 @@
           <a href="{{ permalink_base_url ~ '/' ~ content.permalink }}" title="{{ 'Permanent link to this article'|trans }}"><i class="fa fa-link"></i></a>
         </div>  
       {% endif %}    
+      
+      {% if parameter.comments %}    
+        <div class="content-comments">
+          {% set comments = config.kitcommand.parameter.action.view.comments %}    
+          {{ kitCommand('comments', {'id':content.content_id,'type':'FLEXCONTENT','captcha':comments.captcha,'gravatar':comments.gravatar,'publish':comments.publish,'rating':comments.rating,'message':parameter.comments_message}) }}
+        </div>  
+      {% endif %}
           
     {% endif %}
   </div>
