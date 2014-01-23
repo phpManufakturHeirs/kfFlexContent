@@ -241,7 +241,22 @@ class Configuration
                             'permalink' => true,
                             'control' => true,
                             'author' => true,
-                            'date' => true
+                            'date' => true,
+                            'rating' => array(
+                                'enabled' => true,
+                                'maximum_rate' => 5,
+                                'size' => 'big',
+                                'stars' => 5,
+                                'step' => true,
+                                'template' => 'default'
+                            ),
+                            'comments' => array(
+                                'enabled' => true,
+                                'captcha' => false,
+                                'gravatar' => true,
+                                'publish' => 'admin',
+                                'rating' => true
+                            )
                         ),
                         'category' => array(
                             'css' => true,
@@ -297,6 +312,11 @@ class Configuration
                             'content_date' => true,
                             'content_categories' => true
                         )
+                    )
+                ),
+                'content' => array(
+                    'kitcommand' => array(
+                        'enabled' => false
                     )
                 )
             ),

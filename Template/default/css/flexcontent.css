@@ -28,6 +28,11 @@
   color: #999;
   font-size: smaller;
 }
+.content-rating {
+  margin: 10px 0 10px 0;
+  padding: 0;
+  text-align: right;
+}
 .header-categories {
   margin: 0;
   padding: 0;

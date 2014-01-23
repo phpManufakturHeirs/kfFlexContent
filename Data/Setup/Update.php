@@ -12,10 +12,48 @@
 namespace phpManufaktur\flexContent\Data\Setup;
 
 use Silex\Application;
+use phpManufaktur\flexContent\Control\Configuration;
 
 class Update
 {
     protected $app = null;
+    protected $Configuration = null;
+
+    protected function release_016()
+    {
+        $config = $this->Configuration->getConfiguration();
+        if (!isset($config['kitcommand']['content']['kitcommand']['enabled'])) {
+            $config['kitcommand']['content']['kitcommand']['enabled'] = false;
+            $this->Configuration->setConfiguration($config);
+            $this->Configuration->saveConfiguration();
+            $this->app['monolog']->addDebug('Added kitcommand -> content -> kitcommand -> enabled to the config.flexcontent.json');
+        }
+        if (!isset($config['kitcommand']['parameter']['view']['rating'])) {
+            $config['kitcommand']['parameter']['action']['view']['rating'] = array(
+                'enabled' => true,
+                'maximum_rate' => 5,
+                'size' => 'big',
+                'stars' => 5,
+                'step' => true,
+                'template' => 'default'
+            );
+            $this->Configuration->setConfiguration($config);
+            $this->Configuration->saveConfiguration();
+            $this->app['monolog']->addDebug('Added kitcommand -> parameter -> view -> rating to the config.flexcontent.json');
+        }
+        if (!isset($config['kitcommand']['parameter']['view']['comments'])) {
+            $config['kitcommand']['parameter']['action']['view']['comments'] = array(
+                'enabled' => true,
+                'captcha' => false,
+                'gravatar' => true,
+                'publish' => 'admin',
+                'rating' => true
+            );
+            $this->Configuration->setConfiguration($config);
+            $this->Configuration->saveConfiguration();
+            $this->app['monolog']->addDebug('Added kitcommand -> parameter -> view -> comments to the config.flexcontent.json');
+        }
+    }
 
     /**
      * Execute the update for flexContent
@@ -33,6 +71,12 @@ class Update
 
         // install .htaccess files for the configured languages
         $Setup->createPermalinkDirectories($app);
+
+        // initialize Configuration for the update routines
+        $this->Configuration = new Configuration($app);
+
+        // Release 0.16
+        $this->release_016();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

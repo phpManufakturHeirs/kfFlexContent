@@ -256,6 +256,13 @@ class ActionView extends Basic
         // show publish_from as date?
         self::$parameter['date'] = (isset(self::$parameter['date']) && ((self::$parameter['date'] == 0) || (strtolower(self::$parameter['date']) == 'false'))) ? false : $default_parameter['date'];
 
+        // show a rating?
+        self::$parameter['rating'] = (isset(self::$parameter['rating']) && ((self::$parameter['rating'] == 0) || (strtolower(self::$parameter['rating']) == 'false'))) ? false : $default_parameter['rating']['enabled'];
+
+        // enable comments?
+        self::$parameter['comments'] = (isset(self::$parameter['comments']) && ((self::$parameter['comments'] == 0) || (strtolower(self::$parameter['comments']) == 'false'))) ? false : $default_parameter['comments']['enabled'];
+        self::$parameter['comments_message'] = (isset($GET['message']) && !empty($GET['message'])) ? $GET['message'] : '';
+
         if (self::$parameter['content_id'] > 0) {
             return $this->showID();
         }

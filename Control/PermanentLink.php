@@ -206,6 +206,15 @@ class PermanentLink
             $parameter['highlight'] = $highlight;
         }
 
+        $gets = $this->app['request']->query->all();
+        $ignore = array('searchresult','sstring');
+        foreach ($gets as $key => $value) {
+            if (!key_exists($key, $parameter) && !in_array($key, $ignore)) {
+                // pass all other parameters to the target page
+                $parameter[$key] = $value;
+            }
+        }
+
         // create the target URL and set the needed parameters
         $target_url = CMS_URL.$target.'?'.http_build_query($parameter, '', '&');
 
