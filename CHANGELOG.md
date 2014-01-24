@@ -6,6 +6,14 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.16** - 2014-01-24
+
+* start introducing editor roles - must change all /admin routes
+* added security access rules and security entry points
+* flexContent install also a PAGE add-on in the CMS to enable access to flexContent also over the pages and not only via Admin-Tools and a /kit2 login
+* implement `Rating` and `Comments` for flexContent articles
+* added support for kitCommands within the content
+
 **0.15** - 2014-01-16
 
 * changed handling of the search function
