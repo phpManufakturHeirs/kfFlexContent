@@ -12,7 +12,6 @@
 namespace phpManufaktur\flexContent\Data\Import;
 
 use Silex\Application;
-use phpManufaktur\Basic\Data\CMS\Page;
 
 class ImportControl
 {
@@ -353,6 +352,13 @@ EOD;
         }
     }
 
+    /**
+     * Check for existing TOPICS posts and update the control table
+     *
+     * @param string $language
+     * @throws \Exception
+     * @return boolean
+     */
     protected function checkTopicsPosts($language)
     {
         try {
@@ -390,6 +396,11 @@ EOD;
         }
     }
 
+    /**
+     * Check for external articles to enable an import
+     *
+     * @param string $language
+     */
     public function checkExternals($language)
     {
         $this->checkWYSIWYGpages($language);
