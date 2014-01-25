@@ -25,6 +25,7 @@ class ContentList extends Admin
     protected static $order_direction = null;
     protected static $current_page = null;
     protected static $max_pages = null;
+    protected static $ellipsis = null;
 
     /**
      * (non-PHPdoc)
@@ -47,6 +48,7 @@ class ContentList extends Admin
             self::$select_status = isset($cfg['list']['select_status']) ? $cfg['list']['select_status'] : array('UNPUBLISHED', 'PUBLISHED', 'BREAKING', 'HIDDEN');
             self::$order_by = isset($cfg['list']['order']['by']) ? $cfg['list']['order']['by'] : array('content_id');
             self::$order_direction = isset($cfg['list']['order']['direction']) ? $cfg['list']['order']['direction'] : 'DESC';
+            self::$ellipsis = isset($cfg['list']['ellipsis']) ? $cfg['list']['ellipsis'] : 240;
         } catch (\Exception $e) {
             // the config file does not exists - use all available columns
             self::$columns = $this->ContentData->getColumns();
@@ -54,6 +56,7 @@ class ContentList extends Admin
             self::$select_status = array('UNPUBLISHED', 'PUBLISHED', 'BREAKING', 'HIDDEN');
             self::$order_by = array('content_id');
             self::$order_direction = 'DESC';
+            self::$ellipsis = 240;
         }
         self::$current_page = 1;
         self::$route =  array(
@@ -136,7 +139,8 @@ class ContentList extends Admin
                 'route' => self::$route,
                 'order_by' => $order_by,
                 'order_direction' => strtolower($order_direction),
-                'last_page' => self::$max_pages
+                'last_page' => self::$max_pages,
+                'ellipsis' => self::$ellipsis
             ));
     }
 }

@@ -1,0 +1,34 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2014 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+{% spaceless %}
+{% include '@phpManufaktur/flexContent/Template/default/command/command.header.twig' %}        
+<div class="flexcontent-container">
+  <div class="container">    
+      
+    {{ basic.alert }}
+
+    {# loop only if active contens available ... #}  
+    {% if contents.0.content is defined %}
+      {% for content in contents %}
+        {% if content.redirect_url|length > 0 %}
+          {% set url = content.redirect_url %}
+          {% set target = content.redirect_target %}
+        {% else %}
+          {% set url = permalink_base_url ~ '/' ~ content.permalink %}
+          {% set target = '_self' %}
+        {% endif %}   
+        {% include '@phpManufaktur/flexContent/Template/default/command/content.item.twig' %}
+      {% endfor %}
+    {% endif %}  
+  </div>
+  
+</div>
+{% include '@phpManufaktur/flexContent/Template/default/command/command.footer.twig' %}        
+{% endspaceless %}

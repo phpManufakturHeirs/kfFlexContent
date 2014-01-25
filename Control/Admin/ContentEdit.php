@@ -162,6 +162,13 @@ class ContentEdit extends Admin
             'required' => self::$config['content']['field']['redirect_url']['required'],
             'data' => isset($data['redirect_url']) ? $data['redirect_url'] : ''
         ))
+        ->add('redirect_target', 'choice', array(
+            'choices' => $this->ContentData->getTargetTypeValuesForForm(),
+            'empty_value' => '- please select -',
+            'expanded' => false,
+            'required' => self::$config['content']['field']['redirect_target']['required'],
+            'data' => isset($data['redirect_target']) ? $data['redirect_target'] : self::$config['content']['field']['redirect_target']['default']
+        ))
         ->add('teaser_image', 'hidden', array(
             'data' => isset($data['teaser_image']) ? $data['teaser_image'] : ''
         ))
@@ -301,6 +308,9 @@ class ContentEdit extends Admin
                         // @todo: check the URL!
                         $data[$name] = !is_null($content[$name]) ? $content[$name] : '';
 
+                        break;
+                    case 'redirect_target':
+                        $data[$name] = $content[$name];
                         break;
                     case 'publish_from':
                         if (!$property['required']) {

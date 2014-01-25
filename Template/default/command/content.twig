@@ -57,13 +57,6 @@
         </div>  
       {% endif %}  
       
-      {% if parameter.rating %}    
-        <div class="content-rating">  
-          {% set rating = config.kitcommand.parameter.action.view.rating %}
-          {{ kitCommand('rating', {'id':content.content_id,'type':'flexContent','maximum_rate':rating.maximum_rate,'size':rating.size,'stars':rating.stars,'step':rating.step,'template':rating.template}) }}  
-        </div>
-      {% endif %}
-          
       {% if parameter.tags is defined and parameter.tags %}
         <div class="content-tags">
           {% for tag in tags %}
@@ -73,6 +66,13 @@
             </span>
           {% endfor %}
         </div>  
+      {% endif %}
+      
+      {% if parameter.rating %}    
+        <div class="content-rating">  
+          {% set rating = config.kitcommand.parameter.action.view.rating %}
+          {{ kitCommand('rating', {'id':content.content_id,'type':'flexContent','maximum_rate':rating.maximum_rate,'size':rating.size,'stars':rating.stars,'step':rating.step,'template':rating.template}) }}  
+        </div>
       {% endif %}
           
       {% if parameter.control is defined and parameter.control %}

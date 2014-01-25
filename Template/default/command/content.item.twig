@@ -1,0 +1,34 @@
+<div class="media">
+  {% if parameter.content_image and content.teaser_image|length > 0 %}
+    {% set img = image(content.teaser_image, parameter.content_image_small_max_width, parameter.content_image_small_max_height) %}
+    {# add the margin, padding and border of img-thumbnail to the min-width! #}
+    <div class="pull-left media-object" style="min-width:{{ parameter.content_image_small_max_width+30 }}px;min-height:{{ parameter.content_image_small_max_height }}px;">
+      <a href="{{ url }}" target="{{ target }}">
+        <img class="img-responsive img-thumbnail" src="{{ img.src }}" alt="{{ content.title }}" title="{{ content.title }}" />
+      </a>
+    </div>
+  {% endif %}
+  <div class="media-body">
+    {% if parameter.content_title %}
+      <a href="{{ url }}" target="{{ target }}">
+        <h{{ parameter.title_level+2|default('3') }} class="media-heading">{{ content.title|default('') }}</h{{ parameter.title_level+2|default('3') }}>
+      </a>
+    {% endif %}
+    {% if parameter.content_teaser and content.teaser|length > 0 %}
+      {{ content.teaser }}
+      <div class="go-ahead">
+        <a href="{{ url }}" target="{{ target }}">{{ 'read more'|trans }} ...</a>
+      </div>
+      {% if parameter.list_tags and content.tags|length > 0 %}
+        <div class="content-tags">
+          {% for tag in content.tags %}
+            <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
+              {# attach the primary category ?c= and the actual content ID &i= #}
+              <a href="{{ permalink_base_url ~ '/tag/' ~ tag.tag_permalink ~ '?c=' ~ content.categories.0.category_id ~ '&i=' ~ content.content_id }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
+            </span>
+          {% endfor %}
+        </div> 
+      {% endif %}
+    {% endif %}
+  </div>
+</div>

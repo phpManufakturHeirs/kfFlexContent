@@ -117,6 +117,10 @@ class Configuration
                     'redirect_url' => array(
                         'required' => false
                     ),
+                    'redirect_target' => array(
+                        'required' => false,
+                        'default' => '_blank'
+                    ),
                     'publish_from' => array(
                         'required' => true,
                         'add' => array(
@@ -266,6 +270,7 @@ class Configuration
                             'category_image' => true,
                             'category_image_max_width' => 150,
                             'category_image_max_height' => 150,
+                            'list_tags' => false,
                             'content_limit' => 100,
                             'content_status' => array(
                                 'BREAKING',
@@ -293,7 +298,62 @@ class Configuration
                             'tag_image' => true,
                             'tag_image_max_width' => 150,
                             'tag_image_max_height' => 150,
+                            'list_tags' => false,
                             'content_limit' => 100,
+                            'content_status' => array(
+                                'BREAKING',
+                                'PUBLISHED'
+                            ),
+                            'content_image' => true,
+                            'content_image_max_width' => 350,
+                            'content_image_max_height' => 350,
+                            'content_image_small_max_width' => 100,
+                            'content_image_small_max_height' => 100,
+                            'content_title' => true,
+                            'content_description' => false,
+                            'content_teaser' => true,
+                            'content_content' => false,
+                            'content_tags' => true,
+                            'content_author' => true,
+                            'content_date' => true,
+                            'content_categories' => true
+                        ),
+                        'list' => array(
+                            'css' => true,
+                            'title_level' => 1,
+                            'categories' => array(),
+                            'categories_exclude' => array(),
+                            'order_by' => 'publish_from',
+                            'order_direction' => 'DESC',
+                            'list_tags' => true,
+                            'content_limit' => 100,
+                            'content_status' => array(
+                                'BREAKING',
+                                'PUBLISHED'
+                            ),
+                            'content_image' => true,
+                            'content_image_max_width' => 350,
+                            'content_image_max_height' => 350,
+                            'content_image_small_max_width' => 100,
+                            'content_image_small_max_height' => 100,
+                            'content_title' => true,
+                            'content_description' => false,
+                            'content_teaser' => true,
+                            'content_content' => false,
+                            'content_tags' => true,
+                            'content_author' => true,
+                            'content_date' => true,
+                            'content_categories' => true
+                        ),
+                        'list_simple' => array(
+                            'css' => true,
+                            'title_level' => 1,
+                            'categories' => array(),
+                            'categories_exclude' => array(),
+                            'order_by' => 'publish_from',
+                            'order_direction' => 'DESC',
+                            'list_tags' => false,
+                            'content_limit' => 10,
                             'content_status' => array(
                                 'BREAKING',
                                 'PUBLISHED'

@@ -27,6 +27,7 @@ class ImportDialog extends Admin
     protected static $language = null;
     protected static $import_id = null;
     protected static $data_handling = null;
+    protected static $remove_dbglossary = null;
 
     /**
      * Get the form for the import dialog
@@ -42,6 +43,10 @@ class ImportDialog extends Admin
             'choices' => array('UNCHANGED' => 'DATA_UNCHANGED', 'CLEAN_UP' => 'DATA_CLEAN_UP', 'STRIP_TAGS' => 'DATA_STRIP_TAGS'),
             'expanded' => true,
             'data' => self::$config['admin']['import']['data']['handling']
+        ))
+        ->add('dbglossary', 'checkbox', array(
+            'required' => false,
+            'label' => 'Remove dbGlossary ||tags||'
         ))
         ;
         return $form->getForm();
@@ -390,6 +395,12 @@ class ImportDialog extends Admin
             $content['teaser'] = strip_tags($content['teaser']);
         }
 
+        if (self::$remove_dbglossary) {
+            // remove the dbGlossary tags
+            $content['content'] = str_replace('||', '', $content['content']);
+            $content['teaser'] = str_replace('||', '', $content['teaser']);
+        }
+
         // create the teaser
         if (empty($content['teaser']) && self::$config['admin']['import']['data']['teaser']['create']) {
             $content['teaser'] = $this->app['utils']->Ellipsis($content['content'],
@@ -478,6 +489,7 @@ class ImportDialog extends Admin
             $data = $form->getData();
             self::$import_id = $data['import_id'];
             self::$data_handling = $data['data_handling'];
+            self::$remove_dbglossary = (bool) $data['dbglossary'];
             // execute the import
             return $this->executeImport();
         }

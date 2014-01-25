@@ -77,7 +77,7 @@
                     {% elseif 'active desc' in head_class %}
                       <i class="fa fa-sort-alpha-desc"></i>&nbsp;
                     {% endif %}
-                    <a href="{{ FRAMEWORK_URL ~ route.pagination|replace({'{page}':current_page, '{order}':head, '{direction}':head_order}) }}" title="{% if head_order == 'asc' %}{{ 'Click to sort column ascending'|trans }}{% else %}{{ 'Click to sort column descending'|trans }}{% endif %}">{{ head|trans }}</a>
+                    <a href="{{ FRAMEWORK_URL ~ route.pagination|replace({'{page}':current_page, '{order}':head, '{direction}':head_order}) }}" title="{% if head_order == 'asc' %}{{ 'Click to sort column ascending'|trans }}{% else %}{{ 'Click to sort column descending'|trans }}{% endif %}">{{ head|humanize|trans }}</a>
                   </th>
                 {% endif %}
               {% endfor %}
@@ -97,7 +97,7 @@
                         <a href="{{ FRAMEWORK_URL ~ route.edit|replace({'{content_id}':content.content_id}) }}">{{ value }}</a>
                       </td>
                     {% elseif (column == 'description') %}
-                      <td class="{{ column }}">{{ value|striptags }}</td>
+                      <td class="{{ column }}">{{ value|striptags|ellipsis(ellipsis) }}</td>
                     {% elseif ((column == 'publish_from') or (column == 'breaking_to') or (column == 'archive_from')) %}
                       {# formatting date and time #}
                       <td class="{{ column }}">{{ value|date('DATETIME_FORMAT'|trans) }}</td>

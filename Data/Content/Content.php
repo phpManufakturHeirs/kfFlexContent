@@ -46,6 +46,7 @@ class Content
         `keywords` VARCHAR(512) NOT NULL DEFAULT '',
         `permalink` VARCHAR(255) NOT NULL DEFAULT '',
         `redirect_url` TEXT NOT NULL,
+        `redirect_target` ENUM('_blank','_self','_parent','_top') NOT NULL DEFAULT '_blank',
         `publish_from` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
         `breaking_to` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
         `archive_from` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -89,6 +90,22 @@ EOD;
     public function getStatusTypeValuesForForm()
     {
         $enums = $this->app['db.utils']->getEnumValues(self::$table_name, 'status');
+        $result = array();
+        foreach ($enums as $enum) {
+            $result[$enum] = $enum;
+        }
+        return $result;
+    }
+
+    /**
+     * Get the ENUM values of field redirect_target as associated array for
+     * usage in form
+     *
+     * @return array
+     */
+    public function getTargetTypeValuesForForm()
+    {
+        $enums = $this->app['db.utils']->getEnumValues(self::$table_name, 'redirect_target');
         $result = array();
         foreach ($enums as $enum) {
             $result[$enum] = $enum;
@@ -605,30 +622,59 @@ EOD;
         }
     }
 
-    public function selectContentLinkList($language=null, $status=array('PUBLISHED','BREAKING','HIDDEN','ARCHIVED') )
+    /*
+     * Seem's to be no longer needed ...
+
+    /**
+     * Select a list of contents configured by parameters
+     *
+     * @param string $language
+     * @param integer $limit max. number of hits
+     * @param array $categories query only this categories
+     * @param array $categories_exclude don't query this categories
+     * @param array $status status of contents to list
+     * @param string $order_by given field(s), separated by comma
+     * @param string $order_direction default 'DESC'
+     * @return boolean|array
+     */
+    public function selectContentList($language, $limit=100, $categories=array(),
+        $categories_exclude=array(), $status=array('PUBLISHED','BREAKING','HIDDEN','ARCHIVED'),
+        $order_by='publish_from', $order_direction='DESC')
     {
-        try {
-            $in_status = "('".implode("','", $status)."')";
-            if (is_null($language)) {
-                $SQL = "SELECT `title`, `permalink`, `redirect_url`, `language` FROM `".self::$table_name."` WHERE ".
-                    "`status` IN $in_status ORDER BY `title` ASC";
-            }
-            else {
-                $SQL = "SELECT `title`, `permalink`, `redirect_url`, `language` FROM `".self::$table_name."` WHERE ".
-                    "`language`='$language' AND `status` IN $in_status ORDER BY `title` ASC";
-            }
-            $results = $this->app['db']->fetchAll($SQL);
-            $list = array();
-            foreach ($results as $result) {
-                $item = array();
-                foreach ($result as $key => $value) {
-                    $item[$key] = (is_string($value)) ? $this->app['utils']->unsanitizeText($value) : $value;
-                }
-                $list[] = $item;
-            }
-            return (!empty($list)) ? $list : false;
-        } catch (\Doctrine\DBAL\DBALException $e) {
-            throw new \Exception($e);
+        $content_table = self::$table_name;
+        $category_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
+        $in_status = "('".implode("','", $status)."')";
+
+        $SQL = "SELECT * FROM `$category_table`,`$content_table` WHERE `$content_table`.content_id=`$category_table`.content_id ".
+            "AND `language`='$language' ";
+
+        if (!empty($categories)) {
+            $cats = "('".implode("','", $categories)."')";
+            $SQL .= "AND `$category_table`.category_id IN $cats ";
         }
+        elseif (!empty($categories_exclude)) {
+            $categories = "('".implode("','", $categories_exclude)."')";
+            $SQL .= "AND `$category_table`.category_id NOT IN $categories ";
+        }
+
+        // and the rest - GROUP BY prevents duplicate entries!
+        $order_table = (in_array($order_by, $this->getColumns())) ? $content_table : $category_table;
+        $SQL .= "AND `status` IN $in_status GROUP BY `$content_table`.content_id ORDER BY ".
+            "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), `$order_table`.`$order_by` $order_direction ".
+            "LIMIT $limit";
+        $results = $this->app['db']->fetchAll($SQL);
+
+        $list = array();
+        foreach ($results as $result) {
+            $content = array();
+            foreach ($result as $key => $value) {
+                $content[$key] = (is_string($value)) ? $this->app['utils']->unsanitizeText($value) : $value;
+                if (($key == 'content') || ($key == 'teaser')) {
+                    $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
+                }
+            }
+            $list[] = $content;
+        }
+        return (!empty($list)) ? $list : false;
     }
 }

@@ -14,24 +14,8 @@
       
     {{ basic.alert }}
 
-    {% if parameter.tag_description and tag.tag_description|length > 0 %}
-      <div class="media">
-        {% if parameter.tag_image and tag.tag_image|length > 0 %}
-          {% set img = image(tag.tag_image, parameter.tag_image_max_width, parameter.tag_image_max_height) %}
-          <img class="media-object pull-right img-thumbnail" src="{{ img.src }}" width="{{ img.width }}" height="{{ img.height }}" alt="{{ tag.tag_name }}" title="{{ tag.tag_name }}" />
-        {% endif %}
-        <div class="media-body">
-          {% if parameter.tag_name %}
-            <h{{ parameter.title_level|default('1') }} class="media-heading">{{ tag.tag_name|default('') }}</h{{ parameter.title_level|default('1') }}>
-          {% endif %}
-          {{ tag.tag_description|default('') }}
-        </div>
-      </div>
-    {% elseif parameter.tag_name %}
-      <h{{ parameter.title_level|default('1') }}>{{ tag.tag_name|default('') }}</h{{ parameter.title_level|default('1') }}>
-    {% endif %}
-      
-    {% if contents|length > 0 %}
+    {# loop only if active contens available ... #}  
+    {% if contents.0.content is defined %}
       {% for content in contents %}
         {% if content.redirect_url|length > 0 %}
           {% set url = content.redirect_url %}
@@ -54,7 +38,6 @@
       {# if we have only one exposed content we must close the row here ... #}
       {% if contents|length < 2 %}</div>{% endif %}
     {% endif %}  
-  
   </div>
   
 </div>

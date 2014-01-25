@@ -46,7 +46,7 @@ return array(
         => 'Inhalt',
     'Content ID'
         => 'ID',
-    'content_id'
+    'Content id'
         => 'ID',
     'Create a new tag'
         => 'Einen neuen Hashtag erstellen',
@@ -147,15 +147,19 @@ return array(
         => 'Kategorie',
     "Problem: '%first%' must be defined before '%second%', please check the configuration file!"
         => "Problem: '%first%' muss vor dem Eintrag '%second%' festgelegt werden, bitte prüfen Sie die Konfiguration!",
-    'publish_from'
+    'Publish from'
         => 'Veröffentlichen&nbsp;ab',
     'PUBLISHED'
         => 'Veröffentlicht',
 
     'read more'
         => 'mehr',
+    'Redirect target'
+        => 'Ziel',
     'Redirect url'
         => 'Umleitung auf URL',
+    'Remove dbGlossary ||tags||'
+        => 'dbGlossary <b>||</b>Markierungen<b>||</b> entfernen',
     'Remove from list'
         => 'Aus der Liste entfernen',
 
@@ -196,6 +200,8 @@ return array(
         => 'Ziel URL',
     'Teaser'
         => 'Anreisser',
+    'The Category %category_name% does not contain any active contents'
+        => 'Die Kategorie <strong>%category_name%</strong> enthält keine aktiven Inhalte!',
     'The category type %category% already exists and can not inserted!'
         => 'Die Kategorie <b>%category%</b> existiert bereits und kann nicht erneut eingefügt werden!',
     'The category type %category% was successfull deleted.'

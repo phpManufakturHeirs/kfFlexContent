@@ -221,6 +221,7 @@ class ActionTag extends Basic
 
         // show content tags?
         self::$parameter['content_tags'] = (isset(self::$parameter['content_tags']) && ((self::$parameter['content_tags'] == 0) || (strtolower(self::$parameter['content_tags']) == 'false'))) ? false : $default_parameter['content_tags'];
+        self::$parameter['list_tags'] = (isset(self::$parameter['list_tags']) && ((self::$parameter['list_tags'] == 0) || (strtolower(self::$parameter['list_tags']) == 'false'))) ? false : $default_parameter['list_tags'];
 
         // show content categories?
         self::$parameter['content_categories'] = (isset(self::$parameter['content_categories']) && ((self::$parameter['content_categories'] == 1) || (strtolower(self::$parameter['content_categories']) == 'true'))) ? true : $default_parameter['content_categories'];

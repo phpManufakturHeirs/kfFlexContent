@@ -29,6 +29,13 @@ class Action extends Basic
         self::$config = $ConfigurationData->getConfiguration();
     }
 
+    /**
+     * The default ACTION controller for flexContent - check the action and
+     * return the result of the assigned flexContent Class
+     *
+     * @param Application $app
+     * @return string
+     */
     public function controllerAction(Application $app)
     {
         $this->initParameters($app);
@@ -70,6 +77,12 @@ class Action extends Basic
             case 'tag':
                 $Tag = new ActionTag();
                 return $Tag->ControllerTag($app);
+            case 'list':
+                $List = new ActionList();
+                return $List->ControllerList($app);
+            case 'list_simple':
+                $List = new ActionList();
+                return $List->ControllerList($app, 'simple');
             default:
                 $this->setAlert('The parameter <code>%parameter%[%value%]</code> for the kitCommand <code>~~ %command% ~~</code> is unknown, please check the parameter and the given value!',
                     array('%parameter%' => 'action', '%value%' => $parameter['action'], '%command%' => 'flexContent'), self::ALERT_TYPE_DANGER);
@@ -88,7 +101,6 @@ class Action extends Basic
                         ));
                 }
         }
-
-
     }
+
 }

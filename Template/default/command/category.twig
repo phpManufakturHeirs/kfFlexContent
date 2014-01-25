@@ -31,11 +31,12 @@
       <h{{ parameter.title_level|default('1') }}>{{ category.category_name|default('') }}</h{{ parameter.title_level|default('1') }}>
     {% endif %}
       
-    {% if contents|length > 0 %}
+    {# loop only if active contens available ... #}  
+    {% if contents.0.content is defined %}
       {% for content in contents %}
         {% if content.redirect_url|length > 0 %}
           {% set url = content.redirect_url %}
-          {% set target = '_blank' %}
+          {% set target = content.redirect_target %}
         {% else %}
           {% set url = permalink_base_url ~ '/' ~ content.permalink %}
           {% set target = '_self' %}
@@ -43,12 +44,12 @@
         {% if loop.index == 1 %}<div class="row">{% endif %}
         {% if loop.index < 3 %}  
           {# expose the first two items in columns #}
-          {% include '@phpManufaktur/flexContent/Template/default/command/category.exposed.twig' %}
+          {% include '@phpManufaktur/flexContent/Template/default/command/content.exposed.twig' %}
         {% endif %}
         {% if loop.index == 2 %}</div>{% endif %}
         {% if loop.index > 2 %}
           {# show all other content items in a smaller list #}
-          {% include '@phpManufaktur/flexContent/Template/default/command/category.item.twig' %}
+          {% include '@phpManufaktur/flexContent/Template/default/command/content.item.twig' %}
         {% endif %}
       {% endfor %}
       {# if we have only one exposed content we must close the row here ... #}
