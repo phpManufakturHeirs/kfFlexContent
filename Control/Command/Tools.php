@@ -67,6 +67,13 @@ class Tools
         }
     }
 
+    /**
+     * Replace all #tags within the content with links to this tags
+     *
+     * @param string reference $content
+     * @param string $language
+     * @return string
+     */
     public function linkTags(&$content, $language)
     {
         if (!self::$config['content']['tag']['auto-link']['enabled'] || empty($content)) {
