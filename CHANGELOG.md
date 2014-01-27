@@ -6,6 +6,17 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.17** - 2014-01-28
+
+* added kitCommand parameter `action[list]`
+* added redirect_target
+* added import support for dbGlossary (remove tags only)
+* changed `category.item.twig` to `content.item.twig`
+* changed `category.exposed.twig` to `content.exposed.twig`
+* replace #hashtags in categories with a link
+* replace #hashtags in lists with a link
+* replace #hashtags in lists with a link
+
 **0.16** - 2014-01-24
 
 * start introducing editor roles - must change all /admin routes
