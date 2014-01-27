@@ -15,7 +15,6 @@ use phpManufaktur\Basic\Control\kitCommand\Basic;
 use Silex\Application;
 use phpManufaktur\flexContent\Control\Configuration;
 use phpManufaktur\flexContent\Data\Content\Category;
-use phpManufaktur\flexContent\Data\Content\CategoryType;
 use phpManufaktur\flexContent\Data\Content\Content;
 use phpManufaktur\flexContent\Data\Content\Tag;
 use phpManufaktur\flexContent\Data\Content\TagType;
@@ -30,8 +29,8 @@ class ActionTag extends Basic
     protected $TagData = null;
     protected $TagTypeData = null;
     protected $CategoryData = null;
-    protected $CategoryTypeData = null;
     protected $ContentData = null;
+    protected $Tools = null;
 
     /**
      * (non-PHPdoc)
@@ -52,6 +51,7 @@ class ActionTag extends Basic
         $this->TagData = new Tag($app);
         $this->CategoryData = new Category($app);
         $this->ContentData = new Content($app);
+        $this->Tools = new Tools($app);
     }
 
     /**
@@ -92,6 +92,9 @@ class ActionTag extends Basic
                 self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
             return $this->promptAlert();
         }
+
+        // replace #hashtags
+        $this->Tools->linkTags($tag_type['tag_description'], self::$language);
 
         if (false === ($contents = $this->ContentData->selectContentsByTagID(self::$parameter['tag_id'],
             self::$parameter['content_status'], self::$parameter['content_limit']))) {
