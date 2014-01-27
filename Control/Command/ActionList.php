@@ -29,6 +29,7 @@ class ActionList extends Basic
     protected $ContentData = null;
     protected $CategoryData = null;
     protected $TagData = null;
+    protected $Tools = null;
 
     /**
      * (non-PHPdoc)
@@ -48,23 +49,7 @@ class ActionList extends Basic
         $this->ContentData = new Content($app);
         $this->CategoryData = new Category($app);
         $this->TagData = new Tag($app);
-    }
-
-    /**
-     * Highlight a search result
-     *
-     * @param string $word
-     * @param string reference $content
-     * @return string
-     */
-    protected function highlightSearchResult($word, &$content)
-    {
-        if (!self::$config['search']['result']['highlight']) {
-            return $content;
-        }
-        $replacement = self::$config['search']['result']['replacement'];
-        $content = str_ireplace($word, str_ireplace('{word}', $word, $replacement), $content);
-        return $content;
+        $this->Tools = new Tools($app);
     }
 
     /**
@@ -113,11 +98,15 @@ class ActionList extends Basic
                 // highlight search results?
                 if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
                     foreach (self::$parameter['highlight'] as $highlight) {
-                        $this->highlightSearchResult($highlight, $contents[$i]['teaser']);
-                        $this->highlightSearchResult($highlight, $contents[$i]['content']);
-                        $this->highlightSearchResult($highlight, $contents[$i]['description']);
+                        $this->Tools->highlightSearchResult($highlight, $contents[$i]['teaser']);
+                        $this->Tools->highlightSearchResult($highlight, $contents[$i]['content']);
+                        $this->Tools->highlightSearchResult($highlight, $contents[$i]['description']);
                     }
                 }
+
+                // replace #tags
+                $this->Tools->linkTags($contents[$i]['teaser'], self::$language);
+                $this->Tools->linkTags($contents[$i]['content'], self::$language);
             }
         }
 
