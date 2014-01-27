@@ -30,6 +30,7 @@ class ActionCategory extends Basic
     protected $CategoryTypeData = null;
     protected $ContentData = null;
     protected $TagData = null;
+    protected $Tools = null;
 
     /**
      * (non-PHPdoc)
@@ -50,23 +51,7 @@ class ActionCategory extends Basic
         $this->CategoryTypeData = new CategoryType($app);
         $this->ContentData = new Content($app);
         $this->TagData = new Tag($app);
-    }
-
-    /**
-     * Highlight a search result
-     *
-     * @param string $word
-     * @param string reference $content
-     * @return string
-     */
-    protected function highlightSearchResult($word, &$content)
-    {
-        if (!self::$config['search']['result']['highlight']) {
-            return $content;
-        }
-        $replacement = self::$config['search']['result']['replacement'];
-        $content = str_ireplace($word, str_ireplace('{word}', $word, $replacement), $content);
-        return $content;
+        $this->Tools = new Tools($app);
     }
 
     /**
@@ -114,6 +99,8 @@ class ActionCategory extends Basic
                 $this->highlightSearchResult($highlight, $category_type['category_description']);
             }
         }
+        // replace #hashtags
+        $this->Tools->linkTags($category_type['category_description'], self::$language);
 
         if (false === ($contents = $this->ContentData->selectContentsByCategoryID(self::$parameter['category_id'],
             self::$parameter['content_status'], self::$parameter['content_limit']))) {
@@ -122,17 +109,23 @@ class ActionCategory extends Basic
                 array(__METHOD__, __LINE__));
         }
 
-        for ($i=0; $i < sizeof($contents); $i++) {
-            $contents[$i]['categories'] = $this->CategoryData->selectCategoriesByContentID($contents[$i]['content_id']);
-            $contents[$i]['tags'] = $this->TagData->selectTagArrayForContentID($contents[$i]['content_id']);
+        if (is_array($contents)) {
+            for ($i=0; $i < sizeof($contents); $i++) {
+                $contents[$i]['categories'] = $this->CategoryData->selectCategoriesByContentID($contents[$i]['content_id']);
+                $contents[$i]['tags'] = $this->TagData->selectTagArrayForContentID($contents[$i]['content_id']);
 
-            // highlight search results?
-            if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
-                foreach (self::$parameter['highlight'] as $highlight) {
-                    $this->highlightSearchResult($highlight, $contents[$i]['teaser']);
-                    $this->highlightSearchResult($highlight, $contents[$i]['content']);
-                    $this->highlightSearchResult($highlight, $contents[$i]['description']);
+                // highlight search results?
+                if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
+                    foreach (self::$parameter['highlight'] as $highlight) {
+                        $this->Tools->highlightSearchResult($highlight, $contents[$i]['teaser']);
+                        $this->Tools->highlightSearchResult($highlight, $contents[$i]['content']);
+                        $this->Tools->highlightSearchResult($highlight, $contents[$i]['description']);
+                    }
                 }
+
+                // replace #hashtags
+                $this->Tools->linkTags($contents[$i]['teaser'], self::$language);
+                $this->Tools->linkTags($contents[$i]['content'], self::$language);
             }
         }
 
