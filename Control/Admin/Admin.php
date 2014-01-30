@@ -78,6 +78,15 @@ class Admin extends Alert
                 'link' => FRAMEWORK_URL.'/flexcontent/editor/category/list'.self::$usage_param,
                 'active' => ($active == 'categories')
             ),
+            /*
+            'rss' => array(
+                'name' => 'rss',
+                'text' => 'RSS',
+                'hint' => 'Organize RSS Feeds for the flexContent articles',
+                'link' => FRAMEWORK_URL.'/flexcontent/editor/rss/list'.self::$usage_param,
+                'active' => ($active == 'rss')
+            ),
+            */
             'import' => array(
                 'name' => 'import',
                 'text' => 'Import',

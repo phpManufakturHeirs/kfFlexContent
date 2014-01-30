@@ -236,17 +236,18 @@ class Configuration
                 'parameter' => array(
                     'action' => array(
                         'view' => array(
-                            'css' => true,
-                            'title' => true,
+                            'load_css' => true,
                             'title_level' => 1,
-                            'description' => false,
-                            'categories' => true,
-                            'tags' => true,
-                            'permalink' => true,
-                            'control' => true,
-                            'author' => true,
-                            'date' => true,
-                            'rating' => array(
+                            'content_title' => true,
+                            'content_description' => false,
+                            'content_view' => 'content',
+                            'content_categories' => true,
+                            'content_tags' => true,
+                            'content_permalink' => true,
+                            'content_control' => true,
+                            'content_author' => true,
+                            'content_date' => true,
+                            'content_rating' => array(
                                 'enabled' => true,
                                 'maximum_rate' => 5,
                                 'size' => 'big',
@@ -254,7 +255,7 @@ class Configuration
                                 'step' => true,
                                 'template' => 'default'
                             ),
-                            'comments' => array(
+                            'content_comments' => array(
                                 'enabled' => true,
                                 'captcha' => false,
                                 'gravatar' => true,
@@ -263,14 +264,13 @@ class Configuration
                             )
                         ),
                         'category' => array(
-                            'css' => true,
+                            'load_css' => true,
                             'title_level' => 1,
                             'category_name' => true,
                             'category_description' => true,
                             'category_image' => true,
                             'category_image_max_width' => 150,
                             'category_image_max_height' => 150,
-                            'list_tags' => false,
                             'content_limit' => 100,
                             'content_status' => array(
                                 'BREAKING',
@@ -283,22 +283,20 @@ class Configuration
                             'content_image_small_max_height' => 100,
                             'content_title' => true,
                             'content_description' => false,
-                            'content_teaser' => true,
-                            'content_content' => false,
+                            'content_view' => 'teaser',
                             'content_tags' => true,
                             'content_author' => true,
                             'content_date' => true,
                             'content_categories' => false
                         ),
                         'tag' => array(
-                            'css' => true,
+                            'load_css' => true,
                             'title_level' => 1,
                             'tag_name' => true,
                             'tag_description' => true,
                             'tag_image' => true,
                             'tag_image_max_width' => 150,
                             'tag_image_max_height' => 150,
-                            'list_tags' => false,
                             'content_limit' => 100,
                             'content_status' => array(
                                 'BREAKING',
@@ -319,13 +317,12 @@ class Configuration
                             'content_categories' => true
                         ),
                         'list' => array(
-                            'css' => true,
+                            'load_css' => true,
                             'title_level' => 1,
                             'categories' => array(),
                             'categories_exclude' => array(),
                             'order_by' => 'publish_from',
                             'order_direction' => 'DESC',
-                            'list_tags' => true,
                             'content_limit' => 100,
                             'content_status' => array(
                                 'BREAKING',
@@ -338,21 +335,19 @@ class Configuration
                             'content_image_small_max_height' => 100,
                             'content_title' => true,
                             'content_description' => false,
-                            'content_teaser' => true,
-                            'content_content' => false,
+                            'content_view' => 'teaser',
                             'content_tags' => true,
                             'content_author' => true,
                             'content_date' => true,
                             'content_categories' => true
                         ),
                         'list_simple' => array(
-                            'css' => true,
+                            'load_css' => true,
                             'title_level' => 1,
                             'categories' => array(),
                             'categories_exclude' => array(),
                             'order_by' => 'publish_from',
                             'order_direction' => 'DESC',
-                            'list_tags' => false,
                             'content_limit' => 10,
                             'content_status' => array(
                                 'BREAKING',
@@ -365,18 +360,66 @@ class Configuration
                             'content_image_small_max_height' => 100,
                             'content_title' => true,
                             'content_description' => false,
-                            'content_teaser' => true,
-                            'content_content' => false,
+                            'content_view' => 'teaser',
                             'content_tags' => true,
                             'content_author' => true,
                             'content_date' => true,
                             'content_categories' => true
+                        ),
+                        'faq' => array(
+                            'load_css' => true,
+                            'title_level' => 1,
+                            'category_name' => true,
+                            'category_description' => true,
+                            'category_image' => true,
+                            'category_image_max_width' => 150,
+                            'category_image_max_height' => 150,
+                            'faq_rating' => array(
+                                'enabled' => true,
+                                'maximum_rate' => 5,
+                                'size' => 'big',
+                                'stars' => 5,
+                                'step' => true,
+                                'template' => 'default'
+                            ),
+                            'faq_comments' => array(
+                                'enabled' => true,
+                                'captcha' => false,
+                                'gravatar' => true,
+                                'publish' => 'admin',
+                                'rating' => true
+                            ),
+                            'faq_permalink' => true,
+                            'faq_control' => true,
+                            'order_by' => 'title',
+                            'order_direction' => 'ASC',
+                            'content_status' => array(
+                                'BREAKING',
+                                'PUBLISHED'
+                            ),
+                            'content_limit' => 100,
+                            'content_date' => false,
+                            'content_author' => false,
+                            'content_view' => 'teaser',
+                            'content_categories' => false,
+                            'content_tags' => true,
+                            'content_image' => true,
+                            'content_image_max_width' => 150,
+                            'content_image_max_height' => 150,
+                            'content_rating' => array(
+                                'enabled' => false,
+                                'maximum_rate' => 5,
+                                'size' => 'big',
+                                'stars' => 5,
+                                'step' => true,
+                                'template' => 'default'
+                            )
                         )
                     )
                 ),
                 'content' => array(
                     'kitcommand' => array(
-                        'enabled' => false
+                        'enabled' => true
                     )
                 )
             ),

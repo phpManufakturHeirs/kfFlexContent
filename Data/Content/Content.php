@@ -264,9 +264,14 @@ EOD;
     {
         try {
             $content = self::$table_name;
-            $SQL = "SELECT * FROM `$content`";
+            $category = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
+            $category_type = FRAMEWORK_TABLE_PREFIX.'flexcontent_category_type';
+            $SQL = "SELECT * FROM `$content`, `$category`, `$category_type` ";
+            $SQL .= "WHERE `$category`.content_id=`$content`.content_id AND `$category`.is_primary=1 AND `$category`.category_id=`$category_type`.category_id";
+
             if (is_array($select_status) && !empty($select_status)) {
-                $SQL .= " WHERE ";
+                //$SQL .= " WHERE ";
+                $SQL .= " AND ";
                 $use_status = false;
                 if (is_array($select_status) && !empty($select_status)) {
                     $use_status = true;
@@ -284,10 +289,14 @@ EOD;
                     $SQL .= ')';
                 }
             }
+            $SQL .= " GROUP BY `$content`.content_id ";
             if (is_array($order_by) && !empty($order_by)) {
                 $SQL .= " ORDER BY ";
                 $start = true;
                 foreach ($order_by as $by) {
+                    if ($by == 'content_id') {
+                        $by = "`$content`.content_id";
+                    }
                     if (!$start) {
                         $SQL .= ", ";
                     }
@@ -316,7 +325,7 @@ EOD;
                 }
                 $contents[] = $content;
             }
-        return $contents;
+            return $contents;
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }
@@ -507,16 +516,23 @@ EOD;
      * @throws \Exception
      * @return Ambigous <boolean, array>
      */
-    public function selectContentsByCategoryID($category_id, $status=array('PUBLISHED','BREAKING'), $limit=100)
+    public function selectContentsByCategoryID($category_id, $status=array('PUBLISHED','BREAKING'), $limit=100, $order_by='publish_from', $order_direction='DESC')
     {
         try {
             $content_table = self::$table_name;
             $category_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
             $in_status = "('".implode("','", $status)."')";
-            $SQL = "SELECT * FROM `$category_table`, `$content_table` WHERE $content_table.content_id = $category_table.content_id ".
-                "AND `category_id`=$category_id AND `status` IN $in_status ORDER BY ".
-                "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), `publish_from` DESC ".
-                "LIMIT $limit";
+            if (in_array($order_by, array('publish_from','breaking_to','archive_from','timestamp'))) {
+                $SQL = "SELECT * FROM `$category_table`, `$content_table` WHERE $content_table.content_id = $category_table.content_id ".
+                    "AND `category_id`=$category_id AND `status` IN $in_status ORDER BY ".
+                    "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), ".
+                    "`$order_by` $order_direction LIMIT $limit";
+            }
+            else {
+                $SQL = "SELECT * FROM `$category_table`, `$content_table` WHERE $content_table.content_id = $category_table.content_id ".
+                    "AND `category_id`=$category_id AND `status` IN $in_status ORDER BY ".
+                    "`$content_table`.`$order_by` $order_direction LIMIT $limit";
+            }
             $results = $this->app['db']->fetchAll($SQL);
             $contents = array();
             foreach ($results as $result) {

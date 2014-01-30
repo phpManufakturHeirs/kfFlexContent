@@ -48,15 +48,15 @@ class Action extends Basic
         // use a iframe to show the content?
         $parameter['use_iframe'] = $app['request']->query->get('use_iframe', true);
         // check wether to use the flexcontent.css or not (only needed if self::$parameter['use_iframe'] == false)
-        $parameter['css'] = (isset($parameter['css']) && (($parameter['css'] == 0) || (strtolower($parameter['css']) == 'false'))) ? false : $default_parameter['css'];
+        $parameter['load_css'] = (isset($parameter['load_css']) && (($parameter['load_css'] == 0) || (strtolower($parameter['load_css']) == 'false'))) ? false : $default_parameter['load_css'];
 
         // check the CMS GET parameters
         $GET = $this->getCMSgetParameters();
-        if (isset($GET['command']) && ($GET['command'] == 'flexcontent')) {
+        if (isset($GET['command']) && (strtolower($GET['command']) == 'flexcontent')) {
             // the command and parameters are set as GET from the CMS
             foreach ($GET as $key => $value) {
-                if ($key == 'command') continue;
-                $parameter[$key] = $value;
+                if (strtolower($key) == 'command') continue;
+                $parameter[strtolower($key)] = $value;
             }
             $this->setCommandParameters($parameter);
         }
@@ -83,6 +83,9 @@ class Action extends Basic
             case 'list_simple':
                 $List = new ActionList();
                 return $List->ControllerList($app, 'simple');
+            case 'faq':
+                $FAQ = new ActionFAQ();
+                return $FAQ->ControllerFAQ($app);
             default:
                 $this->setAlert('The parameter <code>%parameter%[%value%]</code> for the kitCommand <code>~~ %command% ~~</code> is unknown, please check the parameter and the given value!',
                     array('%parameter%' => 'action', '%value%' => $parameter['action'], '%command%' => 'flexContent'), self::ALERT_TYPE_DANGER);

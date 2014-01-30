@@ -66,8 +66,8 @@ class ActionTag extends Basic
         }
         else {
             // we must render the iframe free content template
-            if (!isset(self::$parameter['css'])) {
-                self::$parameter['css'] = self::$config['kitcommand']['parameter']['action']['view']['css'];
+            if (!isset(self::$parameter['load_css'])) {
+                self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['view']['load_css'];
             }
             return $this->app['twig']->render($this->app['utils']->getTemplateFile(
                 '@phpManufaktur/flexContent/Template', 'command/alert.twig',
@@ -156,7 +156,7 @@ class ActionTag extends Basic
         self::$parameter['category_id'] = isset(self::$parameter['category_id']) ? self::$parameter['category_id'] : -1;
 
         // check wether to use the flexcontent.css or not (only needed if self::$parameter['use_iframe'] == false)
-        self::$parameter['css'] = (isset(self::$parameter['css']) && ((self::$parameter['css'] == 0) || (strtolower(self::$parameter['css']) == 'false'))) ? false : $default_parameter['css'];
+        self::$parameter['load_css'] = (isset(self::$parameter['load_css']) && ((self::$parameter['load_css'] == 0) || (strtolower(self::$parameter['load_css']) == 'false'))) ? false : $default_parameter['load_css'];
 
         // set the title level - default 1 = <h1>
         self::$parameter['title_level'] = (isset(self::$parameter['title_level']) && is_numeric(self::$parameter['title_level'])) ? self::$parameter['title_level'] : $default_parameter['title_level'];
@@ -224,7 +224,6 @@ class ActionTag extends Basic
 
         // show content tags?
         self::$parameter['content_tags'] = (isset(self::$parameter['content_tags']) && ((self::$parameter['content_tags'] == 0) || (strtolower(self::$parameter['content_tags']) == 'false'))) ? false : $default_parameter['content_tags'];
-        self::$parameter['list_tags'] = (isset(self::$parameter['list_tags']) && ((self::$parameter['list_tags'] == 0) || (strtolower(self::$parameter['list_tags']) == 'false'))) ? false : $default_parameter['list_tags'];
 
         // show content categories?
         self::$parameter['content_categories'] = (isset(self::$parameter['content_categories']) && ((self::$parameter['content_categories'] == 1) || (strtolower(self::$parameter['content_categories']) == 'true'))) ? true : $default_parameter['content_categories'];

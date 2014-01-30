@@ -7,8 +7,8 @@
   @copyright 2014 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
   @license MIT License (MIT) http://www.opensource.org/licenses/MIT
 #}
-{% if parameter.css %}
-  <script type="text/javascript">  
+{% if parameter.load_css %}
+  <script type="text/javascript">
     (function() {
       if (!window.jQuery) {
         alert("{{'flexContent is missing jQuery - please add the parameter library[jquery/jquery/1.10.2/jquery.min.js] to the kitCommand at this page.'|trans }}");
@@ -16,7 +16,7 @@
       else {
         var jq = document.createElement('script');
         jq.setAttribute('type', 'text/javascript');
-        jq.setAttribute('src', '{{ LIBRARY_URL ~ '/bootstrap/latest/js/bootstrap.min.js'}}');
+        jq.setAttribute('src', '{{ LIBRARY_URL ~ '/bootstrap/3.0.3/js/bootstrap.min.js'}}');
         document.getElementsByTagName('head')[0].appendChild(jq);
       }
 
@@ -24,15 +24,15 @@
       css.setAttribute('rel', 'stylesheet');
       css.setAttribute('type', 'text/css');
       css.setAttribute('media', 'all');
-      css.setAttribute('href', '{{ LIBRARY_URL ~ '/bootstrap/latest/css/bootstrap.min.css' }}');
-      document.getElementsByTagName('head')[0].appendChild(css); 
+      css.setAttribute('href', '{{ LIBRARY_URL ~ '/bootstrap/3.0.3/css/bootstrap.min.css' }}');
+      document.getElementsByTagName('head')[0].appendChild(css);
 
       var css = document.createElement('link');
       css.setAttribute('rel', 'stylesheet');
       css.setAttribute('type', 'text/css');
       css.setAttribute('media', 'all');
-      css.setAttribute('href', '{{ LIBRARY_URL ~ '/font-awesome/latest/css/font-awesome.min.css' }}');
-      document.getElementsByTagName('head')[0].appendChild(css); 
+      css.setAttribute('href', '{{ LIBRARY_URL ~ '/font-awesome/4.0.3/css/font-awesome.min.css' }}');
+      document.getElementsByTagName('head')[0].appendChild(css);
 
       var css = document.createElement('link');
       css.setAttribute('rel', 'stylesheet');
@@ -42,8 +42,8 @@
         css.setAttribute('href', '{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.min.css' }}');
       {% else %}
         css.setAttribute('href', '{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/flexcontent.min.css' }}');
-      {% endif %}      
-      document.getElementsByTagName('head')[0].appendChild(css);              
-    })();  
-  </script> 
+      {% endif %}
+      document.getElementsByTagName('head')[0].appendChild(css);
+    })();
+  </script>
 {% endif %}

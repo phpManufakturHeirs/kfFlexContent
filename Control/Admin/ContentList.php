@@ -62,7 +62,8 @@ class ContentList extends Admin
         self::$route =  array(
             'pagination' => '/flexcontent/editor/list/page/{page}?order={order}&direction={direction}&usage='.self::$usage,
             'edit' => '/flexcontent/editor/edit/id/{content_id}?usage='.self::$usage,
-            'search' => '/flexcontent/editor/search?usage='.self::$usage
+            'search' => '/flexcontent/editor/search?usage='.self::$usage,
+            'create' => '/flexcontent/editor/edit?usage='.self::$usage
         );
     }
 

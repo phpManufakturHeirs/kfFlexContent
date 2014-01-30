@@ -13,22 +13,22 @@
   <div class="container">
     {{ basic.alert }}
     {% if content.content|default('')|length > 0 %}
-      {% if parameter.categories is defined and parameter.categories %}
+      {% if parameter.content_categories %}
         <div class="header-categories">
-          {% for category in categories %}
+          {% for category in content.categories %}
             <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
               {# attach the actual content ID with ?i= #}
-              <a href="{{ permalink_base_url ~ '/category/' ~ category.category_permalink ~ '?i=' ~ content.content_id }}" title="{{ category.category_description|ellipsis }}">{{ category.category_name }}</a>
+              <a href="{{ permalink_base_url ~ '/category/' ~ category.category_permalink }}" title="{{ category.category_description|ellipsis }}">{{ category.category_name }}</a>
             </span>
           {% endfor %}
         </div>
       {% endif %}
-      {% if parameter.title is defined and parameter.title %}
+      {% if parameter.content_title %}
         <div class="header">
           <h{{ parameter.title_level|default('1') }}>{{ content.title|default('') }}</h{{ parameter.title_level|default('1') }}>
         </div>
       {% endif %}
-      {% if parameter.description is defined and parameter.description %}
+      {% if parameter.content_description %}
         {% if content.description|length > 0 %}
           <div class="well well-sm">{{ content.description|default('') }}</div>
         {% endif %}
@@ -43,39 +43,39 @@
         {{ content.content|default('') }}
       {% endif %}             
           
-      {% if parameter.author is defined and parameter.author %}
+      {% if parameter.content_author %}
         <div class="small text-right text-muted">
-          {% if parameter.date is defined and parameter.date %}
+          {% if parameter.content_date %}
             {{ author ~ ', ' ~ content.publish_from|date('DATE_FORMAT'|trans) }}
           {% else %}
             {{ author }}
           {% endif %}
         </div>  
-      {% elseif parameter.date is defined and parameter.date %}
+      {% elseif parameter.content_date %}
         <div class="small text-right text-muted">
           {{ content.publish_from|date('DATE_FORMAT'|trans) }}    
         </div>  
       {% endif %}  
       
-      {% if parameter.tags is defined and parameter.tags %}
+      {% if parameter.content_tags %}
         <div class="content-tags">
-          {% for tag in tags %}
+          {% for tag in content.tags %}
             <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
               {# attach the primary category ?c= and the actual content ID &i= #}
-              <a href="{{ permalink_base_url ~ '/tag/' ~ tag.tag_permalink ~ '?c=' ~ categories.0.category_id ~ '&i=' ~ content.content_id }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
+              <a href="{{ permalink_base_url ~ '/tag/' ~ tag.tag_permalink }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
             </span>
           {% endfor %}
         </div>  
       {% endif %}
       
-      {% if parameter.rating %}    
+      {% if parameter.content_rating %}    
         <div class="content-rating">  
-          {% set rating = config.kitcommand.parameter.action.view.rating %}
+          {% set rating = config.kitcommand.parameter.action.view.content_rating %}
           {{ kitCommand('rating', {'id':content.content_id,'type':'flexContent','maximum_rate':rating.maximum_rate,'size':rating.size,'stars':rating.stars,'step':rating.step,'template':rating.template}) }}  
         </div>
       {% endif %}
           
-      {% if parameter.control is defined and parameter.control %}
+      {% if parameter.content_control %}
         <div class="btn-toolbar pull-center" role="toolbar">
           <div class="btn-group btn-group-sm">
             {% if control.previous.permalink is defined %}
@@ -86,7 +86,7 @@
 
             {% if control.category.category_permalink is defined %}
               {# attach the actual content ID ?i= #}
-              <a class="btn btn-default" href="{{ permalink_base_url ~ '/category/' ~ control.category.category_permalink ~ '?i=' ~ content.content_id }}" title="{{ control.category.category_name|ellipsis }}"><i class="fa fa-list"></i> {{ 'Overview'|trans }}</a>
+              <a class="btn btn-default" href="{{ permalink_base_url ~ '/category/' ~ control.category.category_permalink }}" title="{{ control.category.category_name|ellipsis }}"><i class="fa fa-list"></i> {{ 'Overview'|trans }}</a>
             {% else %}
               <button type="button" class="btn btn-default disabled"><i class="fa fa-list"></i> {{ 'Overview'|trans }}</button>  
             {% endif %}
@@ -97,21 +97,21 @@
               <button type="button" class="btn btn-default disabled">{{ 'Next article'|trans }} <i class="fa fa-arrow-right"></i></button>
             {% endif %}
           </div>    
-          {% if parameter.permalink is defined and parameter.permalink %}
+          {% if parameter.content_permalink %}
             <div class="btn-group btn-group-sm">
               <a class="btn btn-default" href="{{ permalink_base_url ~ '/' ~ content.permalink }}" title="{{ 'Permanent link to this article'|trans }}">&nbsp;<i class="fa fa-link"></i>&nbsp;</a>
             </div>
           {% endif %}       
         </div>
-      {% elseif parameter.permalink is defined and parameter.permalink %}
+      {% elseif parameter.content_permalink %}
         <div class="content permalink">
           <a href="{{ permalink_base_url ~ '/' ~ content.permalink }}" title="{{ 'Permanent link to this article'|trans }}"><i class="fa fa-link"></i></a>
         </div>  
       {% endif %}    
       
-      {% if parameter.comments %}    
+      {% if parameter.content_comments %}    
         <div class="content-comments">
-          {% set comments = config.kitcommand.parameter.action.view.comments %}    
+          {% set comments = config.kitcommand.parameter.action.view.content_comments %}    
           {{ kitCommand('comments', {'id':content.content_id,'type':'FLEXCONTENT','captcha':comments.captcha,'gravatar':comments.gravatar,'publish':comments.publish,'rating':comments.rating,'message':parameter.comments_message}) }}
         </div>  
       {% endif %}

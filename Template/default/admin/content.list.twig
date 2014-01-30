@@ -32,6 +32,11 @@
     
     {{ alert }}
     
+    <div>
+      <a class="btn btn-default" role="button" href="{{ FRAMEWORK_URL ~ route.create }}">{{ 'Create a new article'|trans }}</a>
+    </div>  
+    <div class="height-15"></div>
+    
     {% if contents|length < 1 %}
       {% include '@phpManufaktur/Basic/Template/default/pattern/bootstrap/alert.twig' 
         with {content:'The flexContent list is empty, please create your first content!'|trans} only %}

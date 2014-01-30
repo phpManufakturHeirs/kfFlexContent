@@ -19,7 +19,7 @@ use phpManufaktur\flexContent\Data\Content\Content;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-require_once EXTENSION_PATH.'/htmlpurifier/latest/library/HTMLPurifier.auto.php';
+require_once EXTENSION_PATH.'/htmlpurifier/4.6.0/library/HTMLPurifier.auto.php';
 
 class ImportDialog extends Admin
 {

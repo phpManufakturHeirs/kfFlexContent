@@ -282,9 +282,35 @@ class PermanentLink
             'language' => strtolower(self::$language)
         );
 
-        if (null !== ($highlight = $this->app['request']->query->get('highlight'))) {
-            // add search results
+        if (self::$config['search']['result']['highlight'] &&
+            (null !== ($searchresult = $this->app['request']->query->get('searchresult'))) &&
+            (null !== ($sstring = $this->app['request']->query->get('sstring')))) {
+            // create a highlight array
+            $highlight = array();
+            if ($searchresult == 1) {
+                if (false !== strpos($sstring, '+')) {
+                    $words = explode('+', $sstring);
+                    foreach ($words as $word) {
+                        $highlight[] = $word;
+                    }
+                }
+                else {
+                    $highlight[] = $sstring;
+                }
+            }
+            else {
+                $highlight[] = str_replace('_', ' ', $sstring);
+            }
             $parameter['highlight'] = $highlight;
+        }
+
+        $gets = $this->app['request']->query->all();
+        $ignore = array('searchresult','sstring');
+        foreach ($gets as $key => $value) {
+            if (!key_exists($key, $parameter) && !in_array($key, $ignore)) {
+                // pass all other parameters to the target page
+                $parameter[$key] = $value;
+            }
         }
 
         // create the target URL and set the needed parameters
@@ -293,6 +319,109 @@ class PermanentLink
         return $this->cURLexec($target_url);
     }
 
+    /**
+     * Redirect to the target URL to show the FAQ content
+     *
+     * @return string
+     */
+    protected function redirectToFAQID()
+    {
+        if (false === ($category = $this->CategoryTypeData->select(self::$category_id, self::$language))) {
+            // the category ID does not exists!
+            $this->app['monolog']->addError('The flexContent category ID '.self::$category_id." does not exists.",
+                array(__METHOD__, __LINE__));
+            return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+                '@phpManufaktur/Basic/Template', 'kitcommand/bootstrap/noframe/alert.twig'),
+                array(
+                    'content' => $this->app['translator']->trans('There is no category assigned to this pemanent link!'),
+                    'type' => 'alert-danger'));
+        }
+
+        // get the CMS page link from the target link
+        $link = substr($category['target_url'], strlen($this->PageData->getPageDirectory()), (strlen($this->PageData->getPageExtension()) * -1));
+
+        if (false === ($page_id = $this->PageData->getPageIDbyPageLink($link))) {
+            // the page does not exists!
+            $this->app['monolog']->addError('The CMS page for the page link '.$link.' does not exists!', array(__METHOD__, __LINE__));
+            return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+                '@phpManufaktur/Basic/Template', 'kitcommand/bootstrap/noframe/alert.twig'),
+                array(
+                    'content' => $this->app['translator']->trans('The target URL assigned to this permanent link does not exists!'),
+                    'type' => 'alert-danger'));
+        }
+
+        if ((false === ($lang_code = $this->PageData->getPageLanguage($page_id))) || (self::$language != strtolower($lang_code))) {
+            // the page does not support the needed language!
+            $error = 'The CMS target page does not support the needed language <strong>'.self::$language.'</strong> for this permanent link!';
+            $this->app['monolog']->addError(strip_tags($error), array(__METHOD__, __LINE__, self::$content_id));
+            return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+                '@phpManufaktur/Basic/Template', 'kitcommand/bootstrap/noframe/alert.twig'),
+                array(
+                    'content' => $error,
+                    'type' => 'alert-danger'));
+        }
+
+        if (!$this->PageData->existsCommandAtPageID('flexcontent', $page_id)) {
+            // the page exists but does not contain the needed kitCommand
+            $this->app['monolog']->addError('The CMS target URL does not contain the needed kitCommand!', array(__METHOD__, __LINE__));
+            return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+                '@phpManufaktur/Basic/Template', 'kitcommand/bootstrap/noframe/alert.twig'),
+                array(
+                    'content' => $this->app['translator']->trans('The CMS target URL does not contain the needed kitCommand!'),
+                    'type' => 'alert-danger'));
+        }
+
+        // create the parameter array
+        $parameter = array(
+            'command' => 'flexcontent',
+            'action' => 'faq',
+            'category_id' => self::$category_id,
+            'language' => strtolower(self::$language)
+        );
+
+        if (self::$config['search']['result']['highlight'] &&
+            (null !== ($searchresult = $this->app['request']->query->get('searchresult'))) &&
+            (null !== ($sstring = $this->app['request']->query->get('sstring')))) {
+            // create a highlight array
+            $highlight = array();
+            if ($searchresult == 1) {
+                if (false !== strpos($sstring, '+')) {
+                    $words = explode('+', $sstring);
+                    foreach ($words as $word) {
+                        $highlight[] = $word;
+                    }
+                }
+                else {
+                    $highlight[] = $sstring;
+                }
+            }
+            else {
+                $highlight[] = str_replace('_', ' ', $sstring);
+            }
+            $parameter['highlight'] = $highlight;
+        }
+
+        $gets = $this->app['request']->query->all();
+        $ignore = array('searchresult','sstring');
+        foreach ($gets as $key => $value) {
+            if (!key_exists($key, $parameter) && !in_array($key, $ignore)) {
+                // pass all other parameters to the target page
+                $parameter[$key] = $value;
+            }
+        }
+
+        // create the target URL and set the needed parameters
+        $target_url = CMS_URL.$category['target_url'].'?'.http_build_query($parameter, '', '&');
+
+        return $this->cURLexec($target_url);
+    }
+
+
+    /**
+     * Redirect to the target URL to show the associated FAQ
+     *
+     * @return string
+     */
     protected function redirectToTagID()
     {
         if (false === ($tag = $this->TagTypeData->select(self::$tag_id, self::$language))) {
@@ -452,6 +581,42 @@ class PermanentLink
         }
 
         return $this->redirectToCategoryID();
+    }
+
+    /**
+     * Controller to handle permanent links to FAQs
+     *
+     * @param Application $app
+     * @param string $name
+     * @param string $language
+     * @return string
+     */
+    public function ControllerFAQName(Application $app, $name, $language)
+    {
+        $this->initialize($app);
+        self::$language = $language;
+
+        // get the content ID from parameter
+        self::$content_id = $app['request']->query->get('i', -1);
+
+        if (false !== (self::$category_id = filter_var($name, FILTER_VALIDATE_INT))) {
+            // this is an integer - get the category by the given ID
+            return $this->redirectToFAQID();
+        }
+
+        if (false === (self::$category_id = $this->CategoryTypeData->selectCategoryIDbyPermaLink($name, self::$language))) {
+            // this permalink does not exists
+            $this->app['monolog']->addError('The permalink /category/'.$name.' does not exists!', array(__METHOD__, __LINE__));
+            return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+                '@phpManufaktur/Basic/Template', 'kitcommand/bootstrap/noframe/alert.twig'),
+                array(
+                    'content' => $this->app['translator']->trans('The permalink <b>/category/%permalink%</b> does not exists!',
+                        array('%permalink%' => $name)),
+                    'type' => 'alert-danger'
+                ));
+        }
+
+        return $this->redirectToFAQID();
     }
 
     /**

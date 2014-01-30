@@ -106,7 +106,7 @@ $app->get('/admin/flexcontent/uninstall',
 
 
 /**
- * EDITOR routes (was: /admin/flexcontent)
+ * EDITOR routes (PROTECTED)
  */
 
 $app->get('/flexcontent/editor',
@@ -141,6 +141,7 @@ $app->get('/flexcontent/editor/list/page/{page}',
 $app->post('/flexcontent/editor/search',
     'phpManufaktur\flexContent\Control\Admin\ContentSearch::ControllerSearch');
 
+// #hashtag functions
 $app->get('/flexcontent/editor/tag/autocomplete',
     'phpManufaktur\flexContent\Control\Admin\TagResponse::ControllerAutocomplete');
 $app->get('/flexcontent/editor/tag/list',
@@ -160,6 +161,7 @@ $app->post('/flexcontent/editor/tag/image/select',
 $app->get('/flexcontent/editor/tag/image/check/id/{tag_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerImageCheck');
 
+// category functions
 $app->get('/flexcontent/editor/category/list',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerList');
 $app->get('/flexcontent/editor/category/list/page/{page}',
@@ -190,6 +192,10 @@ $app->get('/flexcontent/editor/import/id/{import_id}',
     'phpManufaktur\flexContent\Control\Admin\Import\ImportDialog::ControllerImport');
 $app->post('/flexcontent/editor/import/execute',
     'phpManufaktur\flexContent\Control\Admin\Import\ImportDialog::ControllerExecute');
+
+// RSS functions
+$app->get('/flexcontent/editor/rss/list',
+    'phpManufaktur\flexContent\Control\Admin\ContentRSS::ControllerList');
 
 /**
  * CMS Search function

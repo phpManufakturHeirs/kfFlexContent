@@ -36,22 +36,28 @@ return array(
         => 'Die angeforderte Weiterleitung kann an dieser Stelle nicht ausgeführt werden - nutzen Sie diesen <a href="%permakink%" target="_blank">permanenten Link</a>!',
     'Category'
         => 'Kategorie',
-    'category_description'
+    'Category description'
         => 'Beschreibung',
-    'category_id'
-        => 'Category ID',
-    'category_name'
-        => 'Bezeichner',
+    'Category name'
+        => 'Kategorie',
+    'Category id'
+        => 'ID',
     'Content'
         => 'Inhalt',
     'Content ID'
         => 'ID',
     'Content id'
         => 'ID',
+    'Create a new article'
+        => 'Einen neuen Artikel erstellen',
     'Create a new tag'
         => 'Einen neuen Hashtag erstellen',
     'Create or edit a flexContent article'
         => 'Erstellen oder Bearbeiten Sie einen flexContent Artikel',
+    'Create or edit categories'
+        => 'Erstellen oder Bearbeiten Sie flexContent Kategorien',
+    'Create or edit hashtags'
+        => 'Erstellen oder Bearbeiten Sie #Hashtags',
     'Created the new tag %tag% and attached it to this content.'
         => 'Der Hashtag <b>%tag%</b> wurde erstellt und diesem flexContent Inhalt zugeordnet.',
 
@@ -98,6 +104,12 @@ return array(
 
     'IGNORE'
         => 'Ignorieren',
+    'Ignore this item'
+        => 'Artikel ignorieren',
+    'Import now'
+        => 'Artikel jetzt übernehmen',
+    'Import WYSIWYG and Blog contents'
+        => 'Übernehmen Sie WYSIWYG oder Blog Artikel in flexContent',
     'IMPORTED'
         => 'Importiert',
     'Information about the flexContent extension'
@@ -113,6 +125,9 @@ return array(
     'List of all flexContent articles'
         => 'Liste aller flexContent Artikel',
 
+    'Modified'
+        => 'letzte Änderung',
+
     'Next article'
         => 'Nächster Artikel',
     'NL'
@@ -124,6 +139,8 @@ return array(
 
     'Organize and present contents in a flexible way'
         => 'Inhalte flexible organisieren und präsentieren',
+    'Organize RSS Feeds for the flexContent articles'
+        => 'Organisieren Sie RSS Feeds für die flexContent Artikel',
     'Overview'
         => 'Übersicht',
 

@@ -14,12 +14,16 @@
         <h{{ parameter.title_level+2|default('3') }} class="media-heading">{{ content.title|default('') }}</h{{ parameter.title_level+2|default('3') }}>
       </a>
     {% endif %}
-    {% if parameter.content_teaser and content.teaser|length > 0 %}
-      {{ content.teaser }}
+    {% if (parameter.content_view == 'teaser') or (parameter.content_view == 'content') %}
+      {% if parameter.content_view == 'teaser' %}
+        {{ content.teaser }}
+      {% else %}
+        {{ content.content }}
+      {% endif %}
       <div class="go-ahead">
         <a href="{{ url }}" target="{{ target }}">{{ 'read more'|trans }} ...</a>
       </div>
-      {% if parameter.list_tags and content.tags|length > 0 %}
+      {% if parameter.content_tags and content.tags|length > 0 %}
         <div class="content-tags">
           {% for tag in content.tags %}
             <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">

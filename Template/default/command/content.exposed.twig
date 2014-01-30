@@ -32,8 +32,12 @@
           {{ content.description }}
         </div>
       {% endif %}  
-      {% if parameter.content_teaser and content.teaser|length > 0 %}
-        {{ content.teaser }}
+      {% if (parameter.content_view == 'teaser') or (parameter.content_view == 'content') %}
+        {% if parameter.content_view == 'teaser' %}
+          {{ content.teaser }}
+        {% else %}
+          {{ content.content }}
+        {% endif %}
         <div class="go-ahead">
           <a href="{{ url }}" target="{{ target }}">{{ 'read more'|trans }} ...</a>
         </div>

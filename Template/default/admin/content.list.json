@@ -3,6 +3,7 @@
     "content_id",
     "language",
     "publish_from",
+    "category_name",
     "status",
     "title",
     "description"

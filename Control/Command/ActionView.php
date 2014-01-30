@@ -32,7 +32,7 @@ class ActionView extends Basic
     protected static $language = null;
     protected static $use_iframe = null;
 
-    protected static $view_array = array('content', 'teaser');
+    protected static $view_array = array('content', 'teaser','none');
     protected static $allowed_status_array = array('PUBLISHED', 'BREAKING', 'HIDDEN', 'ARCHIVED');
 
     /**
@@ -69,8 +69,8 @@ class ActionView extends Basic
         }
         else {
             // we must render the iframe free content template
-            if (!isset(self::$parameter['css'])) {
-                $parameter['css'] = self::$config['kitcommand']['parameter']['action']['view']['css'];
+            if (!isset(self::$parameter['load_css'])) {
+                $parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['view']['load_css'];
             }
             return $this->app['twig']->render($this->app['utils']->getTemplateFile(
                 '@phpManufaktur/flexContent/Template', 'command/alert.twig',
@@ -151,10 +151,10 @@ class ActionView extends Basic
         $this->Tools->linkTags($content['content'], self::$language);
 
         // get the categories for this content ID
-        $categories = $this->CategoryData->selectCategoriesByContentID(self::$parameter['content_id']);
+        $content['categories'] = $this->CategoryData->selectCategoriesByContentID(self::$parameter['content_id']);
 
         // get the tags for this content ID
-        $tags = $this->TagData->selectTagArrayForContentID(self::$parameter['content_id']);
+        $content['tags'] = $this->TagData->selectTagArrayForContentID(self::$parameter['content_id']);
 
         // select the previous and the next content
         $previous_content = $this->ContentData->selectPreviousContentForID(self::$parameter['content_id'], self::$language);
@@ -172,8 +172,6 @@ class ActionView extends Basic
                 'config' => self::$config,
                 'content' => $content,
                 'parameter' => self::$parameter,
-                'categories' => $categories,
-                'tags' => $tags,
                 'permalink_base_url' => $this->Tools->getPermalinkBaseURL(self::$language),
                 'control' => array(
                     'previous' => $previous_content,
@@ -213,54 +211,54 @@ class ActionView extends Basic
         }
 
 
-        self::$parameter['view'] = (isset(self::$parameter['view'])) ? strtolower(self::$parameter['view']) : 'content';
+        self::$parameter['content_view'] = (isset(self::$parameter['content_view'])) ? strtolower(self::$parameter['content_view']) : $default_parameter['content_view'];
 
-        if (!in_array(self::$parameter['view'], self::$view_array)) {
+        if (!in_array(self::$parameter['content_view'], self::$view_array)) {
             // unknown value for the view[] parameter
             $this->setAlert('The parameter <code>%parameter%[%value%]</code> for the kitCommand <code>~~ %command% ~~</code> is unknown, '.
                 'please check the parameter and the given value!',
-                array('%parameter%' => 'view', '%value%' => self::$parameter['view'], '%command%' => 'flexContent'), self::ALERT_TYPE_DANGER,
+                array('%parameter%' => 'content_view', '%value%' => self::$parameter['content_view'], '%command%' => 'flexContent'), self::ALERT_TYPE_DANGER,
                 true, array(__METHOD__, __LINE__));
             return $this->promptAlert();
         }
 
         // check wether to use the flexcontent.css or not (only needed if self::$parameter['use_iframe'] == false)
-        self::$parameter['css'] = (isset(self::$parameter['css']) && ((self::$parameter['css'] == 0) || (strtolower(self::$parameter['css']) == 'false'))) ? false : $default_parameter['css'];
+        self::$parameter['load_css'] = (isset(self::$parameter['load_css']) && ((self::$parameter['load_css'] == 0) || (strtolower(self::$parameter['load_css']) == 'false'))) ? false : $default_parameter['load_css'];
 
         self::$parameter['content_id'] = (isset(self::$parameter['content_id']) && is_numeric(self::$parameter['content_id'])) ? self::$parameter['content_id'] : -1;
 
         // set the title above the content?
-        self::$parameter['title'] = (isset(self::$parameter['title']) && ((self::$parameter['title'] == 0) || (strtolower(self::$parameter['title']) == 'false'))) ? false : $default_parameter['title'];
+        self::$parameter['content_title'] = (isset(self::$parameter['content_title']) && ((self::$parameter['content_title'] == 0) || (strtolower(self::$parameter['content_title']) == 'false'))) ? false : $default_parameter['content_title'];
 
         // set the title level - default 1 = <h1>
         self::$parameter['title_level'] = (isset(self::$parameter['title_level']) && is_numeric(self::$parameter['title_level'])) ? self::$parameter['title_level'] : $default_parameter['title_level'];
 
         // show the description as sub title?
-        self::$parameter['description'] = (isset(self::$parameter['description']) && ((self::$parameter['description'] == 1) || (strtolower(self::$parameter['description']) == 'true'))) ? true : $default_parameter['description'];
+        self::$parameter['content_description'] = (isset(self::$parameter['content_description']) && ((self::$parameter['content_description'] == 1) || (strtolower(self::$parameter['content_description']) == 'true'))) ? true : $default_parameter['content_description'];
 
         // show the associated categories?
-        self::$parameter['categories'] = (isset(self::$parameter['categories']) && ((self::$parameter['categories'] == 0) || (strtolower(self::$parameter['categories']) == 'false'))) ? false : $default_parameter['categories'];
+        self::$parameter['content_categories'] = (isset(self::$parameter['content_categories']) && ((self::$parameter['content_categories'] == 0) || (strtolower(self::$parameter['content_categories']) == 'false'))) ? false : $default_parameter['content_categories'];
 
         // show the associated tags?
-        self::$parameter['tags'] = (isset(self::$parameter['tags']) && ((self::$parameter['tags'] == 0) || (strtolower(self::$parameter['tags']) == 'false'))) ? false : $default_parameter['tags'];
+        self::$parameter['content_tags'] = (isset(self::$parameter['content_tags']) && ((self::$parameter['content_tags'] == 0) || (strtolower(self::$parameter['content_tags']) == 'false'))) ? false : $default_parameter['content_tags'];
 
         // show the permanent link to this content?
-        self::$parameter['permalink'] = (isset(self::$parameter['permalink']) && ((self::$parameter['permalink'] == 0) || (strtolower(self::$parameter['permalink']) == 'false'))) ? false : $default_parameter['permalink'];
+        self::$parameter['content_permalink'] = (isset(self::$parameter['content_permalink']) && ((self::$parameter['content_permalink'] == 0) || (strtolower(self::$parameter['content_permalink']) == 'false'))) ? false : $default_parameter['content_permalink'];
 
         // show the previous - overview - next control?
-        self::$parameter['control'] = (isset(self::$parameter['control']) && ((self::$parameter['control'] == 0) || (strtolower(self::$parameter['control']) == 'false'))) ? false : $default_parameter['control'];
+        self::$parameter['content_control'] = (isset(self::$parameter['content_control']) && ((self::$parameter['content_control'] == 0) || (strtolower(self::$parameter['content_control']) == 'false'))) ? false : $default_parameter['content_control'];
 
         // show author name?
-        self::$parameter['author'] = (isset(self::$parameter['author']) && ((self::$parameter['author'] == 0) || (strtolower(self::$parameter['author']) == 'false'))) ? false : $default_parameter['author'];
+        self::$parameter['content_author'] = (isset(self::$parameter['content_author']) && ((self::$parameter['content_author'] == 0) || (strtolower(self::$parameter['content_author']) == 'false'))) ? false : $default_parameter['content_author'];
 
         // show publish_from as date?
-        self::$parameter['date'] = (isset(self::$parameter['date']) && ((self::$parameter['date'] == 0) || (strtolower(self::$parameter['date']) == 'false'))) ? false : $default_parameter['date'];
+        self::$parameter['content_date'] = (isset(self::$parameter['content_date']) && ((self::$parameter['content_date'] == 0) || (strtolower(self::$parameter['content_date']) == 'false'))) ? false : $default_parameter['content_date'];
 
         // show a rating?
-        self::$parameter['rating'] = (isset(self::$parameter['rating']) && ((self::$parameter['rating'] == 0) || (strtolower(self::$parameter['rating']) == 'false'))) ? false : $default_parameter['rating']['enabled'];
+        self::$parameter['content_rating'] = (isset(self::$parameter['content_rating']) && ((self::$parameter['content_rating'] == 0) || (strtolower(self::$parameter['content_rating']) == 'false'))) ? false : $default_parameter['content_rating']['enabled'];
 
         // enable comments?
-        self::$parameter['comments'] = (isset(self::$parameter['comments']) && ((self::$parameter['comments'] == 0) || (strtolower(self::$parameter['comments']) == 'false'))) ? false : $default_parameter['comments']['enabled'];
+        self::$parameter['content_comments'] = (isset(self::$parameter['content_comments']) && ((self::$parameter['content_comments'] == 0) || (strtolower(self::$parameter['content_comments']) == 'false'))) ? false : $default_parameter['content_comments']['enabled'];
         self::$parameter['comments_message'] = (isset($GET['message']) && !empty($GET['message'])) ? $GET['message'] : '';
 
         if (self::$parameter['content_id'] > 0) {

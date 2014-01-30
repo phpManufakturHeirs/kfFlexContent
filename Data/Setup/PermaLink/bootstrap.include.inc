@@ -28,3 +28,8 @@ $app->get('%subdirectory%%permalink%/tag/{name}',
 $app->get('%subdirectory%%permalink%/list/{name}',
     'phpManufaktur\flexContent\Control\PermanentLink::ControllerListName')
     ->value('language', '%default_language%');
+
+// permalink rout to a FAQ
+$app->get('%subdirectory%%permalink%/faq/{name}',
+    'phpManufaktur\flexContent\Control\PermanentLink::ControllerFAQName')
+    ->value('language', '%default_language%');
