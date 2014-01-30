@@ -52,6 +52,21 @@ class Update
         }
     }
 
+    protected function release_021()
+    {
+        if (isset(self::$config['kitcommand']['parameter']['action']['tag']['content_teaser'])) {
+            unset(self::$config['kitcommand']['parameter']['action']['tag']['content_teaser']);
+            unset(self::$config['kitcommand']['parameter']['action']['tag']['content_content']);
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+        if (!isset(self::$config['kitcommand']['parameter']['action']['tag']['content_view'])) {
+            self::$config['kitcommand']['parameter']['action']['tag']['content_view'] = 'teaser';
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+    }
+
     /**
      * Execute the update for flexContent
      *
@@ -77,6 +92,8 @@ class Update
         $this->release_017();
         // Release 0.20
         $this->release_020();
+        // Release 0.21
+        $this->release_021();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

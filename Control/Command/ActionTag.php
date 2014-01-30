@@ -32,6 +32,8 @@ class ActionTag extends Basic
     protected $ContentData = null;
     protected $Tools = null;
 
+    protected static $view_array = array('content', 'teaser','none');
+
     /**
      * (non-PHPdoc)
      * @see \phpManufaktur\Basic\Control\kitCommand\Basic::initParameters()
@@ -214,14 +216,24 @@ class ActionTag extends Basic
         self::$parameter['content_description'] = (isset(self::$parameter['content_description']) && ((self::$parameter['content_description'] == 0) || (strtolower(self::$parameter['content_description']) == 'false'))) ? false : $default_parameter['content_description'];
 
         // show content teaser?
-        self::$parameter['content_teaser'] = (isset(self::$parameter['content_teaser']) && ((self::$parameter['content_teaser'] == 0) || (strtolower(self::$parameter['content_teaser']) == 'false'))) ? false : $default_parameter['content_teaser'];
+        //self::$parameter['content_teaser'] = (isset(self::$parameter['content_teaser']) && ((self::$parameter['content_teaser'] == 0) || (strtolower(self::$parameter['content_teaser']) == 'false'))) ? false : $default_parameter['content_teaser'];
 
         // show content description?
         self::$parameter['content_description'] = (isset(self::$parameter['content_description']) && ((self::$parameter['content_description'] == 0) || (strtolower(self::$parameter['content_description']) == 'false'))) ? false : $default_parameter['content_description'];
 
         // show content content?
-        self::$parameter['content_content'] = (isset(self::$parameter['content_content']) && ((self::$parameter['content_content'] == 1) || (strtolower(self::$parameter['content_content']) == 'true'))) ? true : $default_parameter['content_content'];
+        //self::$parameter['content_content'] = (isset(self::$parameter['content_content']) && ((self::$parameter['content_content'] == 1) || (strtolower(self::$parameter['content_content']) == 'true'))) ? true : $default_parameter['content_content'];
 
+        self::$parameter['content_view'] = (isset(self::$parameter['content_view'])) ? strtolower(self::$parameter['content_view']) : $default_parameter['content_view'];
+
+        if (!in_array(self::$parameter['content_view'], self::$view_array)) {
+            // unknown value for the view[] parameter
+            $this->setAlert('The parameter <code>%parameter%[%value%]</code> for the kitCommand <code>~~ %command% ~~</code> is unknown, '.
+                'please check the parameter and the given value!',
+                array('%parameter%' => 'content_view', '%value%' => self::$parameter['content_view'], '%command%' => 'flexContent'), self::ALERT_TYPE_DANGER,
+                true, array(__METHOD__, __LINE__));
+            return $this->promptAlert();
+        }
         // show content tags?
         self::$parameter['content_tags'] = (isset(self::$parameter['content_tags']) && ((self::$parameter['content_tags'] == 0) || (strtolower(self::$parameter['content_tags']) == 'false'))) ? false : $default_parameter['content_tags'];
 
