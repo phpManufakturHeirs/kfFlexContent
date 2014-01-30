@@ -6,6 +6,12 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.18** - 2014-01-30
+
+* cleanup the configuration and handling of parameters
+* create a helpfile for the flexContent kitCommand
+* introduce action[faq] for a FAQ mode
+
 **0.17** - 2014-01-28
 
 * added kitCommand parameter `action[list]`
