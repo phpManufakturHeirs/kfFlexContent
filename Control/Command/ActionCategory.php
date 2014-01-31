@@ -99,7 +99,7 @@ class ActionCategory extends Basic
         // highlight search results?
         if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
             foreach (self::$parameter['highlight'] as $highlight) {
-                $this->highlightSearchResult($highlight, $category_type['category_description']);
+                $this->Tools->highlightSearchResult($highlight, $category_type['category_description']);
             }
         }
         // replace #hashtags
