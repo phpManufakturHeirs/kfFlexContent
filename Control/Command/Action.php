@@ -59,6 +59,8 @@ class Action extends Basic
                 $parameter[strtolower($key)] = $value;
             }
             $this->setCommandParameters($parameter);
+            // create also a new parameter ID!
+            $this->createParameterID($parameter);
         }
 
         if (!isset($parameter['action'])) {
