@@ -97,6 +97,9 @@ else {
 $app->get('/admin/flexcontent/setup',
     // setup routine for flexContent
     'phpManufaktur\flexContent\Data\Setup\Setup::Controller');
+$app->get('/admin/flexcontent/setup/pagesection',
+    // additional setup flexContent as Page Section
+    'phpManufaktur\flexContent\Data\Setup\SetupPageSection::ControllerSetupPageSection');
 $app->get('/admin/flexcontent/update',
     // update flexContent
     'phpManufaktur\flexContent\Data\Setup\Update::Controller');

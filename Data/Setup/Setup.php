@@ -5,7 +5,7 @@
  *
  * @author Team phpManufaktur <team@phpmanufaktur.de>
  * @link https://kit2.phpmanufaktur.de/flexContent
- * @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+ * @copyright 2014 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
  * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  */
 
@@ -151,10 +151,6 @@ class Setup
             // setup kit_framework_flexcontent as Add-on in the CMS
             $admin_tool = new InstallAdminTool($app);
             $admin_tool->exec(MANUFAKTUR_PATH.'/flexContent/extension.json', '/flexcontent/cms');
-
-            // setup kit_framework_flexcontent_section_access
-            $section_access = new InstallPageSection($app);
-            $section_access->exec(MANUFAKTUR_PATH.'/flexContent/extension.json', '/flexcontent/cms');
 
             // create the configured permalink routes
             $this->createPermalinkRoutes($app);
