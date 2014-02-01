@@ -17,7 +17,7 @@
           {% for category in content.categories %}
             <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
               {# attach the actual content ID with ?i= #}
-              <a href="{{ permalink_base_url ~ '/category/' ~ category.category_permalink ~ '?i=' ~ content.content_id }}" title="{{ category.category_description|ellipsis }}">{{ category.category_name }}</a>
+              <a href="{{ permalink_base_url ~ '/category/' ~ category.category_permalink }}" title="{{ category.category_description|ellipsis }}">{{ category.category_name }}</a>
             </span>
           {% endfor %}
         </div>
@@ -47,7 +47,7 @@
           {% for tag in content.tags %}
             <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
               {# attach the primary category ?c= and the actual content ID &i= #}
-              <a href="{{ permalink_base_url ~ '/tag/' ~ tag.tag_permalink ~ '?c=' ~ content.categories.0.category_id ~ '&i=' ~ content.content_id }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
+              <a href="{{ permalink_base_url ~ '/tag/' ~ tag.tag_permalink }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
             </span>
           {% endfor %}
         </div> 
