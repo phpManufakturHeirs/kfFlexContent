@@ -54,7 +54,7 @@ class RSSChannel
         `timestamp` TIMESTAMP,
         PRIMARY KEY (`channel_id`)
         )
-    COMMENT='RSS channels used by flexContent'
+    COMMENT='RSS Channels used by flexContent'
     ENGINE=InnoDB
     AUTO_INCREMENT=1
     DEFAULT CHARSET=utf8

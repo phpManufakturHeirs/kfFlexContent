@@ -21,6 +21,10 @@ use phpManufaktur\flexContent\Data\Content\Category;
 use phpManufaktur\flexContent\Control\Configuration;
 use phpManufaktur\flexContent\Data\Import\ImportControl;
 use phpManufaktur\flexContent\Data\Content\RSSChannel;
+use phpManufaktur\flexContent\Data\Content\RSSChannelCounter;
+use phpManufaktur\flexContent\Data\Content\RSSChannelStatistic;
+use phpManufaktur\flexContent\Data\Content\RSSViewCounter;
+use phpManufaktur\flexContent\Data\Content\RSSViewStatistic;
 
 class Setup
 {
@@ -165,6 +169,18 @@ class Setup
 
             $RSSChannel = new RSSChannel($app);
             $RSSChannel->createTable();
+
+            $RSSChannelCounter = new RSSChannelCounter($app);
+            $RSSChannelCounter->createTable();
+
+            $RSSChannelStatistic = new RSSChannelStatistic($app);
+            $RSSChannelStatistic->createTable();
+
+            $RSSViewCounter = new RSSViewCounter($app);
+            $RSSViewCounter->createTable();
+
+            $RSSViewStatistic = new RSSViewStatistic($app);
+            $RSSViewStatistic->createTable();
 
             // setup kit_framework_flexcontent as Add-on in the CMS
             $admin_tool = new InstallAdminTool($app);

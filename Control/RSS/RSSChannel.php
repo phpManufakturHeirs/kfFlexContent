@@ -179,7 +179,7 @@ class RSSChannel
 
             $child = $xml->createElement('title', $content['title']);
             $item->appendChild($child);
-            $child = $xml->createElement('link', $Tools->getPermalinkBaseURL($channel_data['language']).'/'.$content['permalink'].'?rss='.$channel_data['channel_id']);
+            $child = $xml->createElement('link', $Tools->getPermalinkBaseURL($channel_data['language']).'/'.$content['permalink'].'?ref=rss');
             $item->appendChild($child);
             $child = $xml->createElement('guid', $Tools->getPermalinkBaseURL($channel_data['language']).'/'.$content['permalink']);
             $item->appendChild($child);

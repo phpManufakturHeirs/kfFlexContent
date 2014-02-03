@@ -205,6 +205,9 @@ class Configuration
                         'max_width' => 100,
                         'max_height' => 100
                     )
+                ),
+                'tracking' => array(
+                    'enabled' => true
                 )
             ),
             'admin' => array(

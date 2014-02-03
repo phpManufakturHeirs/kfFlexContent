@@ -14,6 +14,10 @@ namespace phpManufaktur\flexContent\Data\Setup;
 use Silex\Application;
 use phpManufaktur\flexContent\Control\Configuration;
 use phpManufaktur\flexContent\Data\Content\RSSChannel;
+use phpManufaktur\flexContent\Data\Content\RSSChannelCounter;
+use phpManufaktur\flexContent\Data\Content\RSSChannelStatistic;
+use phpManufaktur\flexContent\Data\Content\RSSViewCounter;
+use phpManufaktur\flexContent\Data\Content\RSSViewStatistic;
 
 class Update
 {
@@ -77,6 +81,23 @@ class Update
             $RSSChannel = new RSSChannel($this->app);
             $RSSChannel->createTable();
         }
+        if (!$this->app['db.utils']->tableExists(FRAMEWORK_TABLE_PREFIX.'flexcontent_rss_channel_counter')) {
+            $RSSChannelCounter = new RSSChannelCounter($this->app);
+            $RSSChannelCounter->createTable();
+        }
+        if (!$this->app['db.utils']->tableExists(FRAMEWORK_TABLE_PREFIX.'flexcontent_rss_channel_statistic')) {
+            $RSSChannelStatistic = new RSSChannelStatistic($this->app);
+            $RSSChannelStatistic->createTable();
+        }
+        if (!$this->app['db.utils']->tableExists(FRAMEWORK_TABLE_PREFIX.'flexcontent_rss_view_counter')) {
+            $RSSViewCounter = new RSSViewCounter($this->app);
+            $RSSViewCounter->createTable();
+        }
+        if (!$this->app['db.utils']->tableExists(FRAMEWORK_TABLE_PREFIX.'flexcontent_rss_view_statistic')) {
+            $RSSViewStatistic = new RSSViewStatistic($this->app);
+            $RSSViewStatistic->createTable();
+        }
+
 
         if (!isset(self::$config['admin']['rss'])) {
             // general configuration for the RSS Channels

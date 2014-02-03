@@ -20,6 +20,8 @@ use phpManufaktur\flexContent\Data\Content\TagType;
 use phpManufaktur\flexContent\Data\Content\Tag;
 use phpManufaktur\flexContent\Control\RSS\RSSChannel as RSSChannelControl;
 use phpManufaktur\flexContent\Data\Content\RSSChannel as RSSChannelData;
+use phpManufaktur\flexContent\Data\Content\RSSChannelCounter;
+use phpManufaktur\flexContent\Data\Content\RSSViewCounter;
 use Symfony\Component\HttpFoundation\Response;
 
 class PermanentLink
@@ -32,6 +34,7 @@ class PermanentLink
     protected $PageData = null;
     protected $RSSChannelControl = null;
     protected $RSSChannelData = null;
+    protected $RSSChannelCounter = null;
     protected $app = null;
 
     protected static $content_id = null;
@@ -62,6 +65,7 @@ class PermanentLink
         $this->TagTypeData = new TagType($app);
         $this->RSSChannelControl = new RSSChannelControl($app);
         $this->RSSChannelData = new RSSChannelData($app);
+        $this->RSSChannelCounter = new RSSChannelCounter($app);
     }
 
     /**
@@ -220,6 +224,14 @@ class PermanentLink
             if (!key_exists($key, $parameter) && !in_array($key, $ignore)) {
                 // pass all other parameters to the target page
                 $parameter[$key] = $value;
+            }
+        }
+
+        if (self::$config['rss']['tracking']['enabled']) {
+            $RSSViewCounter = new RSSViewCounter($this->app);
+            $RSSViewCounter->cleanup(self::$content_id);
+            if (isset($parameter['ref']) && ($parameter['ref'] == 'rss')) {
+                $RSSViewCounter->trackRemoteAddress(self::$content_id);
             }
         }
 
@@ -551,7 +563,6 @@ class PermanentLink
                     'type' => 'alert-danger'));
         }
 
-        //if (false === ($xml = $this->RSSChannelData->createChannel(self::$rss_channel_id))) {
         if (false === ($xml = $this->RSSChannelControl->getRSSChannelXML(self::$rss_channel_id))) {
             return $this->app['twig']->render($this->app['utils']->getTemplateFile(
                 '@phpManufaktur/Basic/Template', 'kitcommand/bootstrap/noframe/alert.twig'),
@@ -559,6 +570,13 @@ class PermanentLink
                     'content' => $this->app['translator']->trans('Sorry, but the RSS Channel %title% does not contain any feeds!',
                         array('%title%' => $channel['channel_title'])),
                     'type' => 'alert-danger'));
+        }
+
+        if (self::$config['rss']['tracking']['enabled']) {
+            // track this RSS Channel call
+            $this->RSSChannelCounter->trackRemoteAddress(self::$rss_channel_id);
+            // cleanup the counter table if needed
+            $this->RSSChannelCounter->cleanup(self::$rss_channel_id);
         }
 
         return new Response($xml, 201, array('Content-Type' => 'application/xml'));
