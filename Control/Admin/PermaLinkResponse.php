@@ -15,6 +15,7 @@ use Silex\Application;
 use phpManufaktur\flexContent\Data\Content\Content as ContentData;
 use phpManufaktur\flexContent\Data\Content\CategoryType as CategoryTypeData;
 use phpManufaktur\flexcontent\data\content\TagType as TagTypeData;
+use phpManufaktur\flexContent\Data\Content\RSSChannel;
 
 class PermaLinkResponse
 {
@@ -115,6 +116,36 @@ class PermaLinkResponse
             if ($TagTypeData->existsPermaLink($perma, $language)) {
                 // this permalink is already in use!
                 $count = $TagTypeData->countPermaLinksLikeThis($perma, $language);
+                $count++;
+                // add a counter to the new permanet link
+                $perma = sprintf('%s-%d', $perma, $count);
+            }
+
+            // return JSON response
+            return $app->json($perma, 201);
+        }
+        catch (\Exception $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    public function ControllerPermaLinkRSSChannel(Application $app)
+    {
+        try {
+            if (null == ($link = $app['request']->get('link'))) {
+                throw new \Exception('Missing the GET parameter `link`!');
+            }
+            if (null == ($language = $app['request']->get('lang'))) {
+                throw new \Exception('Missing the GET parameter `lang`!');
+            }
+
+            // create the permalink
+            $perma = $app['utils']->sanitizeLink($link);
+
+            $RSSChannelData = new RSSChannel($app);
+            if ($RSSChannelData->existsChannelLink($perma, $language)) {
+                // this Channel Link is already in use!
+                $count = $RSSChannelData->countChannelLinksLikeThis($perma, $language);
                 $count++;
                 // add a counter to the new permanet link
                 $perma = sprintf('%s-%d', $perma, $count);

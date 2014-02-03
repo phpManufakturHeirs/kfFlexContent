@@ -144,6 +144,14 @@ class ContentEdit extends Admin
             'data' => isset($data['content']) ? $data['content'] : '',
             'required' => self::$config['content']['field']['content']['required']
         ))
+        ->add('rss', 'choice', array(
+            'choices' => $this->ContentData->getRSSValuesForForm(),
+            'empty_value' => '- please select -',
+            'expanded' => false,
+            'required' => self::$config['content']['field']['rss']['required'],
+            'data' => isset($data['rss']) ? $data['rss'] : 'YES',
+            'label' => 'RSS'
+        ))
         ->add('status', 'choice', array(
             'choices' => $this->ContentData->getStatusTypeValuesForForm(),
             'empty_value' => '- please select -',
@@ -309,6 +317,7 @@ class ContentEdit extends Admin
                         $data[$name] = !is_null($content[$name]) ? $content[$name] : '';
 
                         break;
+                    case 'rss':
                     case 'redirect_target':
                         $data[$name] = $content[$name];
                         break;

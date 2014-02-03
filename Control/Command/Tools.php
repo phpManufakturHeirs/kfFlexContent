@@ -50,6 +50,17 @@ class Tools
     }
 
     /**
+     * Get the permanet link base URL for the RSS Channels in the given language
+     *
+     * @param string $language
+     * @return string
+     */
+    public function getRSSPermalinkBaseURL($language)
+    {
+        return CMS_URL.str_ireplace('{language}', strtolower($language), self::$config['rss']['permalink']['directory']);
+    }
+
+    /**
      * Highlight a search result
      *
      * @param string $word

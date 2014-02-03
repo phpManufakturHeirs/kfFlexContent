@@ -54,6 +54,7 @@ class Content
         `teaser` TEXT NOT NULL,
         `teaser_image` TEXT NOT NULL,
         `content` TEXT NOT NULL,
+        `rss` ENUM('YES','NO') NOT NULL DEFAULT 'YES',
         `author_username` VARCHAR(64) NOT NULL DEFAULT '',
         `update_username` VARCHAR(64) NOT NULL DEFAULT '',
         `timestamp` TIMESTAMP,
@@ -90,6 +91,21 @@ EOD;
     public function getStatusTypeValuesForForm()
     {
         $enums = $this->app['db.utils']->getEnumValues(self::$table_name, 'status');
+        $result = array();
+        foreach ($enums as $enum) {
+            $result[$enum] = $enum;
+        }
+        return $result;
+    }
+
+    /**
+     * Get the RSS Status Values as associated array usage in form
+     *
+     * @return array
+     */
+    public function getRSSValuesForForm()
+    {
+        $enums = $this->app['db.utils']->getEnumValues(self::$table_name, 'rss');
         $result = array();
         foreach ($enums as $enum) {
             $result[$enum] = $enum;

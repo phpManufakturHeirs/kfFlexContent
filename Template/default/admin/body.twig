@@ -21,7 +21,7 @@
       <meta name="viewport" content="{% block viewport %}width=device-width, initial-scale=1.0{% endblock viewport %}">
       {% block stylesheet %}
         {# Bootstrap #}
-        <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/bootstrap/3.0.3/css/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/bootstrap/3.1.0/css/bootstrap.min.css" />
         {% if usage != 'WebsiteBaker' %}
           <style type="text/css">
             {# the bootstrap container should use all available space #}
@@ -46,7 +46,7 @@
     </div>
     {% block footer_jquery %}
       <script src="{{ LIBRARY_URL }}/jquery/jquery/1.10.2/jquery.min.js"></script>
-      <script src="{{ LIBRARY_URL }}/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+      <script src="{{ LIBRARY_URL }}/bootstrap/3.1.0/js/bootstrap.min.js"></script>
     {% endblock footer_jquery %}
     {% block footer %}
       <script type="text/javascript">

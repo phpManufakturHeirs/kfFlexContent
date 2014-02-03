@@ -18,6 +18,8 @@ return array(
     '- new entry -'
         => '- neuer Datensatz -',
 
+    'A brief description of this RSS Channel'
+        => 'Kurze Beschreibung dieses RSS Kanal',
     'Archive from'
         => 'Archivieren ab',
     'ARCHIVED'
@@ -26,6 +28,8 @@ return array(
         => 'Der Hashtag <b>%tag%</b> wurde diesem flexContent Inhalt zugeordnet.',
     'At least must it exists some text within the teaser or the content, at the moment the Teaser and the Content are empty!'
         => 'Es muss zumindest im Anreisser oder im Inhalt ein Text vorhanden sein, momentan sind beide Felder leer!',
+    'A title for this RSS Channel'
+        => 'Bezeichnung für diesen RSS Kanal',
 
     'BREAKING'
         => 'Aktuelle Meldung',
@@ -42,14 +46,32 @@ return array(
         => 'Kategorie',
     'Category id'
         => 'ID',
+    'Channel category'
+        => 'Kategorie',
+    'Channel copyright'
+        => 'Urheberrecht',
+    'Channel description'
+        => 'Beschreibung',
+    'Channel id'
+        => 'Kanal ID',
+    'Channel link'
+        => 'Permanenter Link',
+    'Channel title'
+        => 'Titel',
+    'Channel webmaster'
+        => 'Webmaster',
     'Content'
         => 'Inhalt',
     'Content ID'
         => 'ID',
     'Content id'
         => 'ID',
+    'Content categories'
+        => 'Inhalte',
     'Create a new article'
         => 'Einen neuen Artikel erstellen',
+    'Create a new RSS Channel'
+        => 'Einen neuen RSS Kanal erstellen',
     'Create a new tag'
         => 'Einen neuen Hashtag erstellen',
     'Create or edit a flexContent article'
@@ -102,6 +124,8 @@ return array(
     'HIDDEN'
         => 'Versteckt',
 
+    'If you are providing multiple RSS Channels you can also define a category'
+        => 'Wenn Sie mehrere RSS Kanäle betreiben können Sie zusätzlich eine Kategorie angeben',
     'IGNORE'
         => 'Ignorieren',
     'Ignore this item'
@@ -154,10 +178,14 @@ return array(
         => 'Bitte füllen Sie zunächst alle Pflichtfelder aus!',
     'Please select the language for the new flexContent.'
         => 'Bitte wählen Sie die Sprache, die dem neuen flexContent zugeordnet werden soll.',
+    'Please type in a brief description for the RSS Channel!'
+        => 'Bitte geben Sie eine kurze Beschreibung für den RSS Kanal ein!',
     'Please type in a name for the category type.'
         => 'Bitte geben Sie eine Bezeichnung für die Kategorie an.',
     'Please type in a name for the tag type.'
         => 'Bitte geben Sie eine Bezeichnung für den Hashtag an.',
+    'Please type in a title for the RSS Channel.'
+        => 'Bitte geben Sie einen Titel für den RSS Kanal an!',
     'Previous article'
         => 'Vorheriger Artikel',
     'Primary category'
@@ -190,10 +218,14 @@ return array(
         => 'Bild auswählen',
     'Select teaser image'
         => 'Bild auswählen',
+    'Select the categories which are assigned to this RSS Channel'
+        => 'Wählen Sie die Kategorien aus, die diesem RSS Kanal zugeordnet werden sollen.',
     'Successfull created a new flexContent record with the ID %id%.'
         => 'Es wurde ein neuer flexContent Datensatz mit der ID %id% angelegt.',
     'Successfull create the new category type %category%.'
         => 'Die Kategorie <b>%category%</b> wurde erfolgreich erstellt.',
+    'Successfull create the new RSS Channel %title%.'
+        => 'Der RSS Kanal <b>%title%</b> wurde erfolgreich erstellt.',
     'Successfull create the new tag type %tag%.'
         => 'Der Hashtag %tag% wurde neu erstellt.',
     'Succesfull updated the flexContent record with the ID %id%'
@@ -231,6 +263,8 @@ return array(
         => 'Es existiert kein Kategorie Datensatz mit der ID %id%!',
     'The Category with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!'
         => 'Die Kategorie mit der <strong>ID %id%</strong> existiert nicht für die Sprache <strong>%language%</strong>!',
+    'The Channel Link %channel_link% is already in use by the RSS Channel record %id%, please select another one!'
+        => 'Der RSS Kanal Link %channel_link% wird bereits von dem RSS Kanal mit der ID %id% verwendet, bitte wählen Sie einen anderen!',
     'The description should have a length between %minimum% and %maximum% characters (actual: %length%).'
         => 'Die Beschreibung sollte eine Länge zwischen %minimum% und %maximum% Zeichen haben, zur Zeit sind es %length% Zeichen.',
     'The flexContent record with the ID %id% does not exists!'
@@ -241,6 +275,8 @@ return array(
         => 'Es existieren noch keine flexContent Inhalte, erstellen Sie einen ersten Artikel!',
     'The image %image% was successfull inserted.'
         => 'Das Bild %image% wurde dem Datensatz hinzugefügt.',
+    'The list of RSS Channels for flexContent is empty, please create the first RSS Channel!'
+        => 'Es existieren noch keine RSS Kanäle, erstellen Sie den ersten RSS Kanal!',
     'The permalink %permalink% is already in use, please select another one!'
         => 'Der PermanentLink <b>%permalink%</b> wird bereits verwendet, bitte wählen Sie einen anderen permanenten Link aus!',
     'The permalink %permalink% is already in use by the flexContent record %id%, please select another one!'
@@ -249,6 +285,8 @@ return array(
         => 'Der PermanentLink wird immer benötigt und kann in den Einstellungen nicht ausgeschaltet werden. Bitte prüfen Sie die Konfiguration!',
     "The 'publish from' field is always needed and can not switched off, please check the configuration!"
         => "Das 'Veröffentlichen ab' Feld wird immer benötigt und kann in den Einstellungen nicht ausgeschaltet werden. Bitte prüfen Sie die Konfiguration!",
+    'The RSS Channel record with the ID %id% does not exists!'
+        => 'Es existiert kein Datensatz für den RSS Kanal mit der ID %id%!',
     'The tag %tag_name% does not contain any active contents'
         => "Der Hashtag %tag_name% enthält keine aktiven Inhalte!",
     'The tag %tag% is no longer associated with this content.'
@@ -278,8 +316,15 @@ return array(
         => 'Unveröffentlicht',
     'Updated the category type %category%'
         => 'Die Kategorie <b>%category%</b> wurde aktualisiert.',
+    'Updated the RSS Channel %title%.'
+        => 'Der RSS Kanal %title% wurde aktualisiert.',
     'Updated the tag type %tag%'
         => 'Der Hashtag <b>%tag%</b> wurde aktualisiert.',
     'used_by_content_id'
         => 'Verwendet in flexContent ID',
+
+    'You can specify a copyright hint for the RSS Channel'
+        => 'Sie können einen Copyright Hinweis für die Artikel des RSS Kanal angeben',
+    'You can specify the email address of the webmaster for this RSS Channel'
+        => 'Sie können optional die E-Mail Adresse des für diesen RSS Kanal zuständigen Webmaster angeben.'
 );

@@ -136,6 +136,8 @@ $app->match('/flexcontent/editor/permalink/create/category',
     'phpManufaktur\flexContent\Control\Admin\PermaLinkResponse::ControllerPermaLinkCategory');
 $app->match('/flexcontent/editor/permalink/create/tag',
     'phpManufaktur\flexContent\Control\Admin\PermaLinkResponse::ControllerPermaLinkTag');
+$app->match('/flexcontent/editor/permalink/create/rss',
+    'phpManufaktur\flexContent\Control\Admin\PermaLinkResponse::ControllerPermaLinkRSSChannel');
 
 $app->get('/flexcontent/editor/list',
     'phpManufaktur\flexContent\Control\Admin\ContentList::ControllerList');
@@ -197,8 +199,20 @@ $app->post('/flexcontent/editor/import/execute',
     'phpManufaktur\flexContent\Control\Admin\Import\ImportDialog::ControllerExecute');
 
 // RSS functions
-$app->get('/flexcontent/editor/rss/list',
-    'phpManufaktur\flexContent\Control\Admin\ContentRSS::ControllerList');
+$app->get('/flexcontent/editor/rss/channel/list',
+    'phpManufaktur\flexContent\Control\Admin\RSSChannel::ControllerChannelList');
+$app->post('/flexcontent/editor/rss/channel/language/check',
+    'phpManufaktur\flexContent\Control\Admin\RSSChannel::ControllerLanguageCheck');
+$app->get('/flexcontent/editor/rss/channel/edit/{channel_id}',
+    'phpManufaktur\flexContent\Control\Admin\RSSChannel::ControllerChannelEdit')
+    ->assert('channel_id', '\d+')
+    ->value('channel_id', -1);
+$app->post('/flexcontent/editor/rss/channel/check',
+    'phpManufaktur\flexContent\Control\Admin\RSSChannel::ControllerChannelCheck');
+$app->post('/flexcontent/editor/rss/channel/image/select',
+    'phpManufaktur\flexContent\Control\Admin\RSSChannel::ControllerImage');
+$app->get('/flexcontent/editor/rss/channel/image/check/id/{channel_id}',
+    'phpManufaktur\flexContent\Control\Admin\RSSChannel::ControllerImageCheck');
 
 /**
  * CMS Search function

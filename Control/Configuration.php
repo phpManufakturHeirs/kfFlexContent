@@ -59,7 +59,13 @@ class Configuration
         foreach ($languages as $language) {
             $path = self::$config['content']['permalink']['directory'];
             $path = str_ireplace('{language}', strtolower($language['code']), $path);
-            if (!$this->app['filesystem']->exists($path)) {
+            if (!$this->app['filesystem']->exists(CMS_PATH.$path)) {
+                $exists = false;
+                break;
+            }
+            $rss_path = self::$config['rss']['permalink']['directory'];
+            $rss_path = str_ireplace('{language}', strtolower($language['code']), $rss_path);
+            if (!$this->app['filesystem']->exists(CMS_PATH.$rss_path)) {
                 $exists = false;
                 break;
             }
@@ -147,6 +153,9 @@ class Configuration
                     ),
                     'status' => array(
                         'required' => true
+                    ),
+                    'rss' => array(
+                        'required' => false
                     )
                 ),
                 'permalink' => array(
@@ -182,6 +191,19 @@ class Configuration
                             'unassigned' => '<span class="tag unassigned" title="The hashtag {tag} exists but is not assigend to any content!"><i class="fa fa-chain-broken"></i> {tag}</span>'
                         ),
                         'ellipsis' => 64
+                    )
+                )
+            ),
+            'rss' => array(
+                'enabled' => true,
+                'permalink' => array(
+                    'directory' => '/{language}/rss'
+                ),
+                'channel' => array(
+                    'limit' => 50,
+                    'image' => array(
+                        'max_width' => 100,
+                        'max_height' => 100
                     )
                 )
             ),

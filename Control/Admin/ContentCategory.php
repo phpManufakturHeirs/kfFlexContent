@@ -16,7 +16,6 @@ use phpManufaktur\Basic\Data\CMS\Page;
 use phpManufaktur\flexContent\Data\Content\CategoryType as CategoryTypeData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use phpManufaktur\flexContent\Control\Configuration;
 
 class ContentCategory extends Admin
 {
@@ -32,7 +31,6 @@ class ContentCategory extends Admin
     protected static $order_direction = null;
     protected static $current_page = null;
     protected static $max_pages = null;
-    protected static $config = null;
     protected static $language = null;
 
     /**
@@ -71,9 +69,6 @@ class ContentCategory extends Admin
             'create' => '/flexcontent/editor/category/create?usage='.self::$usage,
             'edit_content' => '/flexcontent/editor/edit/id/{content_id}?usage='.self::$usage
         );
-
-        $Configuration = new Configuration($app);
-        self::$config = $Configuration->getConfiguration();
 
         self::$language = $this->app['request']->get('form[language]', self::$config['content']['language']['default'], true);
     }
@@ -239,7 +234,7 @@ class ContentCategory extends Admin
             foreach (CategoryTypeData::$forbidden_chars as $forbidden) {
                 if (false !== strpos($category['category_name'], $forbidden)) {
                     $this->setAlert('The category type name %category% contains the forbidden character %char%, please change the name.',
-                        array('%char%' => $forbidden, '%category%' => $category['tag_name']), self::ALERT_TYPE_WARNING);
+                        array('%char%' => $forbidden, '%category%' => $category['category_name']), self::ALERT_TYPE_WARNING);
                     return false;
                 }
             }
@@ -429,6 +424,7 @@ class ContentCategory extends Admin
             // language selection is active - select language first!
             return $this->selectLanguage();
         }
+
         $data = array();
         if ((self::$category_id > 0) && (false === ($data = $this->CategoryTypeData->select(self::$category_id)))) {
             $this->setAlert('The Category Type record with the ID %id% does not exists!',
@@ -448,7 +444,7 @@ class ContentCategory extends Admin
     {
         $this->initialize($app);
 
-        // check the form data and set self::$contact_id
+        // check the form data and set self::$category_id
         $data = array();
         if (!$this->checkCategoryTypeForm($data)) {
             // the check fails - show the form again

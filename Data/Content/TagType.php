@@ -382,7 +382,7 @@ EOD;
     }
 
     /**
-     * Count PermaLinks which starts LIKE the given $this
+     * Count PermaLinks which starts LIKE the given $permalink
      *
      * @param string $this
      * @throws \Exception

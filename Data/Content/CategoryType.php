@@ -160,7 +160,7 @@ EOD;
     }
 
     /**
-     * Select a Category Type record by the given TAG ID
+     * Select a Category Type record by the given CATEGORY ID
      *
      * @param integer $category_id
      * @throws \Exception

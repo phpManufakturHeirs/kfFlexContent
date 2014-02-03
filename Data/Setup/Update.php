@@ -13,6 +13,7 @@ namespace phpManufaktur\flexContent\Data\Setup;
 
 use Silex\Application;
 use phpManufaktur\flexContent\Control\Configuration;
+use phpManufaktur\flexContent\Data\Content\RSSChannel;
 
 class Update
 {
@@ -38,9 +39,9 @@ class Update
     }
 
     /**
-     * Release 0.20
+     * Release 0.18
      */
-    protected function release_020()
+    protected function release_018()
     {
         if (isset(self::$config['kitcommand']['parameter']['action']['view']['description'])) {
             // the configuration use old and obsolete keys, delete the file and create a new one!
@@ -52,16 +53,53 @@ class Update
         }
     }
 
-    protected function release_021()
+    /**
+     * Release 0.19
+     */
+    protected function release_019()
     {
         if (isset(self::$config['kitcommand']['parameter']['action']['tag']['content_teaser'])) {
+            // the config items 'content_teaser' and 'content_content' are replaced by 'content_view'
             unset(self::$config['kitcommand']['parameter']['action']['tag']['content_teaser']);
             unset(self::$config['kitcommand']['parameter']['action']['tag']['content_content']);
             $this->Configuration->setConfiguration(self::$config);
             $this->Configuration->saveConfiguration();
         }
         if (!isset(self::$config['kitcommand']['parameter']['action']['tag']['content_view'])) {
+            // add missing 'content_view'
             self::$config['kitcommand']['parameter']['action']['tag']['content_view'] = 'teaser';
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+
+        if (!$this->app['db.utils']->tableExists(FRAMEWORK_TABLE_PREFIX.'flexcontent_rss_channel')) {
+            // introduce RSS Channel
+            $RSSChannel = new RSSChannel($this->app);
+            $RSSChannel->createTable();
+        }
+
+        if (!isset(self::$config['admin']['rss'])) {
+            // general configuration for the RSS Channels
+            self::$config['admin']['rss'] = array(
+                'enabled' => true,
+                'channel' => array(
+                    'limit' => 50
+                )
+            );
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+
+        if (!$this->app['db.utils']->columnExists(FRAMEWORK_TABLE_PREFIX.'flexcontent_content', 'rss')) {
+            // add column redirect_target
+            $SQL = "ALTER TABLE `".FRAMEWORK_TABLE_PREFIX."flexcontent_content` ADD `rss` ENUM('YES','NO') NOT NULL DEFAULT 'YES' AFTER `content`";
+            $this->app['db']->query($SQL);
+            $this->app['monolog']->addInfo('[flexContent Update] Add field `rss` to table `flexcontent_content`');
+        }
+
+        if (!isset(self::$config['content']['field']['rss']['required'])) {
+            // add missing 'rss'
+            self::$config['content']['field']['rss']['required'] = false;
             $this->Configuration->setConfiguration(self::$config);
             $this->Configuration->saveConfiguration();
         }
@@ -90,10 +128,10 @@ class Update
 
         // Release 0.17
         $this->release_017();
-        // Release 0.20
-        $this->release_020();
-        // Release 0.21
-        $this->release_021();
+        // Release 0.18
+        $this->release_018();
+        // Release 0.19
+        $this->release_019();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

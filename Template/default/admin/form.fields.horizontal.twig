@@ -8,6 +8,10 @@
   @license MIT License (MIT) http://www.opensource.org/licenses/MIT
 #}
 
+{% block textarea_row %}
+  {{ block('form_row_textarea') }}
+{% endblock %}
+
 {% block text_row %}
   {% set type = 'text' %}
   {{ block('form_row_simple') }}
@@ -30,15 +34,21 @@
   {% endif %}
   <div class="form-group">
     {{ block('form_label') }}
-    <div class="col-sm-6">
+    <div class="col-sm-9">
+      {% if attr.prefix is defined %}
+        <span class="prefix-block">{{ attr.prefix|trans }}</span>
+      {% endif %}
       {{ block('choice_widget') }}
+      {% if attr.help is defined %}
+        <span class="help-block">{{ attr.help|trans }}</span>
+      {% endif %}  
     </div>
   </div>
 {% endblock %}
 
 {% block checkbox_row %}
   <div class="form-group">
-    <div class="col-sm-6 col-sm-offset-3">
+    <div class="col-sm-9 col-sm-offset-3">
       {{ block('checkbox_widget') }}&nbsp;&nbsp;{% if label is empty %}{{ name|humanize }}{% else %}{{ label|trans }}{% endif %}
     </div>
   </div>
@@ -47,13 +57,42 @@
 {% block form_row_simple %}
   <div class="form-group">
     {{ block('form_label') }}
-    <div class="col-sm-6">
+    <div class="col-sm-9">
+      {% if attr.prefix is defined %}
+        <span class="prefix-block">{{ attr.prefix|trans }}</span>
+      {% endif %}
       <input type="{{ type }}" class="form-control" {{ block('widget_attributes') }} {% if value is not empty %}value="{{ value }}" {% endif %}/>
+      {% if attr.help is defined %}
+        <span class="help-block">{{ attr.help|trans }}</span>
+      {% endif %}
     </div>
   </div>
 {% endblock %}
 
+{% block form_row_textarea %}
+  <div class="form-group">
+    {{ block('form_label') }}
+    <div class="col-sm-9">
+      {% if attr.prefix is defined %}
+        <span class="prefix-block">{{ attr.prefix|trans }}</span>
+      {% endif %}
+      <textarea class="form-control" rows="3" {{ block('widget_attributes') }}>{{ value }}</textarea>
+      {% if attr.help is defined %}
+        <span class="help-block">{{ attr.help|trans }}</span>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}
 
+{% block widget_attributes %}
+  {% spaceless %}
+    id="{{ id }}" name="{{ full_name }}"{% if read_only %} readonly="readonly"{% endif %}{% if disabled %} disabled="disabled"{% endif %}{% if required %} required="required"{% endif %}{% if max_length %} maxlength="{{ max_length }}"{% endif %}{% if pattern %} pattern="{{ pattern }}"{% endif %}
+    {% for attrname, attrvalue in attr %}
+      {# don't show the attribute 'help' or 'prefix' - nothing else changed ... #}
+      {% if attrname in ['placeholder', 'title'] %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}" {% elseif attrname in ['help','prefix'] %}{# ignore item! #}{% else %}{{ attrname }}="{{ attrvalue }}" {% endif %}{% endfor %}
+  {% endspaceless %}
+{% endblock widget_attributes %}
+    
 {% block choice_widget_collapsed %}
   {% spaceless %}  
   <select class="form-control" {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
@@ -109,6 +148,7 @@
         {% endif %}
       {% endfor %}
       {% if i != 1 %}</div>{% endif %}
+
     {% else %}        
       <div {{ block('widget_container_attributes') }}>
       {% for child in form %}
@@ -118,8 +158,6 @@
             <div>{{ child.vars.label|trans }}</div>
           </div>
         </div>
-          {#{ form_widget(child) }}
-          {{ form_label(child) }#}
       {% endfor %}
       </div>
     {% endif %}

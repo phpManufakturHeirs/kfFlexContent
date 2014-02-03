@@ -20,7 +20,7 @@ use phpManufaktur\flexContent\Data\Content\CategoryType;
 use phpManufaktur\flexContent\Data\Content\Category;
 use phpManufaktur\flexContent\Control\Configuration;
 use phpManufaktur\flexContent\Data\Import\ImportControl;
-use phpManufaktur\Basic\Control\CMS\InstallPageSection;
+use phpManufaktur\flexContent\Data\Content\RSSChannel;
 
 class Setup
 {
@@ -50,9 +50,10 @@ class Setup
         }
 
         $permalink = $config['content']['permalink']['directory'];
+        $rsslink = $config['rss']['permalink']['directory'];
 
-        $search = array('%subdirectory%', '%permalink%', '%default_language%');
-        $replace = array($subdirectory, $permalink, strtolower($config['content']['language']['default']));
+        $search = array('%subdirectory%', '%permalink%', '%default_language%', '%rsslink%');
+        $replace = array($subdirectory, $permalink, strtolower($config['content']['language']['default']), $rsslink);
 
         $include = str_replace($search, $replace, $include);
 
@@ -104,11 +105,25 @@ class Setup
             }
             $include = str_replace(array('%subdirectory%'), array($subdirectory), $include);
 
-
             if (false === (file_put_contents(CMS_PATH.$path.'/.htaccess', $include))) {
                 throw new \Exception("Can't create $path/.htaccess!");
             }
             $app['monolog']->addDebug('Create '.'/'.strtolower($language['code']).$config['content']['permalink']['directory'].'/.htaccess');
+
+            $rss_path = $config['rss']['permalink']['directory'];
+            $rss_path = str_ireplace('{language}', strtolower($language['code']), $rss_path);
+
+            $app['filesystem']->mkdir(CMS_PATH.$rss_path);
+            if (false === ($include = file_get_contents(MANUFAKTUR_PATH.'/flexContent/Data/Setup/PermaLink/.htaccess'))) {
+                throw new \Exception('Missing /flexContent/Data/Setup/PermaLink/.htaccess!');
+            }
+            $include = str_replace(array('%subdirectory%'), array($subdirectory), $include);
+
+            if (false === (file_put_contents(CMS_PATH.$rss_path.'/.htaccess', $include))) {
+                throw new \Exception("Can't create $rss_path/.htaccess!");
+            }
+            $app['monolog']->addDebug('Create '.'/'.strtolower($language['code']).$config['rss']['permalink']['directory'].'/.htaccess');
+
         }
     }
 
@@ -147,6 +162,9 @@ class Setup
             // create the import control table
             $ImportControl = new ImportControl($app);
             $ImportControl->createTable();
+
+            $RSSChannel = new RSSChannel($app);
+            $RSSChannel->createTable();
 
             // setup kit_framework_flexcontent as Add-on in the CMS
             $admin_tool = new InstallAdminTool($app);

@@ -1,0 +1,22 @@
+{
+  "columns":[
+    "channel_id",
+    "channel_language",
+    "channel_title",
+    "channel_description",
+    "status",
+    "content_categories"
+  ],
+  "list":{
+    "order":{
+      "by":[
+        "channel_title"
+      ],
+      "direction":"ASC"
+    },
+    "status":[
+      "ACTIVE",
+      "LOCKED"
+    ]
+  }
+}

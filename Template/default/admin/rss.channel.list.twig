@@ -1,0 +1,117 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+{% if usage == 'framework' %}
+  {% set template_namespace = '@phpManufaktur/Basic/Template' %}
+  {% set template_file = 'framework/body.twig' %}
+{% else %}
+  {% set template_namespace = '@phpManufaktur/flexContent/Template' %}
+  {% set template_file = 'admin/body.twig' %}
+{% endif %}
+{% extends getTemplateFile(template_namespace, template_file) %}
+{% block title %}{{ 'flexContent - Category types'|trans }}{% endblock %}
+{% block stylesheet %}
+  {{ parent() }}
+  {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css') %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css' }}" media="screen, projection" />
+  {% else %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/admin.min.css' }}" media="screen, projection" />
+  {% endif %}
+{% endblock stylesheet %}
+
+{% block content %}
+  <div class="container">
+    {% include '@phpManufaktur/flexContent/Template/default/admin/toolbar.twig' %}
+    <div class="height-15"></div>
+    {{ alert }}
+    <div>
+      <a class="btn btn-default" role="button" href="{{ FRAMEWORK_URL ~ route.create }}">{{ 'Create a new RSS Channel'|trans }}</a>
+    </div>  
+    <div class="height-15"></div>  
+    {% if channels|length < 1 %}
+      {% include '@phpManufaktur/Basic/Template/default/pattern/bootstrap/alert.twig' 
+        with {content:'The list of RSS Channels for flexContent is empty, please create the first RSS Channel!'|trans} only %}
+    {% else %}
+      <div class="table-responsive">
+        <table class="table table-striped table-condensed table-hover">
+          <thead>
+            <tr>
+              {#
+                  Enable an automatic ordering of the table by the columns, just
+                  clicking at the head of the column. Default order is specified in:
+                  /flexContent/Template/default/backend/category.type.list.json
+               #}
+              {% set order_by_str = order_by|join(',') %}
+              {% for head in channels.0|keys %}
+                {% if head in columns %}
+                  {% set head_order = order_direction %}
+                  {% set head_class = head %}
+                  {% if (head == order_by_str) %}
+                    {% if (head_order == 'asc') %}
+                      {% set head_order = 'desc' %}
+                      {% set head_class = head_class ~ ' active asc' %}
+                    {% else %}
+                      {% set head_order = 'asc' %}
+                      {% set head_class = head_class ~ ' active desc' %}
+                    {% endif %}
+                  {% endif %}
+                  <th class="{{ head_class }}">
+                    {% if head == 'content_categories' %}
+                      {{ head|humanize|trans }}
+                    {% else %}
+                      {% if 'active asc' in head_class %}
+                        <i class="fa fa-sort-alpha-asc"></i>&nbsp;
+                      {% elseif 'active desc' in head_class %}
+                        <i class="fa fa-sort-alpha-desc"></i>&nbsp;
+                      {% endif %}
+                      <a href="{{ FRAMEWORK_URL ~ route.list|replace({'{order}':head, '{direction}':head_order}) }}" title="{% if head_order == 'asc' %}{{ 'Click to sort column ascending'|trans }}{% else %}{{ 'Click to sort column descending'|trans }}{% endif %}">{{ head|humanize|trans }}</a>
+                    {% endif %}
+                  </th>
+                {% endif %}
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for channel in channels %}
+              <tr>
+                {% for column, value in channel %}
+                  {% if column in columns %}
+                    {% if column == 'channel_id' %}
+                      <td class="{{ column }}">
+                        <a href="{{ FRAMEWORK_URL ~ route.edit|replace({'{channel_id}':value}) }}">{{ '%05d'|format(value) }}</a>
+                      </td>
+                    {% elseif column == 'channel_title' %}
+                      <td class="{{ column }}">
+                        <a href="{{ FRAMEWORK_URL ~ route.edit|replace({'{channel_id}':channel.channel_id}) }}">{{ value }}</a>
+                      </td>
+                    {% elseif (column == 'channel_description') %}
+                      <td class="{{ column }}">{{ value|striptags }}</td>
+                    {% elseif (column == 'content_categories') %}
+                      <td class="{{ column }}">
+                        {% set separator = '' %}
+                        {% for category_id in value %}
+                          {{ separator }}<a href="{{ FRAMEWORK_URL ~ route.edit_category|replace({'{category_id}':category_id}) }}">{{ '%03d'|format(category_id) }}</a>
+                          {% set separator = ', ' %}
+                        {% endfor %}
+                      </td>
+                    {% elseif column == 'status' %}
+                      <td class="{{ column }}">{{ value|trans }}</td>
+                    {% else %}
+                      <td class="{{ column }}">{{ value }}</td>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>  
+    {% endif %}
+  </div>
+{% endblock content %}

@@ -18,6 +18,9 @@ use phpManufaktur\Basic\Data\CMS\Page;
 use phpManufaktur\flexContent\Data\Content\CategoryType;
 use phpManufaktur\flexContent\Data\Content\TagType;
 use phpManufaktur\flexContent\Data\Content\Tag;
+use phpManufaktur\flexContent\Control\RSS\RSSChannel as RSSChannelControl;
+use phpManufaktur\flexContent\Data\Content\RSSChannel as RSSChannelData;
+use Symfony\Component\HttpFoundation\Response;
 
 class PermanentLink
 {
@@ -27,6 +30,8 @@ class PermanentLink
     protected $TagData = null;
     protected $TagTypeData = null;
     protected $PageData = null;
+    protected $RSSChannelControl = null;
+    protected $RSSChannelData = null;
     protected $app = null;
 
     protected static $content_id = null;
@@ -34,6 +39,7 @@ class PermanentLink
     protected static $config = null;
     protected static $category_id = null;
     protected static $tag_id = null;
+    protected static $rss_channel_id = null;
 
     /**
      * Initialize the class
@@ -54,6 +60,8 @@ class PermanentLink
         $this->PageData = new Page($app);
         $this->TagData = new Tag($app);
         $this->TagTypeData = new TagType($app);
+        $this->RSSChannelControl = new RSSChannelControl($app);
+        $this->RSSChannelData = new RSSChannelData($app);
     }
 
     /**
@@ -516,6 +524,47 @@ class PermanentLink
     }
 
     /**
+     * Return the XML data for the requested RSS Channel
+     *
+     * @return string
+     */
+    protected function promptRSSChannel()
+    {
+        if (false === ($channel = $this->RSSChannelData->select(self::$rss_channel_id))) {
+            // the RSS Channel does not exists!
+            $this->app['monolog']->addError('The RSS Channel record with the ID '.self::$rss_channel_id.' does not exists!',
+                array(__METHOD__, __LINE__));
+            return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+                '@phpManufaktur/Basic/Template', 'kitcommand/bootstrap/noframe/alert.twig'),
+                array(
+                    'content' => $this->app['translator']->trans('The RSS Channel record with the ID %id% does not exists!',
+                        array('%id%' => self::$rss_channel_id)),
+                    'type' => 'alert-danger'));
+        }
+
+        if ($channel['status'] != 'ACTIVE') {
+            return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+                '@phpManufaktur/Basic/Template', 'kitcommand/bootstrap/noframe/alert.twig'),
+                array(
+                    'content' => $this->app['translator']->trans('Sorry, but the RSS Channel %title% is currently not available!',
+                        array('%title%' => $channel['channel_title'])),
+                    'type' => 'alert-danger'));
+        }
+
+        //if (false === ($xml = $this->RSSChannelData->createChannel(self::$rss_channel_id))) {
+        if (false === ($xml = $this->RSSChannelControl->getRSSChannelXML(self::$rss_channel_id))) {
+            return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+                '@phpManufaktur/Basic/Template', 'kitcommand/bootstrap/noframe/alert.twig'),
+                array(
+                    'content' => $this->app['translator']->trans('Sorry, but the RSS Channel %title% does not contain any feeds!',
+                        array('%title%' => $channel['channel_title'])),
+                    'type' => 'alert-danger'));
+        }
+
+        return new Response($xml, 201, array('Content-Type' => 'application/xml'));
+    }
+
+    /**
      * Controller to handle permanent links to content names
      *
      * @param Application $app
@@ -560,9 +609,6 @@ class PermanentLink
         $this->initialize($app);
         self::$language = $language;
 
-        // get the content ID from parameter
-        self::$content_id = $app['request']->query->get('i', -1);
-
         if (false !== (self::$category_id = filter_var($name, FILTER_VALIDATE_INT))) {
             // this is an integer - get the category by the given ID
             return $this->redirectToCategoryID();
@@ -595,9 +641,6 @@ class PermanentLink
     {
         $this->initialize($app);
         self::$language = $language;
-
-        // get the content ID from parameter
-        self::$content_id = $app['request']->query->get('i', -1);
 
         if (false !== (self::$category_id = filter_var($name, FILTER_VALIDATE_INT))) {
             // this is an integer - get the category by the given ID
@@ -632,11 +675,6 @@ class PermanentLink
         $this->initialize($app);
         self::$language = $language;
 
-        // get the category ID from parameter
-        self::$category_id = $app['request']->query->get('c', -1);
-        // get the content ID from parameter
-        self::$content_id = $app['request']->query->get('i', -1);
-
         if (false !== (self::$tag_id = filter_var($name, FILTER_VALIDATE_INT))) {
             // this is an integer - get the tag by the given ID
             return $this->redirectToTagID();
@@ -655,6 +693,37 @@ class PermanentLink
         }
 
         return $this->redirectToTagID();
+    }
+
+    /**
+     * Controller to handle the RSS Channel requests
+     *
+     * @param Application $app
+     * @param string $channel
+     * @param string $language
+     */
+    public function ControllerRSSChannel(Application $app, $channel, $language)
+    {
+        $this->initialize($app);
+        self::$language = $language;
+
+        if (false !== (self::$rss_channel_id = filter_var($channel, FILTER_VALIDATE_INT))) {
+            // this is an integer - get the rss channel by the given ID
+            return $this->promptRSSChannel();
+        }
+
+        if (false === (self::$rss_channel_id = $this->RSSChannelData->selectChannelIDbyChannelLink($channel, $language))) {
+            // this channel link does not exists
+            $this->app['monolog']->addError('The RSS Channel /'.$language.'/rss/'.$channel.' does not exists or is not active!', array(__METHOD__, __LINE__));
+            return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+                '@phpManufaktur/Basic/Template', 'kitcommand/bootstrap/noframe/alert.twig'),
+                array(
+                    'content' => $this->app['translator']->trans('The RSS Channel <b>/'.$language.'/rss/%permalink%</b> does not exists or is not active!',
+                        array('%permalink%' => $channel)),
+                    'type' => 'alert-danger'
+                ));
+        }
+        return $this->promptRSSChannel();
     }
 
 }

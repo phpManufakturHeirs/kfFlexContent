@@ -114,6 +114,20 @@ select#form_secondary_categories {
 .choice-radio {
   margin-right: 10px;
 }
+
+.help-block {
+  font-size: 11px;
+  color: #999;
+  margin-bottom: 0;
+}
+.prefix-block {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 5px;
+  font-size: 11px;
+  color: #363636;
+}
+
 /*
   TagEdit
 */

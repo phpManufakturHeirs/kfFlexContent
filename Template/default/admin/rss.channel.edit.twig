@@ -1,0 +1,105 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+{% if usage == 'framework' %}
+  {% set template_namespace = '@phpManufaktur/Basic/Template' %}
+  {% set template_file = 'framework/body.twig' %}
+{% else %}
+  {% set template_namespace = '@phpManufaktur/flexContent/Template' %}
+  {% set template_file = 'admin/body.twig' %}
+{% endif %}
+{% extends getTemplateFile(template_namespace, template_file) %}
+{% block title %}{{ 'flexContent - Create or edit a category'|trans }}{% endblock %}
+{% block stylesheet %}
+  {{ parent() }}
+  {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css') %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css' }}" media="screen, projection" />
+  {% else %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/admin.min.css' }}" media="screen, projection" />
+  {% endif %}
+{% endblock stylesheet %}
+{% block jquery %}
+  {{ parent() }}
+{% endblock jquery %}
+
+{% block content %}
+  <div class="container">
+    {% include '@phpManufaktur/flexContent/Template/default/admin/toolbar.twig' %}
+    <div class="height-15"></div>
+
+    {{ alert }}
+
+    {% form_theme form '@phpManufaktur/flexContent/Template/default/admin/form.fields.horizontal.twig' %}
+    
+    <form id="rss-channel-edit" class="form-horizontal" method="post" role="form" action="{{ FRAMEWORK_URL ~ route.action }}">
+      <div class="row">
+        <div class="col-sm-9">
+          {{ form_widget(form) }}
+          <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-6">
+              <input type="button" class="btn btn-default form-control" value="{{ 'Submit'|trans }}" onclick="submitForm('{{ FRAMEWORK_URL ~ route.action ~ '?usage=' ~ usage }}');" />
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3">
+          <div class="height-30"></div>
+          {% if form.channel_image.vars.value|length > 0 %}
+            <img class="img-rounded img-responsive" src="{{ FRAMEWORK_URL ~ form.channel_image.vars.value }}" />
+          {% endif %}
+          <div class="height-15"></div>
+          <input class="form-control btn btn-default" type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL ~ route.image ~ '?usage=' ~ usage }}');" value="{{ 'RSS Channel Image'|trans }}" />
+        </div>
+      </div>
+    </form>    
+  </div>
+{% endblock content %}
+
+{% block footer %}
+  {{ parent() }}
+  <script type="text/javascript">
+    if (typeof 'jQuery' !== 'undefined') {
+      function submitForm(action)
+      {
+        if (!$('#rss-channel-edit')[0].checkValidity()) {
+          alert('{{ 'Please fill in all requested fields before submitting the form!'|trans }}');
+        }
+        else {
+          $('#rss-channel-edit').attr('action', action);
+          $('#rss-channel-edit').submit();
+        }
+      }
+
+      $(document).ready(function() {
+        $("#form_channel_title").change(function () {
+          var permalink = $('#form_channel_link').val();
+          var name = $('#form_channel_title').val();
+
+          if (permalink.length < 1) {
+            // no permalink defined, use the category name as propose ...
+            $.ajax({
+              url:"{{ FRAMEWORK_URL }}/flexcontent/editor/permalink/create/rss?lang={{ form.language.vars.value }}",
+              type: "POST",
+              dataType: "json",
+              data: {
+                link: name
+              },
+              complete: function (XMLHttpRequest, textStatus) {
+                var result = $.parseJSON(XMLHttpRequest.responseText);
+                $('#form_channel_link').val(result);
+              },
+              error: function(jqXHR, textStatus, errorThrown) {
+                alert('Error creating PermaLink:'+textStatus);
+              }
+            });
+          }
+        });
+      });
+    }
+  </script>
+{% endblock footer %}

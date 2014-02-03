@@ -29,7 +29,12 @@ $app->get('%subdirectory%%permalink%/list/{name}',
     'phpManufaktur\flexContent\Control\PermanentLink::ControllerListName')
     ->value('language', '%default_language%');
 
-// permalink rout to a FAQ
+// permalink route to a FAQ
 $app->get('%subdirectory%%permalink%/faq/{name}',
     'phpManufaktur\flexContent\Control\PermanentLink::ControllerFAQName')
+    ->value('language', '%default_language%');
+
+// permalink route to a RSS Channel
+$app->get('%subdirectory%%rsslink%/{channel}',
+    'phpManufaktur\flexContent\Control\PermanentLink::ControllerRSSChannel')
     ->value('language', '%default_language%');
