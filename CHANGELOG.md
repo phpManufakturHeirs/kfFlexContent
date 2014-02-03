@@ -6,6 +6,12 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.19** - 2014-02-03
+
+* introduce RSS Feeds
+* RSS Statistics for the RSS Channels and to track flexContent Contents called by RSS Feeds
+* many, many smaller changes ...
+
 **0.18** - 2014-01-30
 
 * cleanup the configuration and handling of parameters
