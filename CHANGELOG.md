@@ -6,6 +6,11 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.20** - 2014-02-04
+
+* fixed sending content type for the RSS feeds
+* Improved import handling for third party contents
+
 **0.19** - 2014-02-03
 
 * introduce RSS Feeds
