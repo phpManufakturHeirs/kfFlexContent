@@ -84,6 +84,10 @@ class ImportDialog extends Admin
             return $content;
         }
 
+        // set the time limit for the import process
+        $timelimit = isset(self::$config['admin']['import']['timelimit']) ? self::$config['admin']['import']['timelimit'] : 60;
+        set_time_limit($timelimit);
+
         $cmsPages = new Page($this->app);
         $page_directory = $cmsPages->getPageDirectory();
         $page_extension = $cmsPages->getPageExtension();
@@ -137,11 +141,18 @@ class ImportDialog extends Admin
                 $src = str_ireplace($search, $replace, $src);
                 if (strpos($src, CMS_MEDIA_URL) === 0) {
                     $path = substr($src, strlen(CMS_MEDIA_URL));
-                    // copy the image to the framework /media directory
-                    $this->app['filesystem']->copy(CMS_MEDIA_PATH.$path, FRAMEWORK_MEDIA_PATH.$path);
-                    $src = FRAMEWORK_MEDIA_URL.$path;
-                    // set the src again
-                    $image->setAttribute('src', $src);
+                    if ($this->app['filesystem']->exists(CMS_MEDIA_PATH.$path)) {
+                        // copy the image to the framework /media directory
+                        $target_path = $path;
+                        if (self::$config['admin']['import']['data']['images']['sanitize']) {
+                            // sanitize the target path to avoid problems
+                            $target_path = $this->app['utils']->sanitizeLink($target_path);
+                        }
+                        $this->app['filesystem']->copy(CMS_MEDIA_PATH.$path, FRAMEWORK_MEDIA_PATH.$target_path);
+                        $src = FRAMEWORK_MEDIA_URL.$target_path;
+                        // set the src again
+                        $image->setAttribute('src', $src);
+                    }
                 }
             }
         }
@@ -163,66 +174,31 @@ class ImportDialog extends Admin
             return $content;
         }
 
-        if (self::$config['admin']['import']['data']['remove']['nbsp']) {
-            // replace &nbsp; with a regular space
-            $content = str_ireplace('&nbsp;', ' ', $content);
-        }
         if (self::$config['admin']['import']['data']['remove']['double-space']) {
             // remove double spaces
-            while (strpos($content, '  ')) {
-                $content = str_replace('  ', ' ', $content);
-            }
+            $content = preg_replace('!\s+!', ' ', $content);
+        }
+
+        foreach (self::$config['admin']['import']['data']['replace'] as $search => $replace) {
+            // process search & replace with the given items
+            $content = str_replace($search, $replace, $content);
         }
 
         if (self::$config['admin']['import']['data']['htmlpurifier']['enabled']) {
             // cleanup the HTML with HTML Purifier
             $config = \HTMLPurifier_Config::createDefault();
-            $config->set('URI.Base', 'http://www.example.com');
-            $config->set('URI.MakeAbsolute', true);
+            $config->set('URI.Base', CMS_URL);
+            $config->set('Core.Encoding', 'utf-8');
+
+            // get the settings for HTML Purifier from the flexContent configuration
+            foreach (self::$config['admin']['import']['data']['htmlpurifier']['config'] as $key => $value) {
+                $config->set($key, $value);
+            }
+
             $purifier = new \HTMLPurifier($config);
             $content = $purifier->purify($content);
         }
-
-        $DOM = new \DOMDocument;
-        // enable internal error handling
-        libxml_use_internal_errors(true);
-
-        $DOM->preserveWhiteSpace = false;
-
-        // need a hack to properly handle UTF-8 encoding
-        if (!$DOM->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', "UTF-8"))) {
-            foreach (libxml_get_errors() as $error) {
-                // handle errors here
-                $this->app['monolog']->addError('[flexContent] '.$error->message, array(__METHOD__, __LINE__));
-                libxml_clear_errors();
-            }
-            throw new \Exception('Problem processing the content - check the logfile for more information.');
-        }
-        libxml_clear_errors();
-
-        $DOMIterator = new \RecursiveIteratorIterator(
-            new RecursiveDOMIterator($DOM),
-            \RecursiveIteratorIterator::SELF_FIRST
-        );
-
-        foreach ($DOMIterator as $node) {
-            if ($node->nodeType === XML_ELEMENT_NODE) {
-                if (self::$config['admin']['import']['data']['remove']['style'] &&
-                    $node->hasAttribute('style')) {
-                    // remove style information
-                    $node->removeAttribute('style');
-                }
-                if (self::$config['admin']['import']['data']['remove']['class'] &&
-                    $node->hasAttribute('class')) {
-                    // remove class information
-                    $node->removeAttribute('class');
-                }
-            }
-        }
-
-        $XPath = new \DOMXPath($DOM);
-        // get only the body tag with its contents, then trim the body tag itself to get only the original content
-        return mb_substr($DOM->saveXML($XPath->query('//body')->item(0)), 6, -7, "UTF-8");
+        return $content;
     }
 
     /**

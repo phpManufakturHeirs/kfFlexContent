@@ -127,6 +127,46 @@ class Update
     }
 
     /**
+     * Release 0.20
+     */
+    protected function release_020()
+    {
+        if (!isset(self::$config['admin']['import']['timelimit'])) {
+            // set default timelimit for the import
+            self::$config['admin']['import']['timelimit'] = 60;
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+        if (!isset(self::$config['admin']['import']['data']['htmlpurifier']['config'])) {
+            $default = $this->Configuration->getDefaultConfigArray();
+            self::$config['admin']['import']['data']['htmlpurifier']['config'] =
+                $default['admin']['import']['data']['htmlpurifier']['config'];
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+        if (!isset(self::$config['admin']['import']['data']['images']['sanitize'])) {
+            self::$config['admin']['import']['data']['images']['sanitize'] = true;
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+        if (isset(self::$config['admin']['import']['data']['remove']['nbsp'])) {
+            // remove items which are eplaced by htmlpurifier
+            unset(self::$config['admin']['import']['data']['remove']['nbsp']);
+            unset(self::$config['admin']['import']['data']['remove']['style']);
+            unset(self::$config['admin']['import']['data']['remove']['class']);
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+        if (!isset(self::$config['admin']['import']['data']['replace'])) {
+            $default = $this->Configuration->getDefaultConfigArray();
+            self::$config['admin']['import']['data']['replace'] =
+                $default['admin']['import']['data']['replace'];
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+    }
+
+    /**
      * Execute the update for flexContent
      *
      * @param Application $app
@@ -153,6 +193,8 @@ class Update
         $this->release_018();
         // Release 0.19
         $this->release_019();
+        // Release 0.20
+        $this->release_020();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

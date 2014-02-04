@@ -213,16 +213,29 @@ class Configuration
             'admin' => array(
                 'import' => array(
                     'enabled' => true,
+                    'timelimit' => 60,
                     'data' => array(
                         'handling' => 'CLEAN_UP',
                         'htmlpurifier' => array(
-                            'enabled' => true
+                            'enabled' => true,
+                            'config' => array(
+                                'URI.MakeAbsolute' => true,
+                                'AutoFormat.RemoveSpansWithoutAttributes' => true,
+                                'AutoFormat.RemoveEmpty' => true,
+                                'AutoFormat.RemoveEmpty.RemoveNbsp' => true,
+                                'HTML.ForbiddenElements' => array(
+                                    'span'
+                                )
+                            )
                         ),
                         'remove' => array(
-                            'nbsp' => true,
                             'double-space' => true,
-                            'style' => true,
-                            'class' => true
+                        ),
+                        'replace' => array(
+                            '„' => '"',
+                            '“' => '"',
+                            "‚" => "'",
+                            "’" => "'"
                         ),
                         'images' => array(
                             'move' => true,
@@ -230,7 +243,8 @@ class Configuration
                                 'get_from_content' => true,
                                 'min_width' => 150,
                                 'min_height' => 150
-                             )
+                             ),
+                            'sanitize' => true
                         ),
                         'teaser' => array(
                             'create' => true,
