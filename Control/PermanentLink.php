@@ -579,7 +579,7 @@ class PermanentLink
             $this->RSSChannelCounter->cleanup(self::$rss_channel_id);
         }
 
-        return new Response($xml, 201, array('Content-Type' => 'application/xml'));
+        return new Response($xml, 200);
     }
 
     /**
