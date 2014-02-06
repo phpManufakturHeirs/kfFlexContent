@@ -6,6 +6,10 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.21** - 2014-02-06
+
+* added support for setting canonical links
+
 **0.20** - 2014-02-04
 
 * fixed sending content type for the RSS feeds
