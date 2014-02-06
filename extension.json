@@ -47,19 +47,19 @@
     "extension":{
         "phpmanufaktur":{
             "Basic":{
-                "release":"0.74"
+                "release":"0.79"
             },
             "Library":{
-                "release":"0.12"
+                "release":"0.15"
             },
             "CKEditor":{
                 "release":"0.22"
             },
             "CommandCollection":{
-                "release":"0.31"
+                "release":"0.32"
             },
             "MediaBrowser":{
-                "release":"0.25"
+                "release":"0.26"
             }
         }
     }
