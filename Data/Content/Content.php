@@ -441,6 +441,25 @@ EOD;
     }
 
     /**
+     * Select a permanent link for the given content ID. The function return a
+     * array with the permalink and the language assigned to this content
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     */
+    public function selectPermaLinkByContentID($content_id)
+    {
+        try {
+            $SQL = "SELECT `permalink`, `language` FROM `".self::$table_name."` WHERE `content_id`='$content_id'";
+            $result = $this->app['db']->fetchAssoc($SQL);
+            return (isset($result['permalink'])) ? $result : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
      * Select the content in previous or next order to the given content ID.
      *
      * @param integer $content_id

@@ -233,6 +233,9 @@ $app->post('/command/flexcontent',
 $app->get('/command/flexcontent/getheader/id/{content_id}',
     // return header information to set title, description and keywords
     'phpManufaktur\flexContent\Control\Command\getHeader::controllerGetHeader');
+$app->get('/command/flexcontent/canonical/id/{content_id}',
+    // return the permanent link URL of the given content ID to create a canonical link
+    'phpManufaktur\flexContent\Control\Command\getCanonicalLink::controllerGetCanonicalLink');
 
 $app->get('/flexcontent/action',
     'phpManufaktur\flexContent\Control\Command\Action::controllerAction');

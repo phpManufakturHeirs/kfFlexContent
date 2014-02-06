@@ -150,7 +150,7 @@ class Update
             $this->Configuration->saveConfiguration();
         }
         if (isset(self::$config['admin']['import']['data']['remove']['nbsp'])) {
-            // remove items which are eplaced by htmlpurifier
+            // remove items which are replaced by htmlpurifier
             unset(self::$config['admin']['import']['data']['remove']['nbsp']);
             unset(self::$config['admin']['import']['data']['remove']['style']);
             unset(self::$config['admin']['import']['data']['remove']['class']);
@@ -161,6 +161,19 @@ class Update
             $default = $this->Configuration->getDefaultConfigArray();
             self::$config['admin']['import']['data']['replace'] =
                 $default['admin']['import']['data']['replace'];
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+    }
+
+    /**
+     * Release 0.21
+     */
+    protected function release_021()
+    {
+        if (isset(self::$config['admin']['import']['data']['htmlpurifier']['config']['AutoFormat.RemoveSpansWithoutAttributes'])) {
+            // remove conflicting setting in htmlpurifier
+            unset(self::$config['admin']['import']['data']['htmlpurifier']['config']['AutoFormat.RemoveSpansWithoutAttributes']);
             $this->Configuration->setConfiguration(self::$config);
             $this->Configuration->saveConfiguration();
         }
@@ -195,6 +208,8 @@ class Update
         $this->release_019();
         // Release 0.20
         $this->release_020();
+        // Release 0.21
+        $this->release_021();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

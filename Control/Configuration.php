@@ -220,11 +220,14 @@ class Configuration
                             'enabled' => true,
                             'config' => array(
                                 'URI.MakeAbsolute' => true,
-                                'AutoFormat.RemoveSpansWithoutAttributes' => true,
                                 'AutoFormat.RemoveEmpty' => true,
                                 'AutoFormat.RemoveEmpty.RemoveNbsp' => true,
                                 'HTML.ForbiddenElements' => array(
-                                    'span'
+                                    'b',
+                                    'em',
+                                    'i',
+                                    'span',
+                                    'strong'
                                 )
                             )
                         ),
