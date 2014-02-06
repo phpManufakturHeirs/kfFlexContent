@@ -25,12 +25,12 @@
           {% set target = '_self' %}
         {% endif %}   
         {% if loop.index == 1 %}<div class="row">{% endif %}
-        {% if loop.index < 3 %}  
-          {# expose the first two items in columns #}
+        {% if loop.index < parameter.content_exposed+1 %}  
+          {# expose in columns #}
           {% include '@phpManufaktur/flexContent/Template/default/command/content.exposed.twig' %}
         {% endif %}
-        {% if loop.index == 2 %}</div>{% endif %}
-        {% if loop.index > 2 %}
+        {% if loop.index == parameter.content_exposed %}</div>{% endif %}
+        {% if loop.index > parameter.content_exposed %}
           {# show all other content items in a smaller list #}
           {% include '@phpManufaktur/flexContent/Template/default/command/content.item.twig' %}
         {% endif %}

@@ -314,6 +314,7 @@ class Configuration
                             'category_image_max_width' => 150,
                             'category_image_max_height' => 150,
                             'content_limit' => 100,
+                            'content_exposed' => 2,
                             'content_status' => array(
                                 'BREAKING',
                                 'PUBLISHED'
@@ -340,6 +341,7 @@ class Configuration
                             'tag_image_max_width' => 150,
                             'tag_image_max_height' => 150,
                             'content_limit' => 100,
+                            'content_exposed' => 2,
                             'content_status' => array(
                                 'BREAKING',
                                 'PUBLISHED'
@@ -365,6 +367,7 @@ class Configuration
                             'order_by' => 'publish_from',
                             'order_direction' => 'DESC',
                             'content_limit' => 100,
+                            'content_exposed' => 2,
                             'content_status' => array(
                                 'BREAKING',
                                 'PUBLISHED'

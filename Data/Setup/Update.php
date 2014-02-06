@@ -180,6 +180,31 @@ class Update
     }
 
     /**
+     * Release 0.22
+     */
+    protected function release_022()
+    {
+        if (!isset(self::$config['kitcommand']['parameter']['action']['list']['content_exposed'])) {
+            // the config items 'content_teaser' and 'content_content' are replaced by 'content_view'
+            self::$config['kitcommand']['parameter']['action']['list']['content_exposed'] = 2;
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+        if (!isset(self::$config['kitcommand']['parameter']['action']['category']['content_exposed'])) {
+            // the config items 'content_teaser' and 'content_content' are replaced by 'content_view'
+            self::$config['kitcommand']['parameter']['action']['category']['content_exposed'] = 2;
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+        if (!isset(self::$config['kitcommand']['parameter']['action']['tag']['content_exposed'])) {
+            // the config items 'content_teaser' and 'content_content' are replaced by 'content_view'
+            self::$config['kitcommand']['parameter']['action']['tag']['content_exposed'] = 2;
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+    }
+
+    /**
      * Execute the update for flexContent
      *
      * @param Application $app
@@ -210,6 +235,8 @@ class Update
         $this->release_020();
         // Release 0.21
         $this->release_021();
+        // Release 0.22
+        $this->release_022();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

@@ -236,6 +236,13 @@ class ActionList extends Basic
         // limit for the content items
         self::$parameter['content_limit'] = (isset(self::$parameter['content_limit'])) ? intval(self::$parameter['content_limit']) : $default_parameter['content_limit'];
 
+        // expose content items?
+        self::$parameter['content_exposed'] = (isset(self::$parameter['content_exposed'])) ? intval(self::$parameter['content_exposed']) : $default_parameter['content_exposed'];
+        if (!in_array(self::$parameter['content_exposed'], array(0,1,2,3,4,6,12))) {
+            self::$parameter['content_exposed'] = 2;
+            $this->setAlert('Please check the parameter content_exposed, allowed values are only 0,1,2,3,4,6 or 12!', array(), self::ALERT_TYPE_WARNING);
+        }
+
         // show the content image?
         self::$parameter['content_image'] = (isset(self::$parameter['content_image']) && ((self::$parameter['content_image'] == 0) || (strtolower(self::$parameter['content_image']) == 'false'))) ? false : $default_parameter['content_image'];
 

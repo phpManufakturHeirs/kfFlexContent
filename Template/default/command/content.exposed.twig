@@ -1,4 +1,5 @@
-<div class="col-sm-6">
+{% set cols_exposed = 12/parameter.content_exposed %}
+<div class="col-sm-{{ cols_exposed }}">
   <div class="thumbnail">
     {% if parameter.content_date %}
       <div class="content-date">

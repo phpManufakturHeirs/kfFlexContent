@@ -240,8 +240,16 @@ class ActionFAQ extends Basic
         // sorting the FAQs
         self::$parameter['order_by'] = (isset(self::$parameter['order_by']) && !empty(self::$parameter['order_by'])) ? strtolower(trim(self::$parameter['order_by'])) : $default_parameter['order_by'];
         self::$parameter['order_direction'] = (isset(self::$parameter['order_direction']) && (strtoupper(trim(self::$parameter['order_direction'])) == 'DESC')) ? 'DESC' : $default_parameter['order_direction'];
+
         // exists a limit?
         self::$parameter['content_limit'] = (isset(self::$parameter['content_limit']) && is_numeric(self::$parameter['content_limit'])) ? intval(self::$parameter['content_limit']) : $default_parameter['content_limit'];
+
+        // expose content items?
+        self::$parameter['content_exposed'] = (isset(self::$parameter['content_exposed'])) ? intval(self::$parameter['content_exposed']) : $default_parameter['content_exposed'];
+        if (!in_array(self::$parameter['content_exposed'], array(0,1,2,3,4,6,12))) {
+            self::$parameter['content_exposed'] = 2;
+            $this->setAlert('Please check the parameter content_exposed, allowed values are only 0,1,2,3,4,6 or 12!', array(), self::ALERT_TYPE_WARNING);
+        }
 
         // status for the contents specified?
         if (isset(self::$parameter['content_status']) && !empty(self::$parameter['content_status'])) {
