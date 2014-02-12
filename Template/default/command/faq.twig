@@ -81,7 +81,11 @@
                     </div>
                   {% endif %}
                 {% elseif parameter.content_view == 'content' %}
-                  {{ faq.content }}
+                  {% if config.kitcommand.content.kitcommand.enabled %}  
+                    {{ kitCommandParser(faq.content) }}
+                  {% else %}
+                    {{ faq.content }}
+                  {% endif %}
                 {% endif %}
                 
                 {% if parameter.content_author %}
