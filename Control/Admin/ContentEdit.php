@@ -279,11 +279,25 @@ class ContentEdit extends Admin
                                         self::ALERT_TYPE_WARNING);
                                     $checked = false;
                                 }
-                                $data[$name] = implode($separator, $keywords);
+                                $data[$name] = implode(($separator == 'comma') ? ', ' : ' ', $keywords);
                             }
                         }
                         else {
-                            $data[$name] = !is_null($content[$name]) ? $content[$name] : '';
+                            if (($property['separator'] == 'comma') && strpos($content[$name], ',')) {
+                                // proper separate the keywords
+                                $explode = explode(',', $content[$name]);
+                                $keywords = array();
+                                foreach ($explode as $item) {
+                                    $keyword = strtolower(trim($item));
+                                    if (!empty($keyword)) {
+                                        $keywords[] = $keyword;
+                                    }
+                                }
+                                $data[$name] = implode(', ', $keywords);
+                            }
+                            else {
+                                $data[$name] = !is_null($content[$name]) ? $content[$name] : '';
+                            }
                         }
                         break;
                     case 'permalink':
