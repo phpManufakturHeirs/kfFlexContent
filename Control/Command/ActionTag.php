@@ -157,6 +157,16 @@ class ActionTag extends Basic
         self::$parameter['content_id'] = isset(self::$parameter['content_id']) ? self::$parameter['content_id'] : -1;
         self::$parameter['category_id'] = isset(self::$parameter['category_id']) ? self::$parameter['category_id'] : -1;
 
+        // limit for the content items
+        self::$parameter['content_limit'] = (isset(self::$parameter['content_limit'])) ? intval(self::$parameter['content_limit']) : $default_parameter['content_limit'];
+
+        // expose content items?
+        self::$parameter['content_exposed'] = (isset(self::$parameter['content_exposed'])) ? intval(self::$parameter['content_exposed']) : $default_parameter['content_exposed'];
+        if (!in_array(self::$parameter['content_exposed'], array(0,1,2,3,4,6,12))) {
+            self::$parameter['content_exposed'] = 2;
+            $this->setAlert('Please check the parameter content_exposed, allowed values are only 0,1,2,3,4,6 or 12!', array(), self::ALERT_TYPE_WARNING);
+        }
+
         // check wether to use the flexcontent.css or not (only needed if self::$parameter['use_iframe'] == false)
         self::$parameter['load_css'] = (isset(self::$parameter['load_css']) && ((self::$parameter['load_css'] == 0) || (strtolower(self::$parameter['load_css']) == 'false'))) ? false : $default_parameter['load_css'];
 
