@@ -728,4 +728,31 @@ EOD;
         }
         return (!empty($list)) ? $list : false;
     }
+
+    public function SelectContentLinkList($language=null, $status=array('PUBLISHED','BREAKING','HIDDEN','ARCHIVED'))
+    {
+        try {
+            $content = self::$table_name;
+            $in_status = "('".implode("','", $status)."')";
+
+            if (is_null($language)) {
+                $SQL = "SELECT * FROM `$content` WHERE `status` IN $in_status ORDER BY `title` ASC";
+            }
+            else {
+                $SQL = "SELECT * FROM `$content` WHERE `language`='$language' AND `status` IN $in_status ORDER BY `title` ASC";
+            }
+            $results = $this->app['db']->fetchAll($SQL);
+            $list = array();
+            foreach ($results as $result) {
+                $item = array();
+                foreach ($result as $key => $value) {
+                    $item[$key] = (is_string($value)) ? $this->app['utils']->unsanitizeText($value) : $value;
+                }
+                $list[] = $item;
+            }
+            return (!empty($list)) ? $list : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
 }
