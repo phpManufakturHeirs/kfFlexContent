@@ -141,7 +141,7 @@ class cmsSearch
                         'success' => true,
                         'page' => array(
                             'title' => $title,
-                            'url' => $permanent_link_base_url.'/category/'.$category_info['category_permalink'].$highlight
+                            'url' => $permanent_link_base_url.'/category/'.$category_info['category_permalink']
                         ),
                         'image_link' => $image_link
                     );
@@ -171,7 +171,7 @@ class cmsSearch
                                 'keywords' => $content['keywords'],
                                 'modified_when' => strtotime($content['timestamp']),
                                 'modified_by' => $user_account['user_id'],
-                                'url' => $permanent_link_base_url.'/'.$content['permalink'].$highlight
+                                'url' => $permanent_link_base_url.'/'.$content['permalink']
                             ),
                             'image_link' => $image_link
                         );
@@ -214,7 +214,7 @@ class cmsSearch
                             'success' => true,
                             'page' => array(
                                 'title' => $title,
-                                'url' => $permanent_link_base_url.'/tag/'.$tag['tag_permalink'].$highlight
+                                'url' => $permanent_link_base_url.'/tag/'.$tag['tag_permalink']
                             ),
                             'image_link' => $image_link
                         );
