@@ -44,6 +44,8 @@ class PermanentLink
     protected static $tag_id = null;
     protected static $rss_channel_id = null;
 
+    protected static $ignore_parameters = array('searchresult','sstring','pid');
+
     /**
      * Initialize the class
      *
@@ -219,9 +221,8 @@ class PermanentLink
         }
 
         $gets = $this->app['request']->query->all();
-        $ignore = array('searchresult','sstring');
         foreach ($gets as $key => $value) {
-            if (!key_exists($key, $parameter) && !in_array($key, $ignore)) {
+            if (!key_exists($key, $parameter) && !in_array($key, self::$ignore_parameters)) {
                 // pass all other parameters to the target page
                 $parameter[$key] = $value;
             }
@@ -325,9 +326,8 @@ class PermanentLink
         }
 
         $gets = $this->app['request']->query->all();
-        $ignore = array('searchresult','sstring');
         foreach ($gets as $key => $value) {
-            if (!key_exists($key, $parameter) && !in_array($key, $ignore)) {
+            if (!key_exists($key, $parameter) && !in_array($key, self::$ignore_parameters)) {
                 // pass all other parameters to the target page
                 $parameter[$key] = $value;
             }
@@ -422,9 +422,8 @@ class PermanentLink
         }
 
         $gets = $this->app['request']->query->all();
-        $ignore = array('searchresult','sstring');
         foreach ($gets as $key => $value) {
-            if (!key_exists($key, $parameter) && !in_array($key, $ignore)) {
+            if (!key_exists($key, $parameter) && !in_array($key, self::$ignore_parameters)) {
                 // pass all other parameters to the target page
                 $parameter[$key] = $value;
             }
