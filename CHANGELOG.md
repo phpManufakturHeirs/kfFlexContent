@@ -6,6 +6,14 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.22** - 2014-02-12
+
+* introduce parameter `content_exposed` to tell the template how many content items should be shown exposed
+* grant a proper build of the keywords
+* add array with ignore parameters to permanent link handling
+* added support for kitCommands in FAQ lists
+* added missing function `SelectContentLinkList()`
+
 **0.21** - 2014-02-06
 
 * added support for setting canonical links
