@@ -84,6 +84,9 @@
           {% endif %}
           <div class="height-15"></div>
           <input class="form-control btn btn-default" type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/category/image/select?usage={{ usage }}');" value="{{ 'Select category type image'|trans }}" />
+          {% if form.category_image.vars.value|length > 0 %}
+            &nbsp;<a class="form-control btn btn-default" href="#" name="image_remove" role="button" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/category/image/remove/id/{{ form.category_id.vars.value }}?usage={{ usage }}')" title="{{ 'Remove image'|trans }}"><i class="fa fa-trash-o"></i></a>
+          {% endif %}
         </div>
       </div>
       {#{ form_rest(form) }#}

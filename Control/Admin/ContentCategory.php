@@ -522,4 +522,32 @@ class ContentCategory extends Admin
         return $this->renderCategoryTypeForm($form);
     }
 
+    /**
+     * Controller to remove the category image
+     *
+     * @param Application $app
+     * @param integer $category_id
+     */
+    public function ControllerImageRemove(Application $app, $category_id)
+    {
+        $this->initialize($app);
+
+        self::$category_id = $category_id;
+
+        // udate the Category record
+        $data = array(
+            'category_image' => '' // empty field == no image
+        );
+        $this->CategoryTypeData->update(self::$category_id, $data);
+        $this->setAlert('The image was successfull removed.',
+            array(), self::ALERT_TYPE_SUCCESS);
+
+        if (false === ($data = $this->CategoryTypeData->select(self::$category_id))) {
+            $this->setAlert('The Category Type record with the ID %id% does not exists!',
+                array('%id%' => self::$category_id), self::ALERT_TYPE_WARNING);
+        }
+        $form = $this->getCategoryTypeForm($data);
+        return $this->renderCategoryTypeForm($form);
+    }
+
 }

@@ -207,6 +207,8 @@ return array(
         => 'dbGlossary <b>||</b>Markierungen<b>||</b> entfernen',
     'Remove from list'
         => 'Aus der Liste entfernen',
+    'Remove image'
+        => 'Bild entfernen',
 
     'Save'
         => 'Speichern',
@@ -275,6 +277,8 @@ return array(
         => 'Es existieren noch keine flexContent Inhalte, erstellen Sie einen ersten Artikel!',
     'The image %image% was successfull inserted.'
         => 'Das Bild %image% wurde dem Datensatz hinzugefügt.',
+    'The image was successfull removed.'
+        => 'Das Bild wurde entfernt.',
     'The list of RSS Channels for flexContent is empty, please create the first RSS Channel!'
         => 'Es existieren noch keine RSS Kanäle, erstellen Sie den ersten RSS Kanal!',
     'The permalink %permalink% is already in use, please select another one!'

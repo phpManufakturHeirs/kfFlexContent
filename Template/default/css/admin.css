@@ -91,10 +91,15 @@ input[type=checkbox] {
 input#form_delete {
   width: 15px;
 }
+a.form-control.btn.btn-default {
+  width: auto;
+  
+}
 input.btn.btn-default {
   width: auto;
   padding: 0 30px;
 }
+a.form-control.btn.btn-default:hover,
 input.btn.btn-default:hover {
   color: #da251d;
 }

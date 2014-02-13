@@ -129,6 +129,8 @@ $app->post('/flexcontent/editor/edit/image/select',
     'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerImage');
 $app->get('/flexcontent/editor/edit/image/check/id/{content_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerImageCheck');
+$app->post('/flexcontent/editor/edit/image/remove/id/{content_id}',
+    'phpManufaktur\flexContent\Control\Admin\ContentEdit::ControllerImageRemove');
 
 $app->match('/flexcontent/editor/permalink/create',
     'phpManufaktur\flexContent\Control\Admin\PermaLinkResponse::ControllerPermaLink');
@@ -165,6 +167,8 @@ $app->post('/flexcontent/editor/tag/image/select',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerImage');
 $app->get('/flexcontent/editor/tag/image/check/id/{tag_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerImageCheck');
+$app->post('/flexcontent/editor/tag/image/remove/id/{tag_id}',
+    'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerImageRemove');
 
 // category functions
 $app->get('/flexcontent/editor/category/list',
@@ -183,6 +187,8 @@ $app->post('/flexcontent/editor/category/image/select',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerImage');
 $app->get('/flexcontent/editor/category/image/check/id/{category_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerImageCheck');
+$app->post('/flexcontent/editor/category/image/remove/id/{category_id}',
+    'phpManufaktur\flexContent\Control\Admin\ContentCategory::ControllerImageRemove');
 
 // import functions
 $app->get('/flexcontent/editor/import/list',

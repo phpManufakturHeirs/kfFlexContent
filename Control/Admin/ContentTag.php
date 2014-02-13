@@ -470,6 +470,34 @@ class ContentTag extends Admin
     }
 
     /**
+     * Controller to remove a image from the Hashtag description
+     *
+     * @param Application $app
+     * @param integer $tag_id
+     */
+    public function ControllerImageRemove(Application $app, $tag_id)
+    {
+        $this->initialize($app);
+
+        self::$tag_id = $tag_id;
+
+        // udate the flexContent record
+        $data = array(
+            'tag_image' => '' // empty field == no image
+        );
+        $this->TagTypeData->update(self::$tag_id, $data);
+        $this->setAlert('The image was successfull removed.',
+            array(), self::ALERT_TYPE_SUCCESS);
+
+        if (false === ($data = $this->TagTypeData->select(self::$tag_id))) {
+            $this->setAlert('The Tag Type record with the ID %id% does not exists!',
+                array('%id%' => self::$tag_id), self::ALERT_TYPE_WARNING);
+        }
+        $form = $this->getTagTypeForm($data);
+        return $this->renderTagTypeForm($form);
+    }
+
+    /**
      * Controller to show a list with all TAG Types
      *
      * @param Application $app

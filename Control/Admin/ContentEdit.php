@@ -873,4 +873,32 @@ class ContentEdit extends Admin
         $form = $this->getContentForm($data);
         return $this->renderContentForm($form);
     }
+
+    /**
+     * Controller to remove the actual image from the teaser section
+     *
+     * @param Application $app
+     * @param integer $content_id
+     */
+    public function ControllerImageRemove(Application $app, $content_id)
+    {
+        $this->initialize($app);
+
+        self::$content_id = $content_id;
+
+        // udate the flexContent record
+        $data = array(
+            'teaser_image' => '' // empty field == no image
+        );
+        $this->ContentData->update($data, self::$content_id);
+        $this->setAlert('The image was successfull removed.',
+            array(), self::ALERT_TYPE_SUCCESS);
+
+        if (false === ($data = $this->ContentData->select(self::$content_id))) {
+            $this->setAlert('The flexContent record with the ID %id% does not exists!',
+                array('%id%' => self::$content_id), self::ALERT_TYPE_WARNING);
+        }
+        $form = $this->getContentForm($data);
+        return $this->renderContentForm($form);
+    }
 }

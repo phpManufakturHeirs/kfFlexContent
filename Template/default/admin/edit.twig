@@ -120,7 +120,10 @@
             <img class="img-rounded img-responsive" src="{{ FRAMEWORK_URL ~ form.teaser_image.vars.value }}" />
           {% endif %}
           <div class="height-15"></div>
-          <input class="form-control btn btn-default" type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/edit/image/select?usage={{ usage }}');" value="{{ 'Select teaser image'|trans }}" />
+          <input class="form-control btn btn-default" type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/edit/image/select?usage={{ usage }}');" value="{{ 'Select teaser image'|trans }}" title="{{ 'Select teaser image'|trans }}" />
+          {% if form.teaser_image.vars.value|length > 0 %}
+            &nbsp;<a class="form-control btn btn-default" href="#" name="image_remove" role="button" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/edit/image/remove/id/{{ form.content_id.vars.value }}?usage={{ usage }}')" title="{{ 'Remove image'|trans }}"><i class="fa fa-trash-o"></i></a>
+          {% endif %}
         </div>
       </div>
 
