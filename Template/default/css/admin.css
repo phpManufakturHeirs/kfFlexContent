@@ -158,3 +158,8 @@ select#form_secondary_categories {
 .tagedit-list li.tagedit-listelement-old a.tagedit-save {
   border-left: 1px dotted #a9a9a9; /*#7E9DD6;*/ 
 }
+
+.search-content-small {
+  width: 200px;
+  margin-top: -10px;
+}

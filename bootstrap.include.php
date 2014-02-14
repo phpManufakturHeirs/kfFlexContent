@@ -12,7 +12,7 @@
 use phpManufaktur\Basic\Control\CMS\EmbeddedAdministration;
 
 // not really needed but make error control more easy ...
-global $app;
+//global $app;
 
 // grant the ROLE hierarchy for the flexContent ROLES
 $roles = $app['security.role_hierarchy'];
@@ -145,8 +145,8 @@ $app->get('/flexcontent/editor/list',
     'phpManufaktur\flexContent\Control\Admin\ContentList::ControllerList');
 $app->get('/flexcontent/editor/list/page/{page}',
     'phpManufaktur\flexContent\Control\Admin\ContentList::ControllerList');
-$app->post('/flexcontent/editor/search',
-    'phpManufaktur\flexContent\Control\Admin\ContentSearch::ControllerSearch');
+$app->match('/flexcontent/editor/list/search',
+    'phpManufaktur\flexContent\Control\Admin\ContentList::ControllerListSearch');
 
 // #hashtag functions
 $app->get('/flexcontent/editor/tag/autocomplete',

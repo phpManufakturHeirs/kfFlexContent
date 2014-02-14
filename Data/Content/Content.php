@@ -755,4 +755,89 @@ EOD;
             throw new \Exception($e);
         }
     }
+
+    public function SearchContent($search_term, $order_by=array('content_id'), $order_direction='DESC', $status='DELETED', $status_operator='!=')
+    {
+        try {
+            $SQL = "SELECT * FROM `".self::$table_name."` WHERE (";
+            $search = trim($search_term);
+            $search_array = array();
+            if (strpos($search, ' ')) {
+                $dummy = explode(' ', $search_term);
+                foreach ($dummy as $item) {
+                    $search_array[] = trim($item);
+                }
+            }
+            else {
+                $search_array[] = trim($search_term);
+            }
+            $start = true;
+            $skipped = false;
+            foreach ($search_array as $search) {
+                if (!$skipped) {
+                    if ($start) {
+                        $SQL .= "(";
+                        $start = false;
+                    }
+                    elseif (strtoupper($search) == 'AND') {
+                        $SQL .= ") AND (";
+                        $skipped = true;
+                        continue;
+                    }
+                    elseif (strtoupper($search) == 'NOT') {
+                        $SQL .= ") AND NOT (";
+                        $skipped = true;
+                        continue;
+                    }
+                    elseif (strtoupper($search) == 'OR') {
+                        $SQL .= ") OR (";
+                        $skipped = true;
+                        continue;
+                    }
+                    else {
+                        $SQL .= ") OR (";
+                    }
+                }
+                else {
+                    $skipped = false;
+                }
+                $SQL .= "`title` LIKE '%$search%' OR "
+                ."`description` LIKE '%$search%' OR "
+                ."`keywords` LIKE '%$search%' OR "
+                ."`teaser` LIKE '%$search%' OR "
+                ."`content` LIKE '%$search%'";
+            }
+            $SQL .= ")) AND ";
+
+            $in_order_by = "'".implode("','", $order_by)."'";
+
+            $SQL .= "`status` $status_operator '$status'";// ORDER BY $in_order_by $order_direction";
+
+
+            if (is_array($order_by) && !empty($order_by)) {
+                $SQL .= " ORDER BY ";
+                $start = true;
+                foreach ($order_by as $by) {
+                    if (!$start) {
+                        $SQL .= ", ";
+                    }
+                    else {
+                        $start = false;
+                    }
+                    $SQL .= "$by";
+                }
+                $SQL .= " $order_direction";
+            }
+
+            $results = $this->app['db']->fetchAll($SQL);
+
+            $contents = array();
+            foreach ($results as $key => $value) {
+                $contents[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+            }
+            return (!empty($contents)) ? $contents : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
 }

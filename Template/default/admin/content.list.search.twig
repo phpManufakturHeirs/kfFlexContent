@@ -30,8 +30,23 @@
     {% include '@phpManufaktur/flexContent/Template/default/admin/toolbar.twig' %}
     <div class="height-15"></div>
     
+    {% if app.translator.locale == 'de' %}
+      {# german translation #}
+      {% include '@phpManufaktur/Basic/Template/default/pattern/bootstrap/alert.twig' 
+        with {content:'<p>Suchbegriffe die mit einem <i>Leerzeichen</i> oder dem <code>OR</code> Operator verknüpft werden, z.B. <code>berlin mustermann</code> finden Ergebnisse die zu einem <i>beliebigen</i> Begriff passen.</p>' ~
+          '<p>Suchbegriffe die mit einem <code>AND</code> Operator verknüpft werden, z.B. <code>berlin AND mustermann</code> finden Ergebnisse die zu <i>beiden</i> Begriffen passsen.</p>' ~
+          '<p>Suchbegriffe die mit einem <code>NOT</code> Operator verknüpft werden, z.B. <code>berlin NOT mustermann</code> finden Ergebnisse die zum ersten jedoch <i>nicht</i> zum zweiten Begriff passen.</p>'
+        } only %}
+    {% else %}
+      {# english translation #}
+      {% include '@phpManufaktur/Basic/Template/default/pattern/bootstrap/alert.twig' 
+        with {content:'<p>Search terms joined with a <i>space</i> or the <code>OR</code> operator, i.e. <code>berlin mustermann</code> will return search results which fit to <i>any</i> of the terms.</p>' ~
+          '<p>Search terms joined with a <code>AND</code> operator, i.e. <code>berlin AND mustermann</code> will return search results which fit to <i>both</i> terms.</p>' ~
+          '<p>Search terms joined with a <code>NOT</code> operator, i.e. <code>berlin NOT mustermann</code> will return search results which fit to the first but <i>not</i> to the second term.</p>'
+        } only %}
+    {% endif %}
+
     {{ alert }}
-    
     
     <div>
       <a class="btn btn-default" role="button" href="{{ FRAMEWORK_URL ~ route.create }}">{{ 'Create a new article'|trans }}</a>
@@ -46,22 +61,7 @@
     </div>  
     <div class="height-15"></div>
     
-    {% if contents|length < 1 %}
-      {% include '@phpManufaktur/Basic/Template/default/pattern/bootstrap/alert.twig' 
-        with {content:'The flexContent list is empty, please create your first content!'|trans} only %}
-    {% else %}      
-      {#
-        The pagination serve a automatic 1 2 3 ... 17 18 19 pagination and
-        navigation for the table if it contain more rows than specified in:
-        /flexContent/Template/default/backend/list.json
-        Changes here must be also done at the footer of the table !!!
-       #}
-      {% include '@phpManufaktur/flexContent/Template/default/admin/pagination.twig' with {
-         currentPage: current_page,
-         paginationPath: FRAMEWORK_URL ~ route.pagination|replace({'{order}':order_by|join(','), '{direction}':order_direction}),
-         lastPage: last_page,
-         showAlwaysFirstAndLast: true
-      } only %}
+    {% if contents|length > 0 %}
       <div class="table-responsive">  
         <table class="table table-striped table-condensed table-hover">
           <thead>
@@ -91,7 +91,7 @@
                     {% elseif 'active desc' in head_class %}
                       <i class="fa fa-sort-alpha-desc"></i>&nbsp;
                     {% endif %}
-                    <a href="{{ FRAMEWORK_URL ~ route.pagination|replace({'{page}':current_page, '{order}':head, '{direction}':head_order}) }}" title="{% if head_order == 'asc' %}{{ 'Click to sort column ascending'|trans }}{% else %}{{ 'Click to sort column descending'|trans }}{% endif %}">{{ head|humanize|trans }}</a>
+                    <a href="{{ FRAMEWORK_URL ~ route.order|replace({'{order}':head, '{direction}':head_order}) }}" title="{% if head_order == 'asc' %}{{ 'Click to sort column ascending'|trans }}{% else %}{{ 'Click to sort column descending'|trans }}{% endif %}">{{ head|humanize|trans }}</a>
                   </th>
                 {% endif %}
               {% endfor %}
@@ -128,15 +128,6 @@
           </tbody>
         </table>
       </div>  
-      {#
-        See top of the table for more information!
-       #}
-      {% include '@phpManufaktur/flexContent/Template/default/admin/pagination.twig' with {
-        currentPage: current_page,
-        paginationPath: FRAMEWORK_URL ~ route.pagination|replace({'{order}':order_by|join(','), '{direction}':order_direction}),
-        lastPage: last_page,
-        showAlwaysFirstAndLast: true
-      } only %}    
     {% endif %}
   </div>
 {% endblock content %}

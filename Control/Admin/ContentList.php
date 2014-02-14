@@ -62,7 +62,7 @@ class ContentList extends Admin
         self::$route =  array(
             'pagination' => '/flexcontent/editor/list/page/{page}?order={order}&direction={direction}&usage='.self::$usage,
             'edit' => '/flexcontent/editor/edit/id/{content_id}?usage='.self::$usage,
-            'search' => '/flexcontent/editor/search?usage='.self::$usage,
+            'search' => '/flexcontent/editor/list/search?usage='.self::$usage,
             'create' => '/flexcontent/editor/edit?usage='.self::$usage
         );
     }
@@ -142,6 +142,49 @@ class ContentList extends Admin
                 'order_direction' => strtolower($order_direction),
                 'last_page' => self::$max_pages,
                 'ellipsis' => self::$ellipsis
+            ));
+    }
+
+    public function ControllerListSearch(Application $app)
+    {
+        $this->initialize($app);
+
+        $order_by = explode(',', $app['request']->get('order', implode(',', self::$order_by)));
+        $order_direction = $app['request']->get('direction', self::$order_direction);
+
+        if (null == ($search = $this->app['request']->get('search'))) {
+            $contents = array();
+            $this->setAlert('Please specify a search term!', array(), self::ALERT_TYPE_WARNING);
+        }
+        else {
+            if (false === ($contents = $this->ContentData->SearchContent($search, $order_by, $order_direction))) {
+                $contents = array();
+                $this->setAlert('No hits for the search term <i>%search%</i>!',
+                    array('%search%' => $search), self::ALERT_TYPE_WARNING);
+            }
+            else {
+                $this->setAlert('%count% hits for the search term </i>%search%</i>.',
+                    array('%count%' => count($contents), '%search%' => $search), self::ALERT_TYPE_SUCCESS);
+            }
+        }
+
+        self::$route['order'] = '/flexcontent/editor/list/search?search='.urlencode($search).'&order={order}&direction={direction}&usage='.self::$usage;
+
+        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+            '@phpManufaktur/flexContent/Template', 'admin/content.list.search.twig'),
+            array(
+                'usage' => self::$usage,
+                'toolbar' => $this->getToolbar('list'),
+                'alert' => $this->getAlert(),
+                'contents' => $contents,
+                'columns' => self::$columns,
+                'current_page' => self::$current_page,
+                'route' => self::$route,
+                'order_by' => $order_by,
+                'order_direction' => strtolower($order_direction),
+                'last_page' => self::$max_pages,
+                'ellipsis' => self::$ellipsis,
+                'search' => $search
             ));
     }
 }
