@@ -17,7 +17,7 @@ use Silex\Application;
 class About extends Admin {
 
     /**
-     * Show the about dialog for Event
+     * Show the about dialog for flexContent
      *
      * @return string rendered dialog
      */
