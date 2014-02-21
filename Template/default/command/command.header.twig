@@ -16,34 +16,59 @@
       else {
         var jq = document.createElement('script');
         jq.setAttribute('type', 'text/javascript');
-        jq.setAttribute('src', '{{ LIBRARY_URL ~ '/bootstrap/3.0.3/js/bootstrap.min.js'}}');
+        jq.setAttribute('src', '{{ LIBRARY_URL ~ '/bootstrap/3.1.0/js/bootstrap.min.js'}}');
         document.getElementsByTagName('head')[0].appendChild(jq);
       }
 
-      var css = document.createElement('link');
-      css.setAttribute('rel', 'stylesheet');
-      css.setAttribute('type', 'text/css');
-      css.setAttribute('media', 'all');
-      css.setAttribute('href', '{{ LIBRARY_URL ~ '/bootstrap/3.0.3/css/bootstrap.min.css' }}');
-      document.getElementsByTagName('head')[0].appendChild(css);
+      function getBasename(url) {
+        var fileName = url.substring(url.lastIndexOf('/') + 1);
+        var dot = fileName.lastIndexOf('.');
+        return dot === -1 ? fileName : fileName.substring(0, dot);
+      }
+      
+      function cssAlreadyLoaded(css_url) {
+        var styleSheets = document.styleSheets;
+        var cssFile = getBasename(css_url);
+        for (var i = 0, max = styleSheets.length; i < max; i++) {
+          var sheetURL = styleSheets[i].href;
+          var basename = getBasename(sheetURL);
+          if ((sheetURL === css_url) || (basename === cssFile)) {
+            return true;
+          }
+        }
+        return false;
+      }
+      
+      if (!cssAlreadyLoaded('{{ LIBRARY_URL ~ '/bootstrap/3.1.0/css/bootstrap.min.css' }}')) {
+        var css = document.createElement('link');
+        css.setAttribute('rel', 'stylesheet');
+        css.setAttribute('type', 'text/css');
+        css.setAttribute('media', 'all');
+        css.setAttribute('href', '{{ LIBRARY_URL ~ '/bootstrap/3.1.0/css/bootstrap.min.css' }}');
+        document.getElementsByTagName('head')[0].appendChild(css);
+      }
 
-      var css = document.createElement('link');
-      css.setAttribute('rel', 'stylesheet');
-      css.setAttribute('type', 'text/css');
-      css.setAttribute('media', 'all');
-      css.setAttribute('href', '{{ LIBRARY_URL ~ '/font-awesome/4.0.3/css/font-awesome.min.css' }}');
-      document.getElementsByTagName('head')[0].appendChild(css);
+      if (!cssAlreadyLoaded('{{ LIBRARY_URL ~ '/font-awesome/4.0.3/css/font-awesome.min.css' }}')) {  
+        var css = document.createElement('link');
+        css.setAttribute('rel', 'stylesheet');
+        css.setAttribute('type', 'text/css');
+        css.setAttribute('media', 'all');
+        css.setAttribute('href', '{{ LIBRARY_URL ~ '/font-awesome/4.0.3/css/font-awesome.min.css' }}');
+        document.getElementsByTagName('head')[0].appendChild(css);
+      }
 
-      var css = document.createElement('link');
-      css.setAttribute('rel', 'stylesheet');
-      css.setAttribute('type', 'text/css');
-      css.setAttribute('media', 'all');
-      {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.min.css') %}
-        css.setAttribute('href', '{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.min.css' }}');
-      {% else %}
-        css.setAttribute('href', '{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/flexcontent.min.css' }}');
-      {% endif %}
-      document.getElementsByTagName('head')[0].appendChild(css);
+      if (!cssAlreadyLoaded('{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/flexcontent.min.css' }}'))  {
+        var css = document.createElement('link');
+        css.setAttribute('rel', 'stylesheet');
+        css.setAttribute('type', 'text/css');
+        css.setAttribute('media', 'all');
+        {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.min.css') %}
+          css.setAttribute('href', '{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/flexcontent.min.css' }}');
+        {% else %}
+          css.setAttribute('href', '{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/flexcontent.min.css' }}');
+        {% endif %}
+        document.getElementsByTagName('head')[0].appendChild(css);
+      }
     })();
   </script>
 {% endif %}
