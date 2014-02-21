@@ -212,7 +212,7 @@ class Configuration
             ),
             'admin' => array(
                 'import' => array(
-                    'enabled' => true,
+                    'enabled' => false,
                     'timelimit' => 60,
                     'data' => array(
                         'handling' => 'CLEAN_UP',
