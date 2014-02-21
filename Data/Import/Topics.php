@@ -188,4 +188,24 @@ class Topics
             throw new \Exception($e);
         }
     }
+
+    /**
+     * Check if the short or long content of a TOPICS article contains a
+     * flexContent kitCommand
+     *
+     * @param integer $topic_id
+     * @throws \Exception
+     * @return boolean
+     */
+    public function checkTopicIDforFlexContentCommand($topic_id)
+    {
+        try {
+            $SQL = "SELECT `topic_id` FROM `".CMS_TABLE_PREFIX."mod_topics` WHERE `topic_id`='$topic_id' ".
+                "AND (`content_long` LIKE '%~~ flexcontent %' OR `content_short` LIKE '%~~ flexcontent %')";
+            $check_id = $this->app['db']->fetchColumn($SQL);
+            return ($check_id === $topic_id);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
 }

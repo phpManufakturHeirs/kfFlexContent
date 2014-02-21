@@ -171,4 +171,23 @@ class WYSIWYG
         $extension = $this->PagesData->getPageExtension();
         return $directory.$link.$extension;
     }
+
+    /**
+     * Check if the page with the given PAGE_ID contain a flexContent kitCommand
+     *
+     * @param integer $page_id
+     * @throws \Exception
+     * @return boolean
+     */
+    public function checkPageIDforFlexContentCommand($page_id)
+    {
+        try {
+            $wysiwyg = CMS_TABLE_PREFIX.'mod_wysiwyg';
+            $SQL = "SELECT `page_id` FROM $wysiwyg WHERE `page_id`='$page_id' AND `content` LIKE '%~~ flexcontent %'";
+            $check_id = $this->app['db']->fetchColumn($SQL);
+            return ($check_id === $page_id);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
 }

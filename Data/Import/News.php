@@ -173,4 +173,24 @@ class News
             throw new \Exception($e);
         }
     }
+
+    /**
+     * Check if the short or long content of a News article contains a
+     * flexContent kitCommand
+     *
+     * @param integer $post_id
+     * @throws \Exception
+     * @return boolean
+     */
+    public function checkNewsIDforFlexContentCommand($post_id)
+    {
+        try {
+            $SQL = "SELECT `post_id` FROM `".CMS_TABLE_PREFIX."mod_news_posts` WHERE `post_id`=$post_id ".
+                "AND (`content_long` LIKE '%~~ flexcontent %' OR `content_short` LIKE '%~~ flexcontent %')";
+            $check_id = $this->app['db']->fetchColumn($SQL);
+            return ($check_id === $post_id);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
 }

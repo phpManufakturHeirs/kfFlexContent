@@ -406,6 +406,70 @@ EOD;
         $this->checkWYSIWYGpages($language);
         $this->checkNewsPosts($language);
         $this->checkTopicsPosts($language);
+
+        $this->checkWYSIWYGpagesForFlexContentCommand($language);
+        $this->checkNewsPostsForFlexContentCommand($language);
+        $this->checkTopicsForFlexContentCommand($language);
+    }
+
+    /**
+     * Check PENDING WYSIWYG pages for a flexContent kitCommand and set them
+     * to status IGNORE
+     *
+     * @param string $language
+     */
+    protected function checkWYSIWYGpagesForFlexContentCommand($language)
+    {
+         $pages = $this->selectWYSIWYGimportControlList($language, 'PENDING');
+         foreach ($pages as $page) {
+             if ($this->WYSIWYG->checkPageIDforFlexContentCommand($page['identifier_id'])) {
+                 // this WYSIWYG page contain a flexContent kitCommand ...
+                 $data = array(
+                     'import_status' => 'IGNORE'
+                 );
+                 $this->update($page['import_id'], $data);
+             }
+         }
+    }
+
+    /**
+     * Check PENDING POSTs for a flexContent kitCommand and set then to
+     * status IGNORE
+     *
+     * @param string $language
+     */
+    protected function checkNewsPostsForFlexContentCommand($language)
+    {
+        $posts = $this->selectNewsImportControlList($language, 'PENDING');
+        foreach ($posts as $post) {
+            if ($this->NEWS->checkNewsIDforFlexContentCommand($post['identifier_id'])) {
+                // this POST contain a flexContent kitCommand ...
+                $data = array(
+                    'import_status' => 'IGNORE'
+                );
+                $this->update($post['import_id'], $data);
+            }
+        }
+    }
+
+    /**
+     * Check PENDING TOPICS for a flexContent kitCommand and set then to
+     * status IGNORE
+     *
+     * @param string $language
+     */
+    protected function checkTopicsForFlexContentCommand($language)
+    {
+        $topics = $this->selectTopicsImportControlList($language, 'PENDING');
+        foreach ($topics as $topic) {
+            if ($this->TOPICS->checkTopicIDforFlexContentCommand($topic['identifier_id'])) {
+                // this TOPIC contain a flexContent kitCommand ...
+                $data = array(
+                    'import_status' => 'IGNORE'
+                );
+                $this->update($topic['import_id'], $data);
+            }
+        }
     }
 
     /**
