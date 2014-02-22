@@ -39,6 +39,13 @@
     <div class="height-15"></div>
 
     {{ alert }}
+    
+    {% if (form.content_id.vars.value > 0) and (form.primary_category.vars.value > 0) and (form.check_kitcommand.vars.value == 0) %}
+      {% include '@phpManufaktur/Basic/Template/default/pattern/bootstrap/alert.twig' 
+        with {content:'In the target URL <strong>%target_url%</strong> for the category <strong>%category_name%</strong> is the kitCommand <strong>~~ flexContent action[category] category_id[%category_id%] ~~</strong> needed!'|trans(
+        {'%category_id%':form.primary_category.vars.value, '%target_url%':form.primary_category_target_url.vars.value, '%category_name%':form.primary_category_name.vars.value}),
+        'type':'alert-warning'} only %}
+    {% endif %}
 
     <form id="content_edit" method="post" {{ form_enctype(form) }} role="form">
       {{ form_errors(form) }}
@@ -46,6 +53,9 @@
       {{ form_row(form.content_id) }}
       {{ form_row(form.language) }}
       {{ form_row(form.permalink_url) }}
+      {{ form_row(form.check_kitcommand) }}
+      {{ form_row(form.primary_category_target_url) }}
+      {{ form_row(form.primary_category_name) }}
 
       <div class="row">
         <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
@@ -56,7 +66,15 @@
                 <label>{{ 'Content ID'|trans }}</label>
                 <div>
                 {% if form.content_id.vars.value > 0 %}
-                  {{ '%05d'|format(form.content_id.vars.value) }}
+                  {{ '%05d'|format(form.content_id.vars.value) }}&nbsp;
+                  {% if form.check_kitcommand.vars.value == 1 %}
+                    {% set kitcommand = '~~ flexContent action[view] content_id[' ~ form.content_id.vars.value ~ '] ~~' %}
+                    {% set purpose = 'Show this content as single article'|trans %} 
+                  {% else %}
+                    {% set kitcommand = '~~ flexContent action[category] category_id[' ~ form.primary_category.vars.value ~ '] ~~' %}
+                    {% set purpose = 'Show the contents of the category'|trans %}
+                  {% endif %}    
+                  <a id="copycommand" class="btn btn-default" role="button" href="#" data-clipboard-text="{{ kitcommand }}" title="{{ 'Copy the kitCommand %command% to clipboard. Purpose: %purpose%.'|trans({'%command%':kitcommand, '%purpose%':purpose}) }}">~~</a>
                 {% else %}
                   {{ '- new entry -'|trans }}
                 {% endif %}
@@ -241,6 +259,7 @@
   {% endif %}
   <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/tagedit/1.5.1/js/jquery.autoGrowInput.js"></script>
   <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/tagedit/1.5.1/js/jquery.tagedit.js"></script>
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/zeroclipboard/1.3.2/ZeroClipboard.min.js"></script>
 {% endblock footer_jquery %}
 
 {% block footer %}
@@ -320,6 +339,13 @@
           timeFormat: "HH:mm",
           stepHour: 1,
           stepMinute: 5
+        });
+        
+        // ZeroClipboad
+        ZeroClipboard.config({ moviePath: '{{ LIBRARY_URL }}/jquery/zeroclipboard/1.3.2/ZeroClipboard.swf' });
+        var client = new ZeroClipboard(document.getElementById('copycommand'));
+        client.on('complete', function(client, args){
+          alert("{{ 'Copied kitCommand to clipboard:'|trans }}"+" "+ args.text);
         });
       });
     }

@@ -16,6 +16,7 @@ use phpManufaktur\Basic\Data\CMS\Page;
 use phpManufaktur\flexContent\Data\Content\CategoryType as CategoryTypeData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use phpManufaktur\flexContent\Data\Import\WYSIWYG;
 
 class ContentCategory extends Admin
 {
@@ -23,6 +24,7 @@ class ContentCategory extends Admin
     protected static $category_id = null;
     protected $CategoryTypeData = null;
     protected $CMSPage = null;
+    protected $WYSIWYG = null;
 
     protected static $route = null;
     protected static $columns = null;
@@ -43,6 +45,8 @@ class ContentCategory extends Admin
 
         $this->CategoryTypeData = new CategoryTypeData($app);
         $this->CMSPage = new Page($app);
+        $this->WYSIWYG = new WYSIWYG($app);
+
         self::$category_id = -1;
 
         try {
@@ -137,7 +141,20 @@ class ContentCategory extends Admin
         $language = (isset($data['language'])) ? $data['language'] : self::$language;
         $permalink_url = CMS_URL.str_ireplace('{language}', strtolower($language), self::$config['content']['permalink']['directory']).'/category/';
 
+        $check_kitcommand = false;
+        if (isset($data['category_id']) && ($data['category_id'] > 0) &&
+            isset($data['target_url']) && !empty($data['target_url'])) {
+            // check if the flexContent kitCommand exists at the target
+            $link = basename($data['target_url'], $this->CMSPage->getPageExtension());
+            if (false !== ($page_id = $this->CMSPage->getPageIDbyPageLink('/'.$link))) {
+                $check_kitcommand = $this->WYSIWYG->checkPageIDforFlexContentCommand($page_id);
+            }
+        }
+
         $form = $this->app['form.factory']->createBuilder('form')
+        ->add('check_kitcommand', 'hidden', array(
+            'data' => $check_kitcommand
+        ))
         ->add('category_id', 'hidden', array(
             'data' => isset($data['category_id']) ? $data['category_id'] : -1
         ))
@@ -185,6 +202,7 @@ class ContentCategory extends Admin
      */
     protected function renderCategoryTypeForm($form)
     {
+
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'admin/category.type.edit.twig'),
             array(

@@ -20,6 +20,8 @@ use phpManufaktur\flexContent\Data\Content\Tag;
 use phpManufaktur\flexContent\Data\Content\TagType;
 use phpManufaktur\flexContent\Data\Content\Category;
 use phpManufaktur\flexContent\Data\Content\CategoryType;
+use phpManufaktur\flexContent\Data\Import\WYSIWYG;
+use phpManufaktur\Basic\Data\CMS\Page;
 
 class ContentEdit extends Admin
 {
@@ -29,6 +31,9 @@ class ContentEdit extends Admin
     protected $TagTypeData = null;
     protected $CategoryTypeData = null;
     protected $CategoryData = null;
+    protected $WYSIWYG = null;
+    protected $CMSPage = null;
+
     protected static $language = null;
 
     /**
@@ -45,6 +50,8 @@ class ContentEdit extends Admin
         $this->TagTypeData = new TagType($app);
         $this->CategoryData = new Category($app);
         $this->CategoryTypeData = new CategoryType($app);
+        $this->WYSIWYG = new WYSIWYG($app);
+        $this->CMSPage = new Page($app);
 
         self::$language = $this->app['request']->get('form[language]', self::$config['content']['language']['default'], true);
     }
@@ -105,7 +112,34 @@ class ContentEdit extends Admin
         // show the permalink URL
         $permalink_url = CMS_URL.str_ireplace('{language}', strtolower(self::$language), self::$config['content']['permalink']['directory']).'/';
 
+        $check_kitcommand = 0;
+        $category_target_url = '';
+        $category_name = '';
+        if (isset($data['content_id']) && ($data['content_id'] > 0) && !is_null($primary_category)) {
+            // get the target_url from the primary category
+            if (false !== ($category = $this->CategoryTypeData->select($primary_category))) {
+                if (!empty($category['target_url'])) {
+                    // check if the flexContent kitCommand exists at the target
+                    $link = basename($category['target_url'], $this->CMSPage->getPageExtension());
+                    if (false !== ($page_id = $this->CMSPage->getPageIDbyPageLink('/'.$link))) {
+                        $check_kitcommand = (int) $this->WYSIWYG->checkPageIDforFlexContentCommand($page_id);
+                        $category_target_url = $category['target_url'];
+                        $category_name = $category['category_name'];
+                    }
+                }
+            }
+        }
+
         $form = $this->app['form.factory']->createBuilder('form')
+        ->add('check_kitcommand', 'hidden', array(
+            'data' => $check_kitcommand
+        ))
+        ->add('primary_category_target_url', 'hidden', array(
+            'data' => $category_target_url
+        ))
+        ->add('primary_category_name', 'hidden', array(
+            'data' => $category_name
+        ))
         ->add('content_id', 'hidden', array(
             'data' => isset($data['content_id']) ? $data['content_id'] : -1
         ))

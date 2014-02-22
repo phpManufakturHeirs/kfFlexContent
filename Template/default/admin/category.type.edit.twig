@@ -36,15 +36,35 @@
 
     {{ alert }}
 
+    {% if (form.category_id.vars.value > 0) and (form.check_kitcommand.vars.value == 0) %}
+      {% include '@phpManufaktur/Basic/Template/default/pattern/bootstrap/alert.twig' 
+        with {content:'In the target URL <strong>%target_url%</strong> for the category <strong>%category_name%</strong> is the kitCommand <strong>~~ flexContent action[category] category_id[%category_id%] ~~</strong> needed!'|trans(
+        {'%category_id%':form.category_id.vars.value, '%target_url%':form.target_url.vars.value, '%category_name%':form.category_name.vars.value}),
+        'type':'alert-warning'} only %}
+    {% endif %}
+    
     <form id="category_edit" method="post" {{ form_enctype(form) }} role="form">
       {{ form_errors(form) }}
       {{ form_row(form._token) }}
       {{ form_row(form.category_id) }}
       {{ form_row(form.language) }}
+      {{ form_row(form.check_kitcommand) }}
 
       <div class="row">
         <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
           {# form contents at the left column #}
+          <div class="form-group">
+            <label>{{ 'Category ID'|trans }}</label>
+            <div>
+            {% if form.category_id.vars.value > 0 %}
+              {{ '%05d'|format(form.category_id.vars.value) }}&nbsp;
+              {% set kitcommand = '~~ flexContent action[category] category_id[' ~ form.category_id.vars.value ~ '] ~~' %}
+              <a id="copycommand" class="btn btn-default" role="button" href="#" data-clipboard-text="{{ kitcommand }}" title="{{ 'Copy the kitCommand %command% to clipboard'|trans({'%command%':kitcommand}) }}">~~</a>              
+            {% else %}
+              {{ '- new entry -'|trans }}
+            {% endif %}
+            </div>
+          </div>
           <div class="form-group">
             {{ form_label(form.category_name) }}
             {{ form_widget(form.category_name, {'attr':{'class':'form-control input-sm'}}) }}
@@ -85,7 +105,7 @@
           <div class="height-15"></div>
           <input class="form-control btn btn-default" type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/category/image/select?usage={{ usage }}');" value="{{ 'Select category type image'|trans }}" />
           {% if form.category_image.vars.value|length > 0 %}
-            &nbsp;<a class="form-control btn btn-default" href="#" name="image_remove" role="button" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/category/image/remove/id/{{ form.category_id.vars.value }}?usage={{ usage }}')" title="{{ 'Remove image'|trans }}"><i class="fa fa-trash-o"></i></a>
+            &nbsp;<a class="form-control btn btn-default" href="#" name="image_remove" role="button" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/category/image/remove/id/{{ form.category_id.vars.value }}?usage={{ usage }}');" title="{{ 'Remove image'|trans }}"><i class="fa fa-trash-o"></i></a>
           {% endif %}
         </div>
       </div>
@@ -94,7 +114,13 @@
   </div>
 {% endblock content %}
 
+{% block footer_jquery %}
+  {{ parent() }}
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/zeroclipboard/1.3.2/ZeroClipboard.min.js"></script>  
+{% endblock footer_jquery %}
+    
 {% block footer %}
+  {% set iframe_add_height = 100 %}
   {{ parent() }}
   <script type="text/javascript">
     if (typeof 'jQuery' !== 'undefined') {
@@ -132,6 +158,13 @@
               }
             });
           }
+        });
+        
+        // ZeroClipboad
+        ZeroClipboard.config({ moviePath: '{{ LIBRARY_URL }}/jquery/zeroclipboard/1.3.2/ZeroClipboard.swf' });
+        var client = new ZeroClipboard(document.getElementById('copycommand'));
+        client.on('complete', function(client, args){
+          alert("{{ 'Copied kitCommand to clipboard:'|trans }}"+" "+ args.text);
         });
       });
     }
