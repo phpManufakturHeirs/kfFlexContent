@@ -68,6 +68,8 @@ return array(
         => 'ID',
     'Content categories'
         => 'Inhalte',
+    'Copy the kitCommand %command% to clipboard. Purpose: %purpose%.'
+        => 'Das kitCommand %command% in die Zwischenablage kopieren. Verwendungszweck: %purpose%.',
     'Create a new article'
         => 'Einen neuen Artikel erstellen',
     'Create a new RSS Channel'
@@ -136,6 +138,8 @@ return array(
         => 'Übernehmen Sie WYSIWYG oder Blog Artikel in flexContent',
     'IMPORTED'
         => 'Importiert',
+    'In the target URL <strong>%target_url%</strong> for the category <strong>%category_name%</strong> is the kitCommand <strong>~~ flexContent action[category] category_id[%category_id%] ~~</strong> needed!'
+        => 'In der Ziel URL <strong>%target_url%</strong> für die Kategorie <strong>%category_name%</strong> wird das kitCommand <strong>~~ flexContent action[category] category_id[%category_id%] ~~</strong> benötigt, bitte einfügen!',
     'Information about the flexContent extension'
         => 'Information über die flexContent Erweiterung',
 
@@ -222,6 +226,10 @@ return array(
         => 'Bild auswählen',
     'Select the categories which are assigned to this RSS Channel'
         => 'Wählen Sie die Kategorien aus, die diesem RSS Kanal zugeordnet werden sollen.',
+    'Show the contents of the category'
+        => 'Die Artikel der Kategorie anzeigen',
+    'Show this content as single article'
+        => 'Diesen Inhalt als einzelnen Artikel anzeigen',
     'Successfull created a new flexContent record with the ID %id%.'
         => 'Es wurde ein neuer flexContent Datensatz mit der ID %id% angelegt.',
     'Successfull create the new category type %category%.'
