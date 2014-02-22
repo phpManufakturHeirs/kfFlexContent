@@ -607,15 +607,17 @@ EOD;
                 "LIMIT $limit";
             $results = $this->app['db']->fetchAll($SQL);
             $contents = array();
-            foreach ($results as $result) {
-                $content = array();
-                foreach ($result as $key => $value) {
-                    $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
-                    if (($key == 'content') || ($key == 'teaser')) {
-                        $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
+            if (is_array($results)) {
+                foreach ($results as $result) {
+                    $content = array();
+                    foreach ($result as $key => $value) {
+                        $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                        if (($key == 'content') || ($key == 'teaser')) {
+                            $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
+                        }
                     }
+                    $contents[] = $content;
                 }
-                $contents[] = $content;
             }
             return (!empty($contents)) ? $contents : false;
         } catch (\Doctrine\DBAL\DBALException $e) {

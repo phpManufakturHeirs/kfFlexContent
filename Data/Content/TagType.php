@@ -185,8 +185,10 @@ EOD;
             $SQL = "SELECT * FROM `".self::$table_name."` WHERE `tag_id`='$tag_id'";
             $result = $this->app['db']->fetchAssoc($SQL);
             $tag = array();
-            foreach ($result as $key => $value) {
-                $tag[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : '';
+            if (is_array($result)) {
+                foreach ($result as $key => $value) {
+                    $tag[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : '';
+                }
             }
             return (!empty($tag)) ? $tag : false;
         } catch (\Doctrine\DBAL\DBALException $e) {

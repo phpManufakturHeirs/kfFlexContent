@@ -88,7 +88,7 @@ class ActionTag extends Basic
      */
     protected function showTagID()
     {
-        if (false === ($tag_type = $this->TagTypeData->select(self::$parameter['tag_id']))) {
+        if (false == ($tag_type = $this->TagTypeData->select(self::$parameter['tag_id']))) {
             $this->setAlert('The Tag with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!',
                 array('%id%' => self::$parameter['tag_id'], '%language%' => self::$language),
                 self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
@@ -98,7 +98,7 @@ class ActionTag extends Basic
         // replace #hashtags
         $this->Tools->linkTags($tag_type['tag_description'], self::$language);
 
-        if (false === ($contents = $this->ContentData->selectContentsByTagID(self::$parameter['tag_id'],
+        if (false == ($contents = $this->ContentData->selectContentsByTagID(self::$parameter['tag_id'],
             self::$parameter['content_status'], self::$parameter['content_limit']))) {
             $this->setAlert('The tag %tag_name% does not contain any active contents',
                 array('%tag_name%' => $tag_type['tag_name']), self::ALERT_TYPE_WARNING,
@@ -106,10 +106,11 @@ class ActionTag extends Basic
         }
 
         for ($i=0; $i < sizeof($contents); $i++) {
-            $contents[$i]['categories'] = $this->CategoryData->selectCategoriesByContentID($contents[$i]['content_id']);
-            $contents[$i]['tags'] = $this->TagData->selectTagArrayForContentID($contents[$i]['content_id']);
+            if (isset($contents[$i]['content_id'])) {
+                $contents[$i]['categories'] = $this->CategoryData->selectCategoriesByContentID($contents[$i]['content_id']);
+                $contents[$i]['tags'] = $this->TagData->selectTagArrayForContentID($contents[$i]['content_id']);
+            }
         }
-
 
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'command/tag.twig',
