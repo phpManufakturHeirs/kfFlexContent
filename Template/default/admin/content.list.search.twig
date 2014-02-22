@@ -48,16 +48,21 @@
 
     {{ alert }}
     
-    <div>
-      <a class="btn btn-default" role="button" href="{{ FRAMEWORK_URL ~ route.create }}">{{ 'Create a new article'|trans }}</a>
-      <form action="{{ FRAMEWORK_URL ~ route.search }}" class="navbar-form navbar-left pull-right" role="form" method="post">
-        <div class="input-group search-content-small">
-          <input class="form-control input-default" type="text" name="search" />
-          <span class="input-group-btn">
-            <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
-          </span>
-        </div>
-      </form>
+    <div class="row">
+      <div class="col-md-4">
+        <a class="btn btn-default" role="button" href="{{ FRAMEWORK_URL ~ route.create }}">{{ 'Create a new article'|trans }}</a>
+      </div>
+      <div class="col-md-4"></div>
+      <div class="col-md-4 text-right">
+        <form action="{{ FRAMEWORK_URL ~ route.search }}" class="search-box" role="form" method="post">
+          <div class="input-group search-content">
+            <input class="form-control input-default" type="text" name="search" />
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+            </span>
+          </div>
+        </form>
+      </div>
     </div>  
     <div class="height-15"></div>
     
