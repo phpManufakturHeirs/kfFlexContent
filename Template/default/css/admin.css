@@ -159,7 +159,10 @@ select#form_secondary_categories {
   border-left: 1px dotted #a9a9a9; /*#7E9DD6;*/ 
 }
 
-.search-content-small {
+form.search-box {
   width: 200px;
-  margin-top: -10px;
+  float: right;
+}
+.search-content {
+  width: 200px;
 }

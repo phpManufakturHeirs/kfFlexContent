@@ -85,5 +85,25 @@
       "repository":"kfFlexContent"
     },
     "url":"https:\/\/github.com\/phpManufaktur\/kfFlexContent"
+  },
+  "wiki": {
+    "en": {
+      "url":"https:\/\/github.com/phpManufaktur\/kfFlexContent\/wiki"
+    }
+  },
+  "firststeps": {
+    "de": {
+      "url":"https:\/\/kit2.phpmanufaktur.de\/de\/flexcontent\/firststeps"
+    }
+  },
+  "issues": {
+    "en": {
+      "url":"https:\/\/github.com/phpManufaktur\/kfFlexContent\/issues"
+    }
+  },
+  "support": {
+    "en": {
+      "url":"https:\/\/support.phpmanufaktur.de"
+    }
   }
 }
