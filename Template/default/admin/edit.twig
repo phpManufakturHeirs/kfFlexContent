@@ -19,6 +19,8 @@
 {% block jquery %}
   {# most jQuery files are loaded at the end of file in block footer_jquery! #}
   <script type="text/javascript" src="{{ MANUFAKTUR_URL }}/CKEditor/Source/ckeditor.js"></script>
+    <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/zeroclipboard/1.3.2/ZeroClipboard.min.js"></script>
+
 {% endblock jquery %}
 {% block stylesheet %}
   <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/jquery/ui/1.10.3/themes/smoothness/jquery-ui.min.css" media="screen, projection" />
@@ -69,12 +71,10 @@
                   {{ '%05d'|format(form.content_id.vars.value) }}&nbsp;
                   {% if form.check_kitcommand.vars.value == 1 %}
                     {% set kitcommand = '~~ flexContent action[view] content_id[' ~ form.content_id.vars.value ~ '] ~~' %}
-                    {% set purpose = 'Show this content as single article'|trans %} 
                   {% else %}
                     {% set kitcommand = '~~ flexContent action[category] category_id[' ~ form.primary_category.vars.value ~ '] ~~' %}
-                    {% set purpose = 'Show the contents of the category'|trans %}
                   {% endif %}    
-                  <a id="copycommand" class="btn btn-default" role="button" href="#" data-clipboard-text="{{ kitcommand }}" title="{{ 'Copy the kitCommand %command% to clipboard. Purpose: %purpose%.'|trans({'%command%':kitcommand, '%purpose%':purpose}) }}">~~</a>
+                  <a id="copycommand" class="btn btn-default" role="button" href="#" data-clipboard-text="{{ kitcommand }}">~~</a>
                 {% else %}
                   {{ '- new entry -'|trans }}
                 {% endif %}
@@ -250,16 +250,17 @@
 {% endblock content %}
 
  {% block footer_jquery %}
-  {{ parent() }}
-  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/ui/1.10.3/ui/minified/jquery-ui.min.js"></script>
-  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/ui/1.10.3/ui/minified//i18n/jquery-ui-i18n.min.js"></script>
+  {#{ parent() }#}
+  <script src="{{ LIBRARY_URL }}/jquery/jquery/1.11.0/jquery.min.js"></script>
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/ui/1.10.4/ui/minified/jquery-ui.min.js"></script>
+  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/ui/1.10.4/ui/minified//i18n/jquery-ui-i18n.min.js"></script>
+  <script src="{{ LIBRARY_URL }}/bootstrap/3.1.0/js/bootstrap.min.js"></script>  
   <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/timepicker/1.4.3/jquery-ui-timepicker-addon.min.js"></script>
   {% if app.translator.locale == 'de' %}
     <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/timepicker/1.4.3/i18n/jquery-ui-timepicker-de.js"></script>
   {% endif %}
   <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/tagedit/1.5.1/js/jquery.autoGrowInput.js"></script>
   <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/tagedit/1.5.1/js/jquery.tagedit.js"></script>
-  <script type="text/javascript" src="{{ LIBRARY_URL }}/jquery/zeroclipboard/1.3.2/ZeroClipboard.min.js"></script>
 {% endblock footer_jquery %}
 
 {% block footer %}
@@ -341,11 +342,31 @@
           stepMinute: 5
         });
         
+        
+        $('#global-zeroclipboard-html-bridge').tooltip();
+        
         // ZeroClipboad
         ZeroClipboard.config({ moviePath: '{{ LIBRARY_URL }}/jquery/zeroclipboard/1.3.2/ZeroClipboard.swf' });
-        var client = new ZeroClipboard(document.getElementById('copycommand'));
-        client.on('complete', function(client, args){
+        var clip = new ZeroClipboard(document.getElementById('copycommand'));
+        clip.on('complete', function(client, args){
           alert("{{ 'Copied kitCommand to clipboard:'|trans }}"+" "+ args.text);
+        });
+        
+        clip.on('load', function(client) {
+          {% if form.check_kitcommand.vars.value == 1 %}
+            {% set kitcommand = '~~ flexContent action[view] content_id[' ~ form.content_id.vars.value ~ '] ~~' %}
+            {% set purpose = 'Show this content as single article'|trans %} 
+          {% else %}
+            {% set kitcommand = '~~ flexContent action[category] category_id[' ~ form.primary_category.vars.value ~ '] ~~' %}
+            {% set purpose = 'Show the contents of the category'|trans %}
+          {% endif %}    
+          $('#global-zeroclipboard-html-bridge').attr({
+            'data-toggle':'tooltip',
+            'data-title': '{{ 'Copy the complete kitCommand<br /><code>%command%</code><br />to clipboard. Purpose:<br />%purpose%.'|trans({'%command%':kitcommand, '%purpose%':purpose}) }}',
+            'data-placement': 'bottom',
+            'data-html': true
+          });
+          $('#global-zeroclipboard-html-bridge').tooltip('show');
         });
       });
     }

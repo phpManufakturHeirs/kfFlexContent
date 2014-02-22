@@ -68,8 +68,8 @@ return array(
         => 'ID',
     'Content categories'
         => 'Inhalte',
-    'Copy the kitCommand %command% to clipboard. Purpose: %purpose%.'
-        => 'Das kitCommand %command% in die Zwischenablage kopieren. Verwendungszweck: %purpose%.',
+    'Copy the complete kitCommand<br /><code>%command%</code><br />to clipboard. Purpose:<br />%purpose%.'
+        => 'Das vollständige kitCommand<br /><code>%command%</code><br />in die Zwischenablage kopieren. Verwendungszweck:<br />%purpose%.',
     'Create a new article'
         => 'Einen neuen Artikel erstellen',
     'Create a new RSS Channel'
@@ -226,8 +226,14 @@ return array(
         => 'Bild auswählen',
     'Select the categories which are assigned to this RSS Channel'
         => 'Wählen Sie die Kategorien aus, die diesem RSS Kanal zugeordnet werden sollen.',
+    'Show the actual articles in a overview'
+        => 'Die aktuellen Artikel in einer Übersicht anzeigen',
     'Show the contents of the category'
         => 'Die Artikel der Kategorie anzeigen',
+    'Show the description of the category and all assigned articles'
+        => 'Die Beschreibung der Kategorie und alle zugeordneten Artikel anzeigen',
+    'Show the description of the hashtag and all assigned articles'
+        => 'Die Beschreibung des Hashtag und alle zugeordneten Artikel anzeigen',
     'Show this content as single article'
         => 'Diesen Inhalt als einzelnen Artikel anzeigen',
     'Successfull created a new flexContent record with the ID %id%.'
