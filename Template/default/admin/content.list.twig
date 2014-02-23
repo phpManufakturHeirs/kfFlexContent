@@ -38,8 +38,7 @@
         {% set kitcommand = '~~ flexContent action[list] ~~' %}
         <a id="copycommand" class="btn btn-default" role="button" href="#" data-clipboard-text="{{ kitcommand }}">~~</a>
       </div>
-      <div class="col-md-4">
-        
+      <div class="col-md-4">     
       </div>
       <div class="col-md-4 text-right">
         <form action="{{ FRAMEWORK_URL ~ route.search }}" class="search-box" role="form" method="post">
@@ -82,25 +81,29 @@
               {% set order_by_str = order_by|join(',') %}
               {% for head in contents.0|keys %}
                 {% if head in columns %}
-                  {% set head_order = order_direction %}
-                  {% set head_class = head %}
-                  {% if (head == order_by_str) %}
-                    {% if (head_order == 'asc') %}
-                      {% set head_order = 'desc' %}
-                      {% set head_class = head_class ~ ' active asc' %}
-                    {% else %}
-                      {% set head_order = 'asc' %}
-                      {% set head_class = head_class ~ ' active desc' %}
+                  {% if not config.content.language.select and head == 'language' %}
+                    {# don't show the language column if language select is disabled! #}
+                  {% else %}
+                    {% set head_order = order_direction %}
+                    {% set head_class = head %}
+                    {% if (head == order_by_str) %}
+                      {% if (head_order == 'asc') %}
+                        {% set head_order = 'desc' %}
+                        {% set head_class = head_class ~ ' active asc' %}
+                      {% else %}
+                        {% set head_order = 'asc' %}
+                        {% set head_class = head_class ~ ' active desc' %}
+                      {% endif %}
                     {% endif %}
+                    <th class="{{ head_class }}">
+                      {% if 'active asc' in head_class %}
+                        <i class="fa fa-sort-alpha-asc"></i>&nbsp;
+                      {% elseif 'active desc' in head_class %}
+                        <i class="fa fa-sort-alpha-desc"></i>&nbsp;
+                      {% endif %}
+                      <a href="{{ FRAMEWORK_URL ~ route.pagination|replace({'{page}':current_page, '{order}':head, '{direction}':head_order}) }}" title="{% if head_order == 'asc' %}{{ 'Click to sort column ascending'|trans }}{% else %}{{ 'Click to sort column descending'|trans }}{% endif %}">{{ head|humanize|trans }}</a>
+                    </th>
                   {% endif %}
-                  <th class="{{ head_class }}">
-                    {% if 'active asc' in head_class %}
-                      <i class="fa fa-sort-alpha-asc"></i>&nbsp;
-                    {% elseif 'active desc' in head_class %}
-                      <i class="fa fa-sort-alpha-desc"></i>&nbsp;
-                    {% endif %}
-                    <a href="{{ FRAMEWORK_URL ~ route.pagination|replace({'{page}':current_page, '{order}':head, '{direction}':head_order}) }}" title="{% if head_order == 'asc' %}{{ 'Click to sort column ascending'|trans }}{% else %}{{ 'Click to sort column descending'|trans }}{% endif %}">{{ head|humanize|trans }}</a>
-                  </th>
                 {% endif %}
               {% endfor %}
             </tr>
@@ -110,24 +113,28 @@
               <tr>
                 {% for column, value in content %}
                   {% if column in columns %}
-                    {% if column == 'content_id' %}
-                      <td class="{{ column }}">
-                        <a href="{{ FRAMEWORK_URL ~ route.edit|replace({'{content_id}':value}) }}">{{ '%05d'|format(value) }}</a>
-                      </td>
-                    {% elseif column == 'title' %}
-                      <td class="{{ column }}">
-                        <a href="{{ FRAMEWORK_URL ~ route.edit|replace({'{content_id}':content.content_id}) }}">{{ value }}</a>
-                      </td>
-                    {% elseif (column == 'description') %}
-                      <td class="{{ column }}">{{ value|striptags|ellipsis(ellipsis) }}</td>
-                    {% elseif ((column == 'publish_from') or (column == 'breaking_to') or (column == 'archive_from')) %}
-                      {# formatting date and time #}
-                      <td class="{{ column }}">{{ value|date('DATETIME_FORMAT'|trans) }}</td>
-                    {% elseif (column == 'status') %}
-                      {# translate this column value #}
-                      <td class="{{ column }}">{{ value|trans }}</td>
+                    {% if not config.content.language.select and column == 'language' %}
+                      {# don't show the language column if language select is disabled! #}
                     {% else %}
-                      <td class="{{ column }}">{{ value }}</td>
+                      {% if column == 'content_id' %}
+                        <td class="{{ column }}">
+                          <a href="{{ FRAMEWORK_URL ~ route.edit|replace({'{content_id}':value}) }}">{{ '%05d'|format(value) }}</a>
+                        </td>
+                      {% elseif column == 'title' %}
+                        <td class="{{ column }}">
+                          <a href="{{ FRAMEWORK_URL ~ route.edit|replace({'{content_id}':content.content_id}) }}">{{ value }}</a>
+                        </td>
+                      {% elseif (column == 'description') %}
+                        <td class="{{ column }}">{{ value|striptags|ellipsis(ellipsis) }}</td>
+                      {% elseif ((column == 'publish_from') or (column == 'breaking_to') or (column == 'archive_from')) %}
+                        {# formatting date and time #}
+                        <td class="{{ column }}">{{ value|date('DATETIME_FORMAT'|trans) }}</td>
+                      {% elseif (column == 'status') %}
+                        {# translate this column value #}
+                        <td class="{{ column }}">{{ value|trans }}</td>
+                      {% else %}
+                        <td class="{{ column }}">{{ value }}</td>
+                      {% endif %}
                     {% endif %}
                   {% endif %}
                 {% endfor %}
