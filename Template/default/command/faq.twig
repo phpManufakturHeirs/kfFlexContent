@@ -27,7 +27,7 @@
     <h{{ parameter.title_level|default('1') }}>{{ category.category_name|default('') }}</h{{ parameter.title_level|default('1') }}>
   {% endif %}
 {% endif %}
-<div class="flexcontent-container">
+<div id="flexcontent">
   <div class="container">
     {{ basic.alert }}
     {% if faqs|length > 0 %}

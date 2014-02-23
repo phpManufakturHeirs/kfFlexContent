@@ -8,59 +8,69 @@
   @license MIT License (MIT) http://www.opensource.org/licenses/MIT
 */
 
-.flexcontent-container .container {
+#flexcontent .container {
   margin: 0;
   padding: 0;
   height: auto;
   width: auto;
+  color: #363636;
+  background-color: transparent;
 }
 
-.content-tags {
+#flexcontent .thumbnail {
+  background-color: rgba(255,255,255,0.6) !important;
+}
+
+#flexcontent .btn-default.disabled {
+  background-color: transparent;
+}
+
+#flexcontent .content-tags {
   margin: 10px 0 10px 0;
   width: auto;
   height: auto;
   line-break:loose;
 }
-.content-date {
+#flexcontent .content-date {
   margin: 0 0 5px 0;
   padding: 0;
   text-align: right;
   color: #999;
   font-size: smaller;
 }
-.content-rating {
+#flexcontent .content-rating {
   margin: 10px 0 10px 0;
   padding: 0;
   text-align: right;
 }
-.header-categories {
+#flexcontent .header-categories {
   margin: 0;
   padding: 0;
 }
-.content-categories {
+#flexcontent .content-categories {
   margin: 5px 0 0 0;
   padding: 0;
 }
-.content-categories .label,
-.header-categories .label,
-.content-tags .label {
+#flexcontent .content-categories .label,
+#flexcontent .header-categories .label,
+#flexcontent .content-tags .label {
   margin-top: 5px;
   margin-right: 5px;
   display: inline-block;
 }
-.go-ahead {
+#flexcontent .go-ahead {
   margin: 0 0 10px 0;
   text-align: right;
   font-size: smaller;
 }
-.media {
+#flexcontent .media {
   margin-bottom: 20px;
 }
-.tag.invalid {
+#flexcontent .tag.invalid {
   color: #ff6633;
   font-weight: bold;
 }
-.tag.unassigned {
+#flexcontent .tag.unassigned {
   color: #9966ff;
   font-weight: bold;
 }
