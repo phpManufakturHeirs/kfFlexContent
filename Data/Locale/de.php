@@ -42,6 +42,8 @@ return array(
         => 'Kategorie',
     'Category description'
         => 'Beschreibung',
+    'Category ID'
+        => 'Kategorie ID',
     'Category name'
         => 'Kategorie',
     'Category id'
@@ -95,6 +97,8 @@ return array(
         => 'Datenbearbeitung',
     'DE'
         => 'Deutsch',
+    'DEFAULT'
+        => 'Standard',
     'delete this category type'
         => 'diese Kategorie löschen',
     'delete this tag type'
@@ -108,6 +112,12 @@ return array(
         => 'Englisch',
     'English'
         => 'Englisch',
+    'EVENT'
+        => 'Veranstaltung',
+    'Event location'
+        => 'Veranstaltungsort',
+    'Event organizer'
+        => 'Veranstalter',
     'Execute the import'
         => 'Import durchführen',
 
@@ -281,6 +291,8 @@ return array(
         => 'Die Kategorie mit der <strong>ID %id%</strong> existiert nicht für die Sprache <strong>%language%</strong>!',
     'The Channel Link %channel_link% is already in use by the RSS Channel record %id%, please select another one!'
         => 'Der RSS Kanal Link %channel_link% wird bereits von dem RSS Kanal mit der ID %id% verwendet, bitte wählen Sie einen anderen!',
+    'The date and time for the event where set automatically, you must check them!'
+        => 'Datum und Uhrzeit für die Veranstaltung wurden automatisch gesetzt, Sie müssen die Angaben prüfen!',
     'The description should have a length between %minimum% and %maximum% characters (actual: %length%).'
         => 'Die Beschreibung sollte eine Länge zwischen %minimum% und %maximum% Zeichen haben, zur Zeit sind es %length% Zeichen.',
     'The flexContent record with the ID %id% does not exists!'

@@ -18,6 +18,12 @@ use phpManufaktur\flexContent\Data\Content\TagType;
 use phpManufaktur\flexContent\Data\Content\Tag;
 use phpManufaktur\flexContent\Data\Content\CategoryType;
 use phpManufaktur\flexContent\Data\Content\Category;
+use phpManufaktur\flexContent\Data\Content\RSSChannel;
+use phpManufaktur\flexContent\Data\Content\RSSChannelCounter;
+use phpManufaktur\flexContent\Data\Content\RSSChannelStatistic;
+use phpManufaktur\flexContent\Data\Content\RSSViewCounter;
+use phpManufaktur\flexContent\Data\Content\RSSViewStatistic;
+use phpManufaktur\flexContent\Data\Content\Event;
 
 class Uninstall
 {
@@ -46,6 +52,22 @@ class Uninstall
             // drop the category table
             $Category = new Category($app);
             $Category->dropTable();
+
+            // drop the RSS Channel tables
+            $RSSChannel = new RSSChannel($app);
+            $RSSChannel->dropTable();
+            $RSSChannelCounter = new RSSChannelCounter($app);
+            $RSSChannelCounter->dropTable();
+            $RSSChannelStatistic = new RSSChannelStatistic($app);
+            $RSSChannelStatistic->dropTable();
+            $RSSViewCounter = new RSSViewCounter($app);
+            $RSSViewCounter->dropTable();
+            $RSSViewStatistic = new RSSViewStatistic($app);
+            $RSSViewStatistic->dropTable();
+
+            // drop the event extension
+            $Event = new Event($app);
+            $Event->dropTable();
 
             // uninstall kit_framework_flexcontent from the CMS
             $admin_tool = new UninstallAdminTool($app);

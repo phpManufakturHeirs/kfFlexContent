@@ -22,6 +22,7 @@ use phpManufaktur\flexContent\Data\Content\Category;
 use phpManufaktur\flexContent\Data\Content\CategoryType;
 use phpManufaktur\flexContent\Data\Import\WYSIWYG;
 use phpManufaktur\Basic\Data\CMS\Page;
+use phpManufaktur\flexContent\Data\Content\Event;
 
 class ContentEdit extends Admin
 {
@@ -33,6 +34,7 @@ class ContentEdit extends Admin
     protected $CategoryData = null;
     protected $WYSIWYG = null;
     protected $CMSPage = null;
+    protected $EventData = null;
 
     protected static $language = null;
 
@@ -52,6 +54,7 @@ class ContentEdit extends Admin
         $this->CategoryTypeData = new CategoryType($app);
         $this->WYSIWYG = new WYSIWYG($app);
         $this->CMSPage = new Page($app);
+        $this->EventData = new Event($app);
 
         self::$language = $this->app['request']->get('form[language]', self::$config['content']['language']['default'], true);
     }
@@ -130,6 +133,9 @@ class ContentEdit extends Admin
             }
         }
 
+        // category type
+        $category_type = !is_null($primary_category) ? $this->CategoryTypeData->selectType($primary_category) : 'DEFAULT';
+
         $form = $this->app['form.factory']->createBuilder('form')
         ->add('check_kitcommand', 'hidden', array(
             'data' => $check_kitcommand
@@ -140,6 +146,16 @@ class ContentEdit extends Admin
         ->add('primary_category_name', 'hidden', array(
             'data' => $category_name
         ))
+        ->add('category_type', 'hidden', array(
+            'data' => $category_type
+        ))
+
+        // add empty fields for the optional category type EVENT
+        ->add('event_date_from', 'hidden')
+        ->add('event_date_to', 'hidden')
+        ->add('event_organizer', 'hidden')
+        ->add('event_location', 'hidden')
+
         ->add('content_id', 'hidden', array(
             'data' => isset($data['content_id']) ? $data['content_id'] : -1
         ))
@@ -228,8 +244,65 @@ class ContentEdit extends Admin
             'multiple' => true,
             'data' => $secondary_categories
         ))
-
         ;
+
+        if ($category_type == 'EVENT') {
+            // additional fields for the handling of EVENTS
+
+            $form->remove('event_date_from');
+            $form->remove('event_date_to');
+            $form->remove('event_organizer');
+            $form->remove('event_location');
+
+            if (!isset($data['event_date_from']) || ($data['event_date_from'] == '0000-00-00 00:00:00')) {
+                $dt = Carbon::createFromFormat('Y-m-d H:i:s', $publish_from);
+                $dt->startOfDay();
+                $event_date_from = $dt->toDateTimeString();
+            }
+            else {
+                $event_date_from = $data['event_date_from'];
+            }
+            if (!isset($data['event_date_to']) || ($data['event_date_to'] == '0000-00-00 00:00:00')) {
+                $dt = Carbon::createFromFormat('Y-m-d H:i:s', $publish_from);
+                $dt->endOfDay();
+                $event_date_to = $dt->toDateTimeString();
+            }
+            else {
+                $event_date_to = $data['event_date_to'];
+            }
+
+            $form->add('event_date_from', 'text', array(
+                'required' => self::$config['content']['field']['event_date_from']['required'],
+                'data' => date($this->app['translator']->trans('DATETIME_FORMAT'), strtotime($event_date_from))
+            ));
+
+            $form->add('event_date_to', 'text', array(
+                'required' => self::$config['content']['field']['event_date_to']['required'],
+                'data' => date($this->app['translator']->trans('DATETIME_FORMAT'), strtotime($event_date_to))
+            ));
+
+            $form->add('event_organizer', 'choice', array(
+                'choices' => $this->app['contact']->selectContactIdentifiersForSelect(
+                    !self::$config['content']['field']['event_organizer']['required'],
+                    self::$config['content']['field']['event_organizer']['tags']),
+                'empty_value' => self::$config['content']['field']['event_organizer']['required'] ? '- please select -' : null,
+                'expanded' => false,
+                'required' => self::$config['content']['field']['event_organizer']['required'],
+                'data' => isset($data['event_organizer']) ? $data['event_organizer'] : -1
+            ));
+
+            $form->add('event_location', 'choice', array(
+                'choices' => $this->app['contact']->selectContactIdentifiersForSelect(
+                    !self::$config['content']['field']['event_location']['required'],
+                    self::$config['content']['field']['event_location']['tags']),
+                'empty_value' => '- please select -',
+                'expanded' => false,
+                'required' => self::$config['content']['field']['event_location']['required'],
+                'data' => isset($data['event_location']) ? $data['event_location'] : -1
+            ));
+
+        }
+
         return $form->getForm();
     }
 
@@ -241,6 +314,8 @@ class ContentEdit extends Admin
      */
     protected function checkContentForm(&$data=array())
     {
+        $request = $this->app['request']->get('form');
+
         // get the form
         $form = $this->getContentForm();
         // get the requested data
@@ -253,6 +328,9 @@ class ContentEdit extends Admin
 
             self::$content_id = $content['content_id'];
             $data['content_id'] = self::$content_id;
+
+            // only for event data
+            $event = array();
 
             $checked = true;
 
@@ -424,6 +502,59 @@ class ContentEdit extends Admin
                         $dt = Carbon::createFromFormat($this->app['translator']->trans('DATETIME_FORMAT'), $content[$name]);
                         $data[$name] = $dt->toDateTimeString();
                         break;
+                    case 'event_date_from':
+                        if (!isset($data['publish_from'])) {
+                            // problem: publish_from must defined first!
+                            $this->setAlert("Problem: '%first%' must be defined before '%second%', please check the configuration file!",
+                                array('%first%' => 'publish_from', '%second%' => 'event_date_from'), self::ALERT_TYPE_DANGER);
+                            $checked = false;
+                            break;
+                        }
+                        if (isset($content[$name])) {
+                            // check only if the field isset
+                            if (empty($content[$name])) {
+                                // if field is empty create date/time as configured
+                                $dt = Carbon::createFromFormat('Y-m-d H:i:s', $data['publish_from']);
+                                $dt->startOfDay();
+                                $content[$name] = date($this->app['translator']->trans('DATETIME_FORMAT'), $dt->getTimestamp());
+                                $this->setAlert('The date and time for the event where set automatically, you must check them!');
+                            }
+                            // convert the date/time string
+                            $dt = Carbon::createFromFormat($this->app['translator']->trans('DATETIME_FORMAT'), $content[$name]);
+                            $data[$name] = $dt->toDateTimeString();
+                            $event[$name] = $data[$name];
+                        }
+                        break;
+                    case 'event_date_to':
+                        if (!isset($data['publish_from'])) {
+                            // problem: publish_from must defined first!
+                            $this->setAlert("Problem: '%first%' must be defined before '%second%', please check the configuration file!",
+                                array('%first%' => 'publish_from', '%second%' => 'event_date_to'), self::ALERT_TYPE_DANGER);
+                            $checked = false;
+                            break;
+                        }
+                        if (isset($content[$name])) {
+                            // check only if the field isset
+                            if (empty($content[$name])) {
+                                // if field is empty create date/time as configured
+                                $dt = Carbon::createFromFormat('Y-m-d H:i:s', $data['publish_from']);
+                                $dt->endOfDay();
+                                $content[$name] = date($this->app['translator']->trans('DATETIME_FORMAT'), $dt->getTimestamp());
+                            }
+                            // convert the date/time string
+                            $dt = Carbon::createFromFormat($this->app['translator']->trans('DATETIME_FORMAT'), $content[$name]);
+                            $data[$name] = $dt->toDateTimeString();
+                            $event[$name] = $data[$name];
+                        }
+                        break;
+                    case 'event_organizer':
+                    case 'event_location':
+                        if (isset($content[$name])) {
+                            // check only if the field isset
+                            $data[$name] = $content[$name];
+                            $event[$name] = $data[$name];
+                        }
+                        break;
                     case 'teaser':
                     case 'content':
                         if ($property['required'] && empty($content[$name])) {
@@ -473,12 +604,20 @@ class ContentEdit extends Admin
 
             if ($checked) {
                 // add update information
-                $data['update_username'] = $this->app['account']->getUsername();
+
+                $record = $data;
+
+                foreach ($event as $key => $value) {
+                    // remove event field from the content fields
+                    unset($record[$key]);
+                }
+
+                $record['update_username'] = $this->app['account']->getUsername();
 
                 if (self::$content_id < 1) {
                     // insert a new record
-                    $data['author_username'] = $this->app['account']->getUsername();
-                    $this->ContentData->insert($data, self::$content_id);
+                    $record['author_username'] = $this->app['account']->getUsername();
+                    $this->ContentData->insert($record, self::$content_id);
                     $this->setAlert('Successfull created a new flexContent record with the ID %id%.',
                         array('%id%' => self::$content_id), self::ALERT_TYPE_SUCCESS);
                     // important: set the content_id also in the $data array!
@@ -486,7 +625,7 @@ class ContentEdit extends Admin
                 }
                 else {
                     // update an existing record
-                    $this->ContentData->update($data, self::$content_id);
+                    $this->ContentData->update($record, self::$content_id);
                     $this->setAlert('Succesfull updated the flexContent record with the ID %id%',
                         array('%id%' => self::$content_id), self::ALERT_TYPE_SUCCESS);
                 }
@@ -496,6 +635,22 @@ class ContentEdit extends Admin
 
                 // check the TAGs
                 $this->checkContentTags();
+
+                if (!empty($event)) {
+                    // this is an event ...
+                    $event['language'] = $data['language'];
+
+                    if (!$this->EventData->existsContentID(self::$content_id)) {
+                        // insert a new event record
+                        $event['content_id'] = self::$content_id;
+                        $this->EventData->insert($event);
+                    }
+                    else {
+                        // update existing event record
+                        $this->EventData->updateContentID(self::$content_id, $event);
+                    }
+                }
+
                 return true;
             }
         }
@@ -812,6 +967,16 @@ class ContentEdit extends Admin
             $this->setAlert('The flexContent record with the ID %id% does not exists!',
                 array('%id%' => self::$content_id), self::ALERT_TYPE_WARNING);
         }
+        if ((self::$content_id > 0) &&
+            (false !== ($primary_category_id = $this->CategoryData->selectPrimaryCategoryIDbyContentID(self::$content_id))) &&
+            ('EVENT' == $this->CategoryTypeData->selectType($primary_category_id))) {
+            // add the event data
+            if (false !== ($event = $this->EventData->selectContentID(self::$content_id))) {
+                foreach ($event as $key => $value) {
+                    $data[$key] = $value;
+                }
+            }
+        }
 
         $form = $this->getContentForm($data);
         return $this->renderContentForm($form);
@@ -834,6 +999,16 @@ class ContentEdit extends Admin
         if ((self::$content_id > 0) && (false === ($data = $this->ContentData->select(self::$content_id)))) {
             $this->setAlert('The flexContent record with the ID %id% does not exists!',
                 array('%id%' => self::$content_id), self::ALERT_TYPE_WARNING);
+        }
+        if ((self::$content_id > 0) &&
+        (false !== ($primary_category_id = $this->CategoryData->selectPrimaryCategoryIDbyContentID(self::$content_id))) &&
+        ('EVENT' == $this->CategoryTypeData->selectType($primary_category_id))) {
+            // add the event data
+            if (false !== ($event = $this->EventData->selectContentID(self::$content_id))) {
+                foreach ($event as $key => $value) {
+                    $data[$key] = $value;
+                }
+            }
         }
 
         // get the form

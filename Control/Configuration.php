@@ -156,6 +156,20 @@ class Configuration
                     ),
                     'rss' => array(
                         'required' => false
+                    ),
+                    'event_date_from' => array(
+                        'required' => true
+                    ),
+                    'event_date_to' => array(
+                        'required' => true
+                    ),
+                    'event_organizer' => array(
+                        'required' => false,
+                        'tags' => array()
+                    ),
+                    'event_location' => array(
+                        'required' => false,
+                        'tags' => array()
                     )
                 ),
                 'permalink' => array(

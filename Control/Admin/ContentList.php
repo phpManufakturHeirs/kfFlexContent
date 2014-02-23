@@ -141,7 +141,8 @@ class ContentList extends Admin
                 'order_by' => $order_by,
                 'order_direction' => strtolower($order_direction),
                 'last_page' => self::$max_pages,
-                'ellipsis' => self::$ellipsis
+                'ellipsis' => self::$ellipsis,
+                'config' => self::$config
             ));
     }
 
@@ -184,7 +185,8 @@ class ContentList extends Admin
                 'order_direction' => strtolower($order_direction),
                 'last_page' => self::$max_pages,
                 'ellipsis' => self::$ellipsis,
-                'search' => $search
+                'search' => $search,
+                'config' => self::$config
             ));
     }
 }

@@ -18,6 +18,7 @@ use phpManufaktur\flexContent\Data\Content\RSSChannelCounter;
 use phpManufaktur\flexContent\Data\Content\RSSChannelStatistic;
 use phpManufaktur\flexContent\Data\Content\RSSViewCounter;
 use phpManufaktur\flexContent\Data\Content\RSSViewStatistic;
+use phpManufaktur\flexContent\Data\Content\Event;
 
 class Update
 {
@@ -32,7 +33,8 @@ class Update
     {
         if (!$this->app['db.utils']->columnExists(FRAMEWORK_TABLE_PREFIX.'flexcontent_content', 'redirect_target')) {
             // add column redirect_target
-            $SQL = "ALTER TABLE `".FRAMEWORK_TABLE_PREFIX."flexcontent_content` ADD `redirect_target` ENUM('_blank','_self','_parent_','_top') NOT NULL DEFAULT '_blank' AFTER `redirect_url`";
+            $SQL = "ALTER TABLE `".FRAMEWORK_TABLE_PREFIX."flexcontent_content` ADD ".
+                "`redirect_target` ENUM('_blank','_self','_parent_','_top') NOT NULL DEFAULT '_blank' AFTER `redirect_url`";
             $this->app['db']->query($SQL);
             $this->app['monolog']->addInfo('[flexContent Update] Add field `redirect_target` to table `flexcontent_content`');
         }
@@ -185,23 +187,72 @@ class Update
     protected function release_022()
     {
         if (!isset(self::$config['kitcommand']['parameter']['action']['list']['content_exposed'])) {
-            // the config items 'content_teaser' and 'content_content' are replaced by 'content_view'
             self::$config['kitcommand']['parameter']['action']['list']['content_exposed'] = 2;
             $this->Configuration->setConfiguration(self::$config);
             $this->Configuration->saveConfiguration();
         }
         if (!isset(self::$config['kitcommand']['parameter']['action']['category']['content_exposed'])) {
-            // the config items 'content_teaser' and 'content_content' are replaced by 'content_view'
             self::$config['kitcommand']['parameter']['action']['category']['content_exposed'] = 2;
             $this->Configuration->setConfiguration(self::$config);
             $this->Configuration->saveConfiguration();
         }
         if (!isset(self::$config['kitcommand']['parameter']['action']['tag']['content_exposed'])) {
-            // the config items 'content_teaser' and 'content_content' are replaced by 'content_view'
             self::$config['kitcommand']['parameter']['action']['tag']['content_exposed'] = 2;
             $this->Configuration->setConfiguration(self::$config);
             $this->Configuration->saveConfiguration();
         }
+    }
+
+    /**
+     * Release 0.23
+     */
+    public function release_023()
+    {
+        if (!$this->app['db.utils']->columnExists(FRAMEWORK_TABLE_PREFIX.'flexcontent_category_type', 'category_type')) {
+            // add column category_type
+            $SQL = "ALTER TABLE `".FRAMEWORK_TABLE_PREFIX."flexcontent_category_type` ADD ".
+                "`category_type` ENUM ('DEFAULT','EVENT','FAQ') NOT NULL DEFAULT 'DEFAULT' AFTER `category_image`";
+            $this->app['db']->query($SQL);
+            $this->app['monolog']->addInfo('[flexContent Update] Add field `category_type` to table `flexcontent_category_type`');
+        }
+
+        if (!$this->app['db.utils']->tableExists(FRAMEWORK_TABLE_PREFIX.'flexcontent_event')) {
+            // create the table flexcontent_event
+            $Event = new Event($this->app);
+            $Event->createTable();
+        }
+
+        if (!isset(self::$config['content']['field']['event_date_from']['required'])) {
+            self::$config['content']['field']['event_date_from']['required'] = true;
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+        if (!isset(self::$config['content']['field']['event_date_to']['required'])) {
+            self::$config['content']['field']['event_date_to']['required'] = true;
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+        if (!isset(self::$config['content']['field']['event_organizer']['required'])) {
+            self::$config['content']['field']['event_organizer']['required'] = false;
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+        if (!isset(self::$config['content']['field']['event_organizer']['tags'])) {
+            self::$config['content']['field']['event_organizer']['tags'] = array();
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+        if (!isset(self::$config['content']['field']['event_location']['required'])) {
+            self::$config['content']['field']['event_location']['required'] = false;
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+        if (!isset(self::$config['content']['field']['event_location']['tags'])) {
+            self::$config['content']['field']['event_location']['tags'] = array();
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+
     }
 
     /**
@@ -237,6 +288,8 @@ class Update
         $this->release_021();
         // Release 0.22
         $this->release_022();
+        // Release 0.23
+        $this->release_023();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

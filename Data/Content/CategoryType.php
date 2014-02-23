@@ -48,6 +48,7 @@ class CategoryType
         `category_permalink` VARCHAR(255) NOT NULL DEFAULT '',
         `category_description` TEXT NOT NULL DEFAULT '',
         `category_image` TEXT NOT NULL,
+        `category_type` ENUM ('DEFAULT','EVENT','FAQ') NOT NULL DEFAULT 'DEFAULT',
         `target_url` TEXT NOT NULL,
         `timestamp` TIMESTAMP,
         PRIMARY KEY (`category_id`)
@@ -289,6 +290,25 @@ EOD;
     }
 
     /**
+     * Get the category TYPES for a SELECT in form.factory / Twig
+     * @throws \Exception
+     * @return array
+     */
+    public function getTypesForSelect()
+    {
+        try {
+            $enums = $this->app['db.utils']->getEnumValues(self::$table_name, 'category_type');
+            $types = array();
+            foreach ($enums as $enum) {
+                $types[$enum] = $enum;
+            }
+            return $types;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
      * Check if a permalink already exists
      *
      * @param link $permalink
@@ -395,6 +415,22 @@ EOD;
                 $excerpt .= '.'.strip_tags($this->app['utils']->unsanitizeText($result['category_description']));
             }
             return (!empty($excerpt)) ? $excerpt : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Select the category TYPE for the given category ID
+     *
+     * @param integer $category_id
+     * @throws \Exception
+     */
+    public function selectType($category_id)
+    {
+        try {
+            $SQL = "SELECT `category_type` FROM `".self::$table_name."` WHERE `category_id`='$category_id'";
+            return $this->app['db']->fetchColumn($SQL);
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }

@@ -49,7 +49,7 @@
         'type':'alert-warning'} only %}
     {% endif %}
 
-    <form id="content_edit" method="post" {{ form_enctype(form) }} role="form">
+    <form id="content_edit" method="post" role="form">
       {{ form_errors(form) }}
       {{ form_row(form._token) }}
       {{ form_row(form.content_id) }}
@@ -58,12 +58,19 @@
       {{ form_row(form.check_kitcommand) }}
       {{ form_row(form.primary_category_target_url) }}
       {{ form_row(form.primary_category_name) }}
-
+      {{ form_row(form.category_type) }}
+      {% if form.category_type.vars.value != 'EVENT' %}
+        {{ form_row(form.event_date_from) }}
+        {{ form_row(form.event_date_to) }}
+        {{ form_row(form.event_organizer) }}
+        {{ form_row(form.event_location) }}
+      {% endif %}
+      
       <div class="row">
         <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
           {# form contents at the left column #}
           <div class="row">
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 no-padding-left">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 no-padding-left">
               <div class="form-group">
                 <label>{{ 'Content ID'|trans }}</label>
                 <div>
@@ -81,13 +88,13 @@
                 </div>
               </div>
             </div>
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
               <div class="form-group">
                 {{ form_label(form.status) }}
                 {{ form_widget(form.status, {'attr':{'class':'form-control input-sm'}}) }}
               </div>
             </div>
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
               <div class="form-group">
                 {{ form_label(form.rss) }}
                 {{ form_widget(form.rss, {'attr':{'class':'form-control input-sm'}}) }}
@@ -111,25 +118,45 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4 no-padding-left">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 no-padding-left">
               <div class="form-group">
                 {{ form_label(form.publish_from) }}
                 {{ form_widget(form.publish_from, {'attr':{'class':'form-control input-sm publish_from'}}) }}
               </div>
             </div>
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
               <div class="form-group">
                 {{ form_label(form.breaking_to) }}
                 {{ form_widget(form.breaking_to, {'attr':{'class':'form-control input-sm breaking_to'}}) }}
               </div>
             </div>
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
               <div class="form-group">
                 {{ form_label(form.archive_from) }}
                 {{ form_widget(form.archive_from, {'attr':{'class':'form-control input-sm archive_from'}}) }}
               </div>
             </div>
           </div>
+          {% if form.category_type.vars.value == 'EVENT' %}
+            <div class="row">
+              <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                {{ form_label(form.event_date_from) }}
+                {{ form_widget(form.event_date_from, {'attr':{'class':'form-control input-sm event_date_from'}}) }}
+              </div>
+              <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                {{ form_label(form.event_date_to) }}
+                {{ form_widget(form.event_date_to, {'attr':{'class':'form-control input-sm event_date_to'}}) }}
+              </div>
+              <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                {{ form_label(form.event_organizer) }}
+                {{ form_widget(form.event_organizer, {'attr':{'class':'form-control input-sm'}}) }}
+              </div>
+              <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                {{ form_label(form.event_location) }}
+                {{ form_widget(form.event_location, {'attr':{'class':'form-control input-sm'}}) }}
+              </div>
+            </div>
+          {% endif %}
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
           {# image container #}
@@ -337,6 +364,16 @@
           stepMinute: 5
         });
         $('.archive_from').datetimepicker({
+          timeFormat: "HH:mm",
+          stepHour: 1,
+          stepMinute: 5
+        });
+        $('.event_date_from').datetimepicker({
+          timeFormat: "HH:mm",
+          stepHour: 1,
+          stepMinute: 5
+        });
+        $('.event_date_to').datetimepicker({
           timeFormat: "HH:mm",
           stepHour: 1,
           stepMinute: 5

@@ -53,16 +53,24 @@
       <div class="row">
         <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
           {# form contents at the left column #}
-          <div class="form-group">
-            <label>{{ 'Category ID'|trans }}</label>
-            <div>
-            {% if form.category_id.vars.value > 0 %}
-              {{ '%05d'|format(form.category_id.vars.value) }}&nbsp;
-              {% set kitcommand = '~~ flexContent action[category] category_id[' ~ form.category_id.vars.value ~ '] ~~' %}
-              <a id="copycommand" class="btn btn-default" role="button" href="#" data-clipboard-text="{{ kitcommand }}">~~</a>
-            {% else %}
-              {{ '- new entry -'|trans }}
-            {% endif %}
+          <div class="row">
+            <div class="col-sm-3">
+              <div class="form-group">
+                <label>{{ 'Category ID'|trans }}</label>
+                <div>
+                {% if form.category_id.vars.value > 0 %}
+                  {{ '%05d'|format(form.category_id.vars.value) }}&nbsp;
+                  {% set kitcommand = '~~ flexContent action[category] category_id[' ~ form.category_id.vars.value ~ '] ~~' %}
+                  <a id="copycommand" class="btn btn-default" role="button" href="#" data-clipboard-text="{{ kitcommand }}">~~</a>
+                {% else %}
+                  {{ '- new entry -'|trans }}
+                {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              {{ form_label(form.category_type) }}
+              {{ form_widget(form.category_type, {'attr':{'class':'form-control input-sm'}}) }}
             </div>
           </div>
           <div class="form-group">
@@ -120,7 +128,7 @@
 {% endblock footer_jquery %}
     
 {% block footer %}
-  {% set iframe_add_height = 100 %}
+  {% set iframe_add_height = 120 %}
   {{ parent() }}
   <script type="text/javascript">
     if (typeof 'jQuery' !== 'undefined') {

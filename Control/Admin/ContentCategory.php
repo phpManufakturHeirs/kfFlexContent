@@ -161,6 +161,14 @@ class ContentCategory extends Admin
         ->add('language', 'hidden', array(
             'data' => $language
         ))
+        ->add('category_type', 'choice', array(
+            'choices' => $this->CategoryTypeData->getTypesForSelect(),
+            'empty_value' => '- please select -',
+            'expanded' => false,
+            'required' => true,
+            'label' => 'Type',
+            'data' => isset($data['category_type']) ? $data['category_type'] : 'DEFAULT'
+        ))
         ->add('category_name', 'text', array(
             'label' => 'Name',
             'data' => isset($data['category_name']) ? $data['category_name'] : ''
@@ -289,6 +297,7 @@ class ContentCategory extends Admin
             $data['category_permalink'] = $permalink;
             $data['category_description'] = !empty($category['category_description']) ? $category['category_description'] : '';
             $data['target_url'] = $category['target_url'];
+            $data['category_type'] = $category['category_type'];
 
             if (self::$category_id < 1) {
                 // create a new category type record
