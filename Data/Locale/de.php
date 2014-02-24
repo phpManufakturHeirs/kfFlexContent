@@ -295,6 +295,10 @@ return array(
         => 'Datum und Uhrzeit für die Veranstaltung wurden automatisch gesetzt, Sie müssen die Angaben prüfen!',
     'The description should have a length between %minimum% and %maximum% characters (actual: %length%).'
         => 'Die Beschreibung sollte eine Länge zwischen %minimum% und %maximum% Zeichen haben, zur Zeit sind es %length% Zeichen.',
+    'The event ending date %event_date_to% is less then the event starting date %event_date_from%!'
+        => 'Das Datum für das Veranstaltungsende %event_date_to% liegt nach dem Beginn der Veranstaltung am %event_date_from%!',
+    'The event starting date %event_date_from% is less then the content publish from date %publish_from%, this is not allowed!'
+        => 'Das Datum für den Beginn der Veranstaltung am %event_date_from% liegt vor dem Datum für die Veröffentlichung dieses Artikel am %publish_from%! Bitte prüfen Sie Ihre Angaben.',
     'The flexContent record with the ID %id% does not exists!'
         => 'Es existiert kein flexContent Datensatz mit der ID %id%!',
     'The flexContent record with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!'
