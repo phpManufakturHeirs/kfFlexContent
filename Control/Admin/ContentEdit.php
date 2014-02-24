@@ -967,16 +967,6 @@ class ContentEdit extends Admin
             $this->setAlert('The flexContent record with the ID %id% does not exists!',
                 array('%id%' => self::$content_id), self::ALERT_TYPE_WARNING);
         }
-        if ((self::$content_id > 0) &&
-            (false !== ($primary_category_id = $this->CategoryData->selectPrimaryCategoryIDbyContentID(self::$content_id))) &&
-            ('EVENT' == $this->CategoryTypeData->selectType($primary_category_id))) {
-            // add the event data
-            if (false !== ($event = $this->EventData->selectContentID(self::$content_id))) {
-                foreach ($event as $key => $value) {
-                    $data[$key] = $value;
-                }
-            }
-        }
 
         $form = $this->getContentForm($data);
         return $this->renderContentForm($form);
@@ -999,16 +989,6 @@ class ContentEdit extends Admin
         if ((self::$content_id > 0) && (false === ($data = $this->ContentData->select(self::$content_id)))) {
             $this->setAlert('The flexContent record with the ID %id% does not exists!',
                 array('%id%' => self::$content_id), self::ALERT_TYPE_WARNING);
-        }
-        if ((self::$content_id > 0) &&
-        (false !== ($primary_category_id = $this->CategoryData->selectPrimaryCategoryIDbyContentID(self::$content_id))) &&
-        ('EVENT' == $this->CategoryTypeData->selectType($primary_category_id))) {
-            // add the event data
-            if (false !== ($event = $this->EventData->selectContentID(self::$content_id))) {
-                foreach ($event as $key => $value) {
-                    $data[$key] = $value;
-                }
-            }
         }
 
         // get the form
