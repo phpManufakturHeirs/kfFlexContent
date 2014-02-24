@@ -288,7 +288,7 @@ class ContentEdit extends Admin
                 'empty_value' => self::$config['content']['field']['event_organizer']['required'] ? '- please select -' : null,
                 'expanded' => false,
                 'required' => self::$config['content']['field']['event_organizer']['required'],
-                'data' => isset($data['event_organizer']) ? $data['event_organizer'] : -1
+                'data' => isset($data['event_organizer']['contact_id']) ? $data['event_organizer']['contact_id'] : -1
             ));
 
             $form->add('event_location', 'choice', array(
@@ -298,7 +298,7 @@ class ContentEdit extends Admin
                 'empty_value' => '- please select -',
                 'expanded' => false,
                 'required' => self::$config['content']['field']['event_location']['required'],
-                'data' => isset($data['event_location']) ? $data['event_location'] : -1
+                'data' => isset($data['event_location']['contact_id']) ? $data['event_location']['contact_id'] : -1
             ));
 
         }
@@ -521,6 +521,18 @@ class ContentEdit extends Admin
                             }
                             // convert the date/time string
                             $dt = Carbon::createFromFormat($this->app['translator']->trans('DATETIME_FORMAT'), $content[$name]);
+
+                            $publish_from = Carbon::createFromFormat('Y-m-d H:i:s', $data['publish_from']);
+                            if ($dt->lt($publish_from)) {
+                                // the event_date_from is less the publish_from date!
+                                $this->setAlert('The event starting date %event_date_from% is less then the content publish from date %publish_from%, this is not allowed!',
+                                    array('%event_date_from%' => date($this->app['translator']->trans('DATETIME_FORMAT'), $dt->timestamp),
+                                        '%publish_from%' => date($this->app['translator']->trans('DATETIME_FORMAT'), $publish_from->timestamp)),
+                                    self::ALERT_TYPE_WARNING);
+                                $checked = false;
+                                break;
+                            }
+
                             $data[$name] = $dt->toDateTimeString();
                             $event[$name] = $data[$name];
                         }
@@ -535,6 +547,13 @@ class ContentEdit extends Admin
                         }
                         if (isset($content[$name])) {
                             // check only if the field isset
+                            if (!isset($data['event_date_from'])) {
+                                // problem: event_date_from must defined first!
+                                $this->setAlert("Problem: '%first%' must be defined before '%second%', please check the configuration file!",
+                                    array('%first%' => 'event_date_from', '%second%' => 'event_date_to'), self::ALERT_TYPE_DANGER);
+                                $checked = false;
+                                break;
+                            }
                             if (empty($content[$name])) {
                                 // if field is empty create date/time as configured
                                 $dt = Carbon::createFromFormat('Y-m-d H:i:s', $data['publish_from']);
@@ -543,6 +562,18 @@ class ContentEdit extends Admin
                             }
                             // convert the date/time string
                             $dt = Carbon::createFromFormat($this->app['translator']->trans('DATETIME_FORMAT'), $content[$name]);
+
+                            $event_date_from = Carbon::createFromFormat('Y-m-d H:i:s', $data['event_date_from']);
+                            if ($dt->lt($event_date_from)) {
+                                // the event_date_from is less the publish_from date!
+                                $this->setAlert('The event ending date %event_date_to% is less then the event starting date %event_date_from%!',
+                                    array('%event_date_from%' => date($this->app['translator']->trans('DATETIME_FORMAT'), $event_date_from->timestamp),
+                                        '%event_date_to%' => date($this->app['translator']->trans('DATETIME_FORMAT'), $dt->timestamp)),
+                                    self::ALERT_TYPE_WARNING);
+                                $checked = false;
+                                break;
+                            }
+
                             $data[$name] = $dt->toDateTimeString();
                             $event[$name] = $data[$name];
                         }
