@@ -74,3 +74,8 @@
   color: #9966ff;
   font-weight: bold;
 }
+#flexcontent .event-info {
+  font-size: smaller;
+  font-weight: bold;
+  margin: 0 0 15px 0;
+}

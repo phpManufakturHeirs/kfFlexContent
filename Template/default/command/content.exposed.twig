@@ -28,6 +28,16 @@
           <h{{ parameter.title_level+1|default('2') }}>{{ content.title|default('') }}</h{{ parameter.title_level+1|default('1') }}>
         </a>
       {% endif %}
+      {% if content.event_date_from is defined %}
+        <div class="event-info">
+          {% set date_from = '<i class="fa fa-calendar-o"></i>  ' ~ content.event_date_from|date('DATE_FORMAT'|trans) %}
+          {% if content.event_location.contact_name is defined %}
+            {{ date_from ~ ', ' ~ content.event_location.contact_name }} 
+          {% else %}
+            {{ date_from }}
+          {% endif %}
+        </div>
+      {% endif %}
       {% if parameter.content_description and content.description|length > 0 %}
         <div class="well well-sm">
           {{ content.description }}

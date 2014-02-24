@@ -1,0 +1,46 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2014 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+<div class="schema_org" itemscope itemtype="http://schema.org/Event">
+  <meta itemprop="startDate" content="{{ content.event_date_from|date('c') }}">
+  <meta itemprop="endDate" content="{{ content.event_date_to|date('c') }}">
+  <meta itemprop="name" content="{{ content.title }}">
+  <meta itemprop="description" content="{{ content.teaser|striptags }}">
+  {% if content.event_organizer.contact_name is defined %}
+    <meta itemprop="performer" content="{{ content.event_organizer.contact_name }}">
+  {% endif %}
+  {% if content.event_location.contact_name is defined %} 
+    <div itemprop="location" >
+      <meta itemprop="name" content="{{ content.event_location.contact_name }}">
+      {% if content.event_location.address_city|length > 0 %}
+        <div itemscope itemtype="http://schema.org/PostalAddress">
+          {% if content.event_location.address_street|length > 0 %}
+            <meta itemprop="streetAddress" content="{{ content.event_location.address_street }}">
+          {% endif %}
+          {% if content.event_location.address_country_code|length > 0 %}  
+            <meta itemprop="addressCountry" content="{{ content.event_location.address_country_code|upper|trans }}">
+          {% endif %}          
+          <meta itemprop="addressLocality" content="{{ content.event_location.address_city }}">
+          {% if content.event_location.address_state|length > 0 %}
+            <meta itemprop="addressRegion" content="{{ content.event_location.address_state }}">
+          {% endif %}
+          {% if content.event_location.address_zip|length > 0 %}
+            <meta itemprop="postalCode" content="{{ content.event_location.address_zip }}">
+          {% endif %}
+          {% if content.event_location.communication_phone|length > 0 %}    
+            <meta itemprop="telephone" content="{{ content.event_location.communication_phone }}">
+          {% endif %}
+          {% if content.event_location.communication_email|length > 0 %}    
+            <meta itemprop="email" content="{{ content.event_location.communication_email }}">
+          {% endif %}    
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}  
+</div>
