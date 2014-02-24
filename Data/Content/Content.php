@@ -16,6 +16,7 @@ use Silex\Application;
 class Content
 {
     protected $app = null;
+    protected $EventData = null;
     protected static $table_name = null;
 
     /**
@@ -27,6 +28,7 @@ class Content
     {
         $this->app = $app;
         self::$table_name = FRAMEWORK_TABLE_PREFIX.'flexcontent_content';
+        $this->EventData = new Event($app);
     }
 
     /**
@@ -158,6 +160,45 @@ EOD;
     }
 
     /**
+     * Loop through the content record and prepare it for output.
+     * Add also EVENT data if avaiable
+     *
+     * @param array $record
+     * @return array
+     */
+    protected function prepareContent($record)
+    {
+        $content = array();
+        if (is_array($record)) {
+            foreach ($record as $key => $value) {
+                $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                if (($key == 'content') || ($key == 'teaser')) {
+                    $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
+                }
+                // is this an EVENT?
+                if (($key == 'content_id') && ('EVENT' == $this->getContentType($value))) {
+                    if (false !== ($event = $this->EventData->selectContentID($value))) {
+                        // add the EVENT data to the content record
+                        foreach ($event as $event_key => $event_value) {
+                            if (in_array($event_key, array('event_date_from', 'event_date_to', 'event_id'))) {
+                                $content[$event_key] = $event_value;
+                            }
+                            elseif (in_array($event_key, array('event_organizer', 'event_location'))) {
+                                $content[$event_key]['contact_id'] = $event_value;
+                                if (($event_value > 0) && (false !== ($contact = $this->app['contact']->selectOverview($event_value)))) {
+                                    // add the contact overview
+                                    $content[$event_key] = $contact;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return $content;
+    }
+
+    /**
      * Insert a new flexContent record
      *
      * @param array $data
@@ -238,15 +279,10 @@ EOD;
                 $SQL = "SELECT * FROM `".self::$table_name."` WHERE `content_id`='$content_id'";
             }
             $result = $this->app['db']->fetchAssoc($SQL);
-            $content = array();
-            if (is_array($result)) {
-                foreach ($result as $key => $value) {
-                    $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
-                    if (($key == 'content') || ($key == 'teaser')) {
-                        $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
-                    }
-                }
-            }
+
+            // prepare the content for output
+            $content = $this->prepareContent($result);
+
             return (!empty($content)) ? $content : false;
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
@@ -328,18 +364,8 @@ EOD;
 
             $contents = array();
             foreach ($results as $result) {
-                $content = array();
-                foreach ($columns as $column) {
-                    foreach ($result as $key => $value) {
-                        if ($key == $column) {
-                            $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
-                            if (($key == 'content') || ($key == 'teaser')) {
-                                $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
-                            }
-                        }
-                    }
-                }
-                $contents[] = $content;
+                // prepare the content for output
+                $contents[] = $this->prepareContent($result);
             }
             return $contents;
         } catch (\Doctrine\DBAL\DBALException $e) {
@@ -502,15 +528,10 @@ EOD;
                 "AND `language`='$language' ORDER BY publish_from $direction LIMIT 1";
 
             $result = $this->app['db']->fetchAssoc($SQL);
-            $content = array();
-            if (is_array($result)) {
-                foreach ($result as $key => $value) {
-                    $content[$key] = (is_string($value)) ? $this->app['utils']->unsanitizeText($value) : $value;
-                    if (($key == 'content') || ($key == 'teaser')) {
-                        $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
-                    }
-                }
-            }
+
+            // prepare the content for output
+            $content = $this->prepareContent($result);
+
             return (!empty($content)) ? $content : false;
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
@@ -571,14 +592,8 @@ EOD;
             $results = $this->app['db']->fetchAll($SQL);
             $contents = array();
             foreach ($results as $result) {
-                $content = array();
-                foreach ($result as $key => $value) {
-                    $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
-                    if (($key == 'content') || ($key == 'teaser')) {
-                        $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
-                    }
-                }
-                $contents[] = $content;
+                // prepare the content for output
+                $contents[] = $this->prepareContent($result);
             }
             return (!empty($contents)) ? $contents : false;
         } catch (\Doctrine\DBAL\DBALException $e) {
@@ -609,14 +624,8 @@ EOD;
             $contents = array();
             if (is_array($results)) {
                 foreach ($results as $result) {
-                    $content = array();
-                    foreach ($result as $key => $value) {
-                        $content[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
-                        if (($key == 'content') || ($key == 'teaser')) {
-                            $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
-                        }
-                    }
-                    $contents[] = $content;
+                    // prepare the content for output
+                    $contents[] = $this->prepareContent($result);
                 }
             }
             return (!empty($contents)) ? $contents : false;
@@ -675,9 +684,6 @@ EOD;
         }
     }
 
-    /*
-     * Seem's to be no longer needed ...
-
     /**
      * Select a list of contents configured by parameters
      *
@@ -719,18 +725,21 @@ EOD;
 
         $list = array();
         foreach ($results as $result) {
-            $content = array();
-            foreach ($result as $key => $value) {
-                $content[$key] = (is_string($value)) ? $this->app['utils']->unsanitizeText($value) : $value;
-                if (($key == 'content') || ($key == 'teaser')) {
-                    $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
-                }
-            }
-            $list[] = $content;
+            // prepare the content for output
+            $list[] = $this->prepareContent($result);
         }
         return (!empty($list)) ? $list : false;
     }
 
+    /**
+     * Create a content link list for the usage in the toolbar of the CKEditor
+     *
+     * @param string $language
+     * @param array $status
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     * @see \phpManufaktur\CKEditor\Control\flexContentLink
+     */
     public function SelectContentLinkList($language=null, $status=array('PUBLISHED','BREAKING','HIDDEN','ARCHIVED'))
     {
         try {
@@ -748,7 +757,9 @@ EOD;
             foreach ($results as $result) {
                 $item = array();
                 foreach ($result as $key => $value) {
-                    $item[$key] = (is_string($value)) ? $this->app['utils']->unsanitizeText($value) : $value;
+                    if (!in_array($key, array('description','keywords','teaser','teaser_image','content','rss','update_username'))) {
+                        $item[$key] = (is_string($value)) ? $this->app['utils']->unsanitizeText($value) : $value;
+                    }
                 }
                 $list[] = $item;
             }
@@ -758,6 +769,18 @@ EOD;
         }
     }
 
+
+    /**
+     * Search the TERM within the CONTENT records
+     *
+     * @param string $search_term
+     * @param array $order_by fields to order the record
+     * @param string $order_direction default DESC
+     * @param string $status default DELETED
+     * @param string $status_operator default !=
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     */
     public function SearchContent($search_term, $order_by=array('content_id'), $order_direction='DESC', $status='DELETED', $status_operator='!=')
     {
         try {
@@ -838,6 +861,29 @@ EOD;
                 $contents[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
             }
             return (!empty($contents)) ? $contents : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Get the content TYPE for the given content ID
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return Ambigous <boolean, string>
+     */
+    public function getContentType($content_id)
+    {
+        try {
+            $content = self::$table_name;
+            $category = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
+            $category_type = FRAMEWORK_TABLE_PREFIX.'flexcontent_category_type';
+            $SQL = "SELECT `category_type` FROM `$content`, `$category`, `$category_type` WHERE ".
+                "`$content`.`content_id`='$content_id' AND `$content`.`content_id`=`$category`.`content_id` AND ".
+                "`$category`.`is_primary`=1 AND `$category_type`.`category_id`=`$category`.`category_id`";
+            $result = $this->app['db']->fetchColumn($SQL);
+            return (!is_null($result)) ? $result : false;
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }
