@@ -227,6 +227,15 @@ class ActionView extends Basic
 
         self::$parameter['content_id'] = (isset(self::$parameter['content_id']) && is_numeric(self::$parameter['content_id'])) ? self::$parameter['content_id'] : -1;
 
+        if ((self::$parameter['content_id'] > 0) && ('FAQ' == $this->ContentData->getContentType(self::$parameter['content_id']))) {
+            // this article belong to a FAQ!
+            if (false !== ($category_id = $this->CategoryData->selectPrimaryCategoryIDbyContentID(self::$parameter['content_id']))) {
+                // return the FAQ instead of the article!
+                $FAQ = new ActionFAQ();
+                return $FAQ->ControllerFAQ($app);
+            }
+        }
+
         // set the title above the content?
         self::$parameter['content_title'] = (isset(self::$parameter['content_title']) && ((self::$parameter['content_title'] == 0) || (strtolower(self::$parameter['content_title']) == 'false'))) ? false : $default_parameter['content_title'];
 
