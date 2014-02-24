@@ -174,6 +174,12 @@ class ActionCategory extends Basic
         // the category ID is always needed!
         self::$parameter['category_id'] = isset(self::$parameter['category_id']) ? self::$parameter['category_id'] : -1;
 
+        if ((self::$parameter['category_id'] > 0) && ('FAQ' == $this->CategoryTypeData->selectType(self::$parameter['category_id']))) {
+            // this is a FAQ not a CATEGORY!
+            $FAQ = new ActionFAQ();
+            return $FAQ->ControllerFAQ($app);
+        }
+
         // optional: content ID
         self::$parameter['content_id'] = isset(self::$parameter['content_id']) ? self::$parameter['content_id'] : -1;
 
@@ -270,6 +276,7 @@ class ActionCategory extends Basic
 
 
         if (self::$parameter['category_id'] > 0) {
+            // show the category
             return $this->showCategoryID();
         }
 
