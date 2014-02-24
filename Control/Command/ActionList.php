@@ -24,7 +24,6 @@ class ActionList extends Basic
     protected static $config = null;
     protected static $language = null;
     protected static $use_iframe = null;
-    protected static $list_type = null;
 
     protected $ContentData = null;
     protected $CategoryData = null;
@@ -86,9 +85,10 @@ class ActionList extends Basic
      */
     protected function showList()
     {
+        $type = (strtoupper(self::$parameter['type']) == 'EVENT') ? 'EVENT' : 'DEFAULT';
         if (false === ($contents = $this->ContentData->selectContentList(self::$language, self::$parameter['content_limit'],
             self::$parameter['categories'], self::$parameter['categories_exclude'], self::$parameter['content_status'],
-            self::$parameter['order_by'], self::$parameter['order_direction']))) {
+            self::$parameter['order_by'], self::$parameter['order_direction'], $type))) {
             $this->setAlert('This list does not contain any contents!');
         }
 
@@ -112,7 +112,7 @@ class ActionList extends Basic
             }
         }
 
-        if (self::$list_type == 'full') {
+        if (self::$parameter['type'] == 'default') {
             $template = 'command/list.twig';
         }
         else {
@@ -137,10 +137,9 @@ class ActionList extends Basic
      * @param Application $app
      * @return string
      */
-    public function ControllerList(Application $app, $list_type='full')
+    public function ControllerList(Application $app)
     {
         $this->initParameters($app);
-        self::$list_type = $list_type;
 
         // get the kitCommand parameters
         self::$parameter = $this->getCommandParameters();
@@ -158,12 +157,14 @@ class ActionList extends Basic
             $this->setCommandParameters(self::$parameter);
         }
 
+        self::$parameter['type'] = isset(self::$parameter['type']) ? strtolower(self::$parameter['type']) : 'default';
+
         // access the default parameters
-        if (self::$list_type == 'full') {
-            $default_parameter = self::$config['kitcommand']['parameter']['action']['list'];
+        if ((self::$parameter['type'] == 'simple') || (self::$parameter['type'] == 'event')) {
+            $default_parameter = self::$config['kitcommand']['parameter']['action']['list_simple'];
         }
         else {
-            $default_parameter = self::$config['kitcommand']['parameter']['action']['list_simple'];
+            $default_parameter = self::$config['kitcommand']['parameter']['action']['list'];
         }
 
         // check wether to use the flexcontent.css or not (only needed if self::$parameter['use_iframe'] == false)
@@ -236,11 +237,16 @@ class ActionList extends Basic
         // limit for the content items
         self::$parameter['content_limit'] = (isset(self::$parameter['content_limit'])) ? intval(self::$parameter['content_limit']) : $default_parameter['content_limit'];
 
-        // expose content items?
-        self::$parameter['content_exposed'] = (isset(self::$parameter['content_exposed'])) ? intval(self::$parameter['content_exposed']) : $default_parameter['content_exposed'];
-        if (!in_array(self::$parameter['content_exposed'], array(0,1,2,3,4,6,12))) {
-            self::$parameter['content_exposed'] = 2;
-            $this->setAlert('Please check the parameter content_exposed, allowed values are only 0,1,2,3,4,6 or 12!', array(), self::ALERT_TYPE_WARNING);
+        if (self::$parameter['type'] == 'default') {
+            // expose content items?
+            self::$parameter['content_exposed'] = (isset(self::$parameter['content_exposed'])) ? intval(self::$parameter['content_exposed']) : $default_parameter['content_exposed'];
+            if (!in_array(self::$parameter['content_exposed'], array(0,1,2,3,4,6,12))) {
+                self::$parameter['content_exposed'] = 2;
+                $this->setAlert('Please check the parameter content_exposed, allowed values are only 0,1,2,3,4,6 or 12!', array(), self::ALERT_TYPE_WARNING);
+            }
+        }
+        else {
+            self::$parameter['content_exposed'] = 0;
         }
 
         // show the content image?
