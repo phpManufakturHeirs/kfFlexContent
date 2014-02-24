@@ -698,14 +698,16 @@ EOD;
      */
     public function selectContentList($language, $limit=100, $categories=array(),
         $categories_exclude=array(), $status=array('PUBLISHED','BREAKING','HIDDEN','ARCHIVED'),
-        $order_by='publish_from', $order_direction='DESC')
+        $order_by='publish_from', $order_direction='DESC', $category_type='DEFAULT')
     {
         $content_table = self::$table_name;
         $category_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
+        $category_type_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category_type';
+
         $in_status = "('".implode("','", $status)."')";
 
-        $SQL = "SELECT * FROM `$category_table`,`$content_table` WHERE `$content_table`.content_id=`$category_table`.content_id ".
-            "AND `language`='$language' ";
+        $SQL = "SELECT * FROM `$category_table`,`$content_table`, `$category_type_table` WHERE `$content_table`.content_id=`$category_table`.content_id ".
+            "AND `$content_table`.`language`='$language' ";
 
         if (!empty($categories)) {
             $cats = "('".implode("','", $categories)."')";
@@ -714,6 +716,12 @@ EOD;
         elseif (!empty($categories_exclude)) {
             $categories = "('".implode("','", $categories_exclude)."')";
             $SQL .= "AND `$category_table`.category_id NOT IN $categories ";
+        }
+
+        if ($category_type != 'DEFAULT') {
+            $SQL .= "AND `$category_table`.`content_id`=`$content_table`.`content_id` AND ".
+                "`$category_table`.`is_primary`='1' AND `$category_type_table`.`category_id`=`$category_table`.`category_id` AND ".
+                "`$category_type_table`.`category_type`='$category_type' ";
         }
 
         // and the rest - GROUP BY prevents duplicate entries!
