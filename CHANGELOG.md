@@ -6,6 +6,26 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.23** - 2014-02-24
+
+* added missing button to remove images from content teaser, tag or category description
+* added a full-text search to the admin content list
+* improved CSS and JS check to avoid duplicate loading of the files
+* change the default status for the import function to FALSE and remove the tab from the admin access
+* Import Control check now for existing ~~ flexcontent ~~ commands and set WYSIWG, NEWS and TOPICS pages which contain the command to IGNORE
+* Added check if the kitCommand for the category is placed at the target URL
+* updated all templates to jQuery 1.11.0 
+* added tooltips to copy needed kitCommands for the actions
+* hide the language column in admin lists if not needed
+* in frontend always use #flexcontent as primary container before Bootstrap .container
+* Introduce a category type to enable EVENTS as content and to improve the handling of FAQs and other extensions
+* `ActionCategory` redirect to `ActionFAQ` if the category type is FAQ
+* introduce `prepareContent()` - add also special contents to the records i.e. for EVENT
+* removed action value `list_simple` and replace it with the new paramter `type[]`
+* View can know redirect to FAQ view if an article belongs to a FAQ
+* show event information and inbound schema.org information for events
+* fixed some smaller bugs and typos
+
 **0.22** - 2014-02-12
 
 * introduce parameter `content_exposed` to tell the template how many content items should be shown exposed
