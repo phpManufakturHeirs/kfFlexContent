@@ -68,6 +68,7 @@ class Action extends Basic
             $subRequest = Request::create('/basic/help/flexcontent/welcome', 'GET');
             return $app->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
         }
+        $parameter['type'] = isset($parameter['type']) ? strtolower($parameter['type']) : 'default';
 
         switch (strtolower($parameter['action'])) {
             case 'view':
@@ -82,9 +83,6 @@ class Action extends Basic
             case 'list':
                 $List = new ActionList();
                 return $List->ControllerList($app);
-            case 'list_simple':
-                $List = new ActionList();
-                return $List->ControllerList($app, 'simple');
             case 'faq':
                 $FAQ = new ActionFAQ();
                 return $FAQ->ControllerFAQ($app);
