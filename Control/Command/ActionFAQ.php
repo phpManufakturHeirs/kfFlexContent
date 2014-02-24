@@ -245,11 +245,7 @@ class ActionFAQ extends Basic
         self::$parameter['content_limit'] = (isset(self::$parameter['content_limit']) && is_numeric(self::$parameter['content_limit'])) ? intval(self::$parameter['content_limit']) : $default_parameter['content_limit'];
 
         // expose content items?
-        self::$parameter['content_exposed'] = (isset(self::$parameter['content_exposed'])) ? intval(self::$parameter['content_exposed']) : $default_parameter['content_exposed'];
-        if (!in_array(self::$parameter['content_exposed'], array(0,1,2,3,4,6,12))) {
-            self::$parameter['content_exposed'] = 2;
-            $this->setAlert('Please check the parameter content_exposed, allowed values are only 0,1,2,3,4,6 or 12!', array(), self::ALERT_TYPE_WARNING);
-        }
+        self::$parameter['content_exposed'] = 0; // disabled for FAQ!
 
         // status for the contents specified?
         if (isset(self::$parameter['content_status']) && !empty(self::$parameter['content_status'])) {
