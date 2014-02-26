@@ -123,8 +123,8 @@ class ContentEdit extends Admin
             if (false !== ($category = $this->CategoryTypeData->select($primary_category))) {
                 if (!empty($category['target_url'])) {
                     // check if the flexContent kitCommand exists at the target
-                    $link = basename($category['target_url'], $this->CMSPage->getPageExtension());
-                    if (false !== ($page_id = $this->CMSPage->getPageIDbyPageLink('/'.$link))) {
+                    $link = substr($category['target_url'], 0, strpos($category['target_url'], $this->CMSPage->getPageExtension()));
+                    if (false !== ($page_id = $this->CMSPage->getPageIDbyPageLink($link))) {
                         $check_kitcommand = (int) $this->WYSIWYG->checkPageIDforFlexContentCommand($page_id);
                         $category_target_url = $category['target_url'];
                         $category_name = $category['category_name'];

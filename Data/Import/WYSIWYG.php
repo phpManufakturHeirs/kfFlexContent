@@ -185,7 +185,7 @@ class WYSIWYG
             $wysiwyg = CMS_TABLE_PREFIX.'mod_wysiwyg';
             $SQL = "SELECT `page_id` FROM $wysiwyg WHERE `page_id`='$page_id' AND `content` LIKE '%~~ flexcontent %'";
             $check_id = $this->app['db']->fetchColumn($SQL);
-            return ($check_id === $page_id);
+            return ($check_id == $page_id);
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }
