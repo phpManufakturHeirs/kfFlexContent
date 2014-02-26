@@ -169,8 +169,8 @@ class Topics
             $content = array(
                 'language' =>  $language,
                 'title' => $this->app['utils']->unsanitizeText($topic['title']),
-                'description' => '',
-                'keywords' => '',
+                'description' => $this->app['utils']->unsanitizeText($topic['description']),
+                'keywords' => $this->app['utils']->unsanitizeText($topic['keywords']),
                 'permalink' => $permalink,
                 'publish_from' => date('Y-m-d H:i:s', $topic['published_when']),
                 'breaking_to' => date('Y-m-d H:i:s', $topic['published_when']+((60*60)*self::$config['content']['field']['breaking_to']['add']['hours'])),
