@@ -896,4 +896,21 @@ EOD;
             throw new \Exception($e);
         }
     }
+
+    public function autoUpdateStatus()
+    {
+        try {
+            // first step: check if BREAKING must be changed to PUBLISHED
+            $now = date('Y-m-d H:i:s');
+            $SQL = "UPDATE `".self::$table_name."` SET `status`='PUBLISHED' WHERE `status`='BREAKING' AND ".
+                "`breaking_to` < '$now'";
+            $this->app['db']->query($SQL);
+            // second step: check if
+            $SQL = "UPDATE `".self::$table_name."` SET `status`='ARCHIVED'  WHERE `status` IN ('PUBLISHED','BREAKING','HIDDEN') ".
+                "AND `archive_from` < '$now'";
+            $this->app['db']->query($SQL);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
 }

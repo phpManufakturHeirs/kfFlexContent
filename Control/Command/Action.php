@@ -16,6 +16,7 @@ use Silex\Application;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use phpManufaktur\flexContent\Control\Configuration;
+use phpManufaktur\flexContent\Data\Content\Content;
 
 class Action extends Basic
 {
@@ -62,11 +63,15 @@ class Action extends Basic
         }
 
         if (!isset($parameter['action'])) {
-            // there is no 'mode' parameter set, so we show the "Welcome" page
+            // there is no 'action' parameter set, so we show the "Welcome" page
             $subRequest = Request::create('/basic/help/flexcontent/welcome', 'GET');
             return $app->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
         }
         $parameter['type'] = isset($parameter['type']) ? strtolower($parameter['type']) : 'default';
+
+        // before executing any action check the records and update the status fields
+        $ContentData = new Content($app);
+        $ContentData->autoUpdateStatus();
 
         switch (strtolower($parameter['action'])) {
             case 'view':
