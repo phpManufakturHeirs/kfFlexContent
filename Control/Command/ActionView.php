@@ -30,7 +30,6 @@ class ActionView extends Basic
     protected static $parameter = null;
     protected static $config = null;
     protected static $language = null;
-    protected static $use_iframe = null;
 
     protected static $view_array = array('content', 'teaser','none');
     protected static $allowed_status_array = array('PUBLISHED', 'BREAKING', 'HIDDEN', 'ARCHIVED');
@@ -52,8 +51,6 @@ class ActionView extends Basic
         $ConfigurationData = new Configuration($app);
         self::$config = $ConfigurationData->getConfiguration();
 
-        self::$use_iframe = $app['request']->query->get('use_iframe', true);
-
         self::$language = strtoupper($this->getCMSlocale());
     }
 
@@ -63,23 +60,16 @@ class ActionView extends Basic
      */
     public function promptAlert()
     {
-        if (self::$use_iframe) {
-            // we can use the default Bootstrap 3 alert response
-            return parent::promptAlert();
+        if (!isset(self::$parameter['load_css'])) {
+            $parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['view']['load_css'];
         }
-        else {
-            // we must render the iframe free content template
-            if (!isset(self::$parameter['load_css'])) {
-                $parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['view']['load_css'];
-            }
-            return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-                '@phpManufaktur/flexContent/Template', 'command/alert.twig',
-                $this->getPreferredTemplateStyle()),
-                array(
-                    'basic' => $this->getBasicSettings(),
-                    'parameter' => self::$parameter
-                ));
-        }
+        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+            '@phpManufaktur/flexContent/Template', 'command/alert.twig',
+            $this->getPreferredTemplateStyle()),
+            array(
+                'basic' => $this->getBasicSettings(),
+                'parameter' => self::$parameter
+            ));
     }
 
     /**
@@ -222,7 +212,7 @@ class ActionView extends Basic
             return $this->promptAlert();
         }
 
-        // check wether to use the flexcontent.css or not (only needed if self::$parameter['use_iframe'] == false)
+        // check wether to use the flexcontent.css or not
         self::$parameter['load_css'] = (isset(self::$parameter['load_css']) && ((self::$parameter['load_css'] == 0) || (strtolower(self::$parameter['load_css']) == 'false'))) ? false : $default_parameter['load_css'];
 
         self::$parameter['content_id'] = (isset(self::$parameter['content_id']) && is_numeric(self::$parameter['content_id'])) ? self::$parameter['content_id'] : -1;

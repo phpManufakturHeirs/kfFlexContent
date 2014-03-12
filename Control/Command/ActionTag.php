@@ -24,7 +24,6 @@ class ActionTag extends Basic
     protected static $parameter = null;
     protected static $config = null;
     protected static $language = null;
-    protected static $use_iframe = null;
 
     protected $TagData = null;
     protected $TagTypeData = null;
@@ -45,8 +44,6 @@ class ActionTag extends Basic
         $Config = new Configuration($app);
         self::$config = $Config->getConfiguration();
 
-        self::$use_iframe = $app['request']->query->get('use_iframe', true);
-
         self::$language = $this->getCMSlocale();
 
         $this->TagTypeData = new TagType($app);
@@ -62,23 +59,16 @@ class ActionTag extends Basic
      */
     public function promptAlert()
     {
-        if (self::$use_iframe) {
-            // we can use the default Bootstrap 3 alert response
-            return parent::promptAlert();
+        if (!isset(self::$parameter['load_css'])) {
+            self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['view']['load_css'];
         }
-        else {
-            // we must render the iframe free content template
-            if (!isset(self::$parameter['load_css'])) {
-                self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['view']['load_css'];
-            }
-            return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-                '@phpManufaktur/flexContent/Template', 'command/alert.twig',
-                $this->getPreferredTemplateStyle()),
-                array(
-                    'basic' => $this->getBasicSettings(),
-                    'parameter' => self::$parameter
-                ));
-        }
+        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+            '@phpManufaktur/flexContent/Template', 'command/alert.twig',
+            $this->getPreferredTemplateStyle()),
+            array(
+                'basic' => $this->getBasicSettings(),
+                'parameter' => self::$parameter
+            ));
     }
 
     /**
@@ -168,7 +158,7 @@ class ActionTag extends Basic
             $this->setAlert('Please check the parameter content_exposed, allowed values are only 0,1,2,3,4,6 or 12!', array(), self::ALERT_TYPE_WARNING);
         }
 
-        // check wether to use the flexcontent.css or not (only needed if self::$parameter['use_iframe'] == false)
+        // check wether to use the flexcontent.css or not
         self::$parameter['load_css'] = (isset(self::$parameter['load_css']) && ((self::$parameter['load_css'] == 0) || (strtolower(self::$parameter['load_css']) == 'false'))) ? false : $default_parameter['load_css'];
 
         // set the title level - default 1 = <h1>

@@ -39,18 +39,9 @@ class flexContentFrame extends Basic
             $template = 'default';
         }
 
-        $use_iframe = (isset($config['kitcommand']['template'][$template]['iframe']) &&
-            $config['kitcommand']['template'][$template]['iframe']);
+        $subRequest = Request::create('/flexcontent/action', 'GET', array(
+            'pid' => self::getParameterID()));
 
-        if ($use_iframe) {
-            // use an iFrame for the content
-            return $this->createIFrame('/flexcontent/action');
-        }
-        else {
-            // no iFrame needed ...
-            $subRequest = Request::create('/flexcontent/action', 'GET', array(
-                'pid' => self::getParameterID(), 'use_iframe' => false));
-            return $app->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
-        }
+        return $app->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
 }

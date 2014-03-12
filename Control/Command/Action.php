@@ -45,9 +45,7 @@ class Action extends Basic
         // access the default parameters for action -> view from the configuration
         $default_parameter = self::$config['kitcommand']['parameter']['action']['view'];
 
-        // use a iframe to show the content?
-        $parameter['use_iframe'] = $app['request']->query->get('use_iframe', true);
-        // check wether to use the flexcontent.css or not (only needed if self::$parameter['use_iframe'] == false)
+        // check wether to use the flexcontent.css or not
         $parameter['load_css'] = (isset($parameter['load_css']) && (($parameter['load_css'] == 0) || (strtolower($parameter['load_css']) == 'false'))) ? false : $default_parameter['load_css'];
 
         // check the CMS GET parameters
@@ -89,20 +87,13 @@ class Action extends Basic
             default:
                 $this->setAlert('The parameter <code>%parameter%[%value%]</code> for the kitCommand <code>~~ %command% ~~</code> is unknown, please check the parameter and the given value!',
                     array('%parameter%' => 'action', '%value%' => $parameter['action'], '%command%' => 'flexContent'), self::ALERT_TYPE_DANGER);
-                if ($parameter['use_iframe']) {
-                    // we can use the default Bootstrap 3 alert response
-                    return $this->promptAlert();
-                }
-                else {
-                    // we must render the iframe free content template
-                    return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-                        '@phpManufaktur/flexContent/Template', 'command/alert.twig',
-                        $this->getPreferredTemplateStyle()),
-                        array(
-                            'basic' => $this->getBasicSettings(),
-                            'parameter' => $parameter
-                        ));
-                }
+                return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+                    '@phpManufaktur/flexContent/Template', 'command/alert.twig',
+                    $this->getPreferredTemplateStyle()),
+                    array(
+                        'basic' => $this->getBasicSettings(),
+                        'parameter' => $parameter
+                    ));
         }
     }
 

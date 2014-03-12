@@ -256,6 +256,19 @@ class Update
     }
 
     /**
+     * Release 0.24
+     */
+    protected function release_024()
+    {
+        if (isset(self::$config['kitcommand']['template'])) {
+            // the key template is no longer used
+            unset(self::$config['kitcommand']['template']);
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+    }
+
+    /**
      * Execute the update for flexContent
      *
      * @param Application $app
@@ -290,6 +303,8 @@ class Update
         $this->release_022();
         // Release 0.23
         $this->release_023();
+        // Release 0.24
+        $this->release_024();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));
