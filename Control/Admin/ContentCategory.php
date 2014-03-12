@@ -145,9 +145,9 @@ class ContentCategory extends Admin
         if (isset($data['category_id']) && ($data['category_id'] > 0) &&
             isset($data['target_url']) && !empty($data['target_url'])) {
             // check if the flexContent kitCommand exists at the target
-            $link = basename($data['target_url'], $this->CMSPage->getPageExtension());
-            if (false !== ($page_id = $this->CMSPage->getPageIDbyPageLink('/'.$link))) {
-                $check_kitcommand = $this->WYSIWYG->checkPageIDforFlexContentCommand($page_id);
+            $link = '/'.basename($data['target_url'], $this->CMSPage->getPageExtension());
+            if (false !== ($page_id = $this->CMSPage->getPageIDbyPageLink($link))) {
+                $check_kitcommand = (int) $this->WYSIWYG->checkPageIDforFlexContentCommand($page_id);
             }
         }
 
