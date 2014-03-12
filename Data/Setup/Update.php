@@ -266,6 +266,16 @@ class Update
             $this->Configuration->setConfiguration(self::$config);
             $this->Configuration->saveConfiguration();
         }
+
+        $check_key = array('view', 'category', 'tag', 'list', 'list_simple', 'faq');
+        foreach ($check_key as $key) {
+            if (!isset(self::$config['kitcommand']['parameter']['action'][$key]['check_jquery'])) {
+                self::$config['kitcommand']['parameter']['action'][$key]['check_jquery'] = true;
+                $this->Configuration->setConfiguration(self::$config);
+                $this->Configuration->saveConfiguration();
+            }
+        }
+
     }
 
     /**

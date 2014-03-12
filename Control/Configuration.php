@@ -285,6 +285,7 @@ class Configuration
                     'action' => array(
                         'view' => array(
                             'load_css' => true,
+                            'check_jquery' => true,
                             'title_level' => 1,
                             'content_title' => true,
                             'content_description' => false,
@@ -313,6 +314,7 @@ class Configuration
                         ),
                         'category' => array(
                             'load_css' => true,
+                            'check_jquery' => true,
                             'title_level' => 1,
                             'category_name' => true,
                             'category_description' => true,
@@ -340,6 +342,7 @@ class Configuration
                         ),
                         'tag' => array(
                             'load_css' => true,
+                            'check_jquery' => true,
                             'title_level' => 1,
                             'tag_name' => true,
                             'tag_description' => true,
@@ -367,6 +370,7 @@ class Configuration
                         ),
                         'list' => array(
                             'load_css' => true,
+                            'check_jquery' => true,
                             'title_level' => 1,
                             'categories' => array(),
                             'categories_exclude' => array(),
@@ -393,6 +397,7 @@ class Configuration
                         ),
                         'list_simple' => array(
                             'load_css' => true,
+                            'check_jquery' => true,
                             'title_level' => 1,
                             'categories' => array(),
                             'categories_exclude' => array(),
@@ -418,6 +423,7 @@ class Configuration
                         ),
                         'faq' => array(
                             'load_css' => true,
+                            'check_jquery' => true,
                             'title_level' => 1,
                             'category_name' => true,
                             'category_description' => true,

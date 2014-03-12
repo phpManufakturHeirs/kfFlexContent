@@ -7,7 +7,7 @@
   @copyright 2014 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
   @license MIT License (MIT) http://www.opensource.org/licenses/MIT
 #}
-{% if parameter.load_css %}
+{% if parameter.load_css and parameter.check_jquery %}
   <script type="text/javascript">  
     if (typeof 'jQuery' !== 'undefined') {
       $(document).ready(function() {

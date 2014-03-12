@@ -10,15 +10,17 @@
 {% if parameter.load_css %}
   <script type="text/javascript">
     (function() {
-      if (!window.jQuery) {
-        alert("{{'flexContent is missing jQuery - please add the parameter library[jquery/jquery/1.10.2/jquery.min.js] to the kitCommand at this page.'|trans }}");
-      }
-      else {
-        var jq = document.createElement('script');
-        jq.setAttribute('type', 'text/javascript');
-        jq.setAttribute('src', '{{ LIBRARY_URL ~ '/bootstrap/3.1.0/js/bootstrap.min.js'}}');
-        document.getElementsByTagName('head')[0].appendChild(jq);
-      }
+      {% if parameter.check_jquery %}
+        if (!window.jQuery) {
+          alert("{{'flexContent is missing jQuery - please add the parameter library[jquery/jquery/1.10.2/jquery.min.js] to the kitCommand at this page.'|trans }}");
+        }
+        else {
+          var jq = document.createElement('script');
+          jq.setAttribute('type', 'text/javascript');
+          jq.setAttribute('src', '{{ LIBRARY_URL ~ '/bootstrap/3.1.0/js/bootstrap.min.js'}}');
+          document.getElementsByTagName('head')[0].appendChild(jq);
+        }
+      {% endif %}  
 
       function getBasename(url) {
         var fileName = url.substring(url.lastIndexOf('/') + 1);
