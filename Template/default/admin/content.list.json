@@ -14,7 +14,8 @@
       "UNPUBLISHED",
       "PUBLISHED",
       "BREAKING",
-      "HIDDEN"
+      "HIDDEN",
+      "ARCHIVED"
     ],
     "order":{
       "by":[
