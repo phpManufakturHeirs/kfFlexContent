@@ -75,14 +75,43 @@ class ActionList extends Basic
      */
     protected function showList()
     {
+        if (self::$parameter['paging'] > 0) {
+            // PAGING is enabled
+            if (isset(self::$parameter['page'])) {
+                self::$parameter['previous_page'] = self::$parameter['page']-1;
+                self::$parameter['next_page'] = self::$parameter['page']+1;
+                $paging_from = self::$parameter['paging'] * (self::$parameter['page']-1);
+            }
+            else {
+                self::$parameter['previous_page'] = 0;
+                self::$parameter['next_page'] = 2;
+                $paging_from = 0;
+            }
+        }
+        else {
+            // PAGING is OFF
+            self::$parameter['previous_page'] = 0;
+            self::$parameter['next_page'] = 0;
+            $paging_from = 0;
+        }
+
         $type = (strtoupper(self::$parameter['type']) == 'EVENT') ? 'EVENT' : 'DEFAULT';
         if (false === ($contents = $this->ContentData->selectContentList(self::$language, self::$parameter['content_limit'],
             self::$parameter['categories'], self::$parameter['categories_exclude'], self::$parameter['content_status'],
-            self::$parameter['order_by'], self::$parameter['order_direction'], $type))) {
+            self::$parameter['order_by'], self::$parameter['order_direction'], $type, $paging_from, self::$parameter['paging']))) {
             $this->setAlert('This list does not contain any contents!');
         }
 
         if (is_array($contents)) {
+            // count the available contents
+            $total = $this->ContentData->count(self::$parameter['content_status']);
+
+            if ((self::$parameter['paging'] > 0) && ((sizeof($contents) < self::$parameter['paging']) ||
+                (((self::$parameter['previous_page']+1) * self::$parameter['paging'])+self::$parameter['paging'] == $total))) {
+                // no next page available ...
+                self::$parameter['next_page'] = 0;
+            }
+
             for ($i=0; $i < sizeof($contents); $i++) {
                 $contents[$i]['categories'] = $this->CategoryData->selectCategoriesByContentID($contents[$i]['content_id']);
                 $contents[$i]['tags'] = $this->TagData->selectTagArrayForContentID($contents[$i]['content_id']);
@@ -283,6 +312,9 @@ class ActionList extends Basic
 
         // show content date?
         self::$parameter['content_date'] = (isset(self::$parameter['content_date']) && ((self::$parameter['content_date'] == 0) || (strtolower(self::$parameter['content_date']) == 'false'))) ? false : $default_parameter['content_date'];
+
+        // use paging?
+        self::$parameter['paging'] = (isset(self::$parameter['paging']) && is_numeric(self::$parameter['paging'])) ? (int) self::$parameter['paging'] : $default_parameter['paging'];
 
         return $this->showList();
     }

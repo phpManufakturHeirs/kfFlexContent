@@ -10,7 +10,7 @@
 {% if parameter.load_css %}
   <script type="text/javascript">
     (function() {
-      {% if parameter.check_jquery %}
+      {% if parameter.check_jquery is defined and parameter.check_jquery %}
         if (!window.jQuery) {
           alert("{{'flexContent is missing jQuery - please add the parameter library[jquery/jquery/1.10.2/jquery.min.js] to the kitCommand at this page.'|trans }}");
         }
@@ -22,10 +22,8 @@
         }
       {% endif %}  
 
-      function getBasename(url) {
-        var fileName = url.substring(url.lastIndexOf('/') + 1);
-        var dot = fileName.lastIndexOf('.');
-        return dot === -1 ? fileName : fileName.substring(0, dot);
+      function getBasename(path) {
+        return path.replace( /.*\//, "" );
       }
       
       function cssAlreadyLoaded(css_url) {

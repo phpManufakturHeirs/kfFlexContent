@@ -168,6 +168,8 @@ return array(
 
     'Next article'
         => 'Nächster Artikel',
+    'Next page'
+        => 'Nächste Seite',
     'NL'
         => 'Niederländisch',
     'No active content available!'
@@ -202,6 +204,8 @@ return array(
         => 'Bitte geben Sie einen Titel für den RSS Kanal an!',
     'Previous article'
         => 'Vorheriger Artikel',
+    'Previous page'
+        => 'Vorherige Seite',
     'Primary category'
         => 'Kategorie',
     "Problem: '%first%' must be defined before '%second%', please check the configuration file!"

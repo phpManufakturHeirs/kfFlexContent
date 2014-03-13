@@ -267,8 +267,8 @@ class Update
             $this->Configuration->saveConfiguration();
         }
 
-        $check_key = array('view', 'category', 'tag', 'list', 'list_simple', 'faq');
-        foreach ($check_key as $key) {
+        $keys = array('view', 'category', 'tag', 'list', 'list_simple', 'faq');
+        foreach ($keys as $key) {
             if (!isset(self::$config['kitcommand']['parameter']['action'][$key]['check_jquery'])) {
                 self::$config['kitcommand']['parameter']['action'][$key]['check_jquery'] = true;
                 $this->Configuration->setConfiguration(self::$config);
@@ -276,6 +276,14 @@ class Update
             }
         }
 
+        $keys = array('list', 'list_simple');
+        foreach ($keys as $key) {
+            if (!isset(self::$config['kitcommand']['parameter']['action'][$key]['paging'])) {
+                self::$config['kitcommand']['parameter']['action'][$key]['paging'] = 0;
+                $this->Configuration->setConfiguration(self::$config);
+                $this->Configuration->saveConfiguration();
+            }
+        }
     }
 
     /**

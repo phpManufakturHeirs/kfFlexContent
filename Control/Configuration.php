@@ -377,6 +377,7 @@ class Configuration
                             'order_by' => 'publish_from',
                             'order_direction' => 'DESC',
                             'content_limit' => 100,
+                            'paging' => 0,
                             'content_exposed' => 2,
                             'content_status' => array(
                                 'BREAKING',
@@ -404,6 +405,7 @@ class Configuration
                             'order_by' => 'publish_from',
                             'order_direction' => 'DESC',
                             'content_limit' => 10,
+                            'paging' => 0,
                             'content_status' => array(
                                 'BREAKING',
                                 'PUBLISHED'

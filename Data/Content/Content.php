@@ -698,7 +698,8 @@ EOD;
      */
     public function selectContentList($language, $limit=100, $categories=array(),
         $categories_exclude=array(), $status=array('PUBLISHED','BREAKING','HIDDEN','ARCHIVED'),
-        $order_by='publish_from', $order_direction='DESC', $category_type='DEFAULT')
+        $order_by='publish_from', $order_direction='DESC', $category_type='DEFAULT',
+        $paging_from=0, $paging_limit=0)
     {
         $content_table = self::$table_name;
         $category_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
@@ -727,8 +728,14 @@ EOD;
         // and the rest - GROUP BY prevents duplicate entries!
         $order_table = (in_array($order_by, $this->getColumns())) ? $content_table : $category_table;
         $SQL .= "AND `status` IN $in_status GROUP BY `$content_table`.content_id ORDER BY ".
-            "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), `$order_table`.`$order_by` $order_direction ".
-            "LIMIT $limit";
+            "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), `$order_table`.`$order_by` $order_direction ";
+
+        if (($paging_from == 0) && ($paging_limit == 0)) {
+            $SQL .= "LIMIT $limit";
+        }
+        else {
+            $SQL .= "LIMIT $paging_from, $paging_limit";
+        }
         $results = $this->app['db']->fetchAll($SQL);
 
         $list = array();
@@ -897,6 +904,11 @@ EOD;
         }
     }
 
+    /**
+     * Update all STATUS information
+     *
+     * @throws \Exception
+     */
     public function autoUpdateStatus()
     {
         try {
@@ -905,7 +917,7 @@ EOD;
             $SQL = "UPDATE `".self::$table_name."` SET `status`='PUBLISHED' WHERE `status`='BREAKING' AND ".
                 "`breaking_to` < '$now'";
             $this->app['db']->query($SQL);
-            // second step: check if
+            // second step: check if articles should  be moved to ARCHIVED
             $SQL = "UPDATE `".self::$table_name."` SET `status`='ARCHIVED'  WHERE `status` IN ('PUBLISHED','BREAKING','HIDDEN') ".
                 "AND `archive_from` < '$now'";
             $this->app['db']->query($SQL);
