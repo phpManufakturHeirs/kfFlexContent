@@ -49,9 +49,18 @@ class Action extends Basic
         // check wether to use the flexcontent.css or not
         $parameter['load_css'] = (isset($parameter['load_css']) && (($parameter['load_css'] == 0) || (strtolower($parameter['load_css']) == 'false'))) ? false : $default_parameter['load_css'];
 
+        if (!isset($parameter['action'])) {
+            // there is no 'action' parameter set, so we show the "Welcome" page
+            $subRequest = Request::create('/basic/help/flexcontent/welcome', 'GET');
+            return $app->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+        }
+
         // check the CMS GET parameters
         $GET = $this->getCMSgetParameters();
-        if (isset($GET['command']) && (strtolower($GET['command']) == 'flexcontent')) {
+
+        if (isset($GET['command']) && (strtolower($GET['command']) == 'flexcontent') &&
+            isset($GET['action']) && ((strtolower($GET['action']) == $parameter['action']) ||
+            ((strtolower($GET['action']) == 'view') && (strtolower($parameter['action']) == 'category')))) {
             // the command and parameters are set as GET from the CMS
             foreach ($GET as $key => $value) {
                 if (strtolower($key) == 'command') continue;
@@ -62,11 +71,6 @@ class Action extends Basic
             $this->createParameterID($parameter);
         }
 
-        if (!isset($parameter['action'])) {
-            // there is no 'action' parameter set, so we show the "Welcome" page
-            $subRequest = Request::create('/basic/help/flexcontent/welcome', 'GET');
-            return $app->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
-        }
         $parameter['type'] = isset($parameter['type']) ? strtolower($parameter['type']) : 'default';
 
         // before executing any action check the records and update the status fields
