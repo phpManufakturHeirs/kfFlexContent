@@ -22,8 +22,8 @@
     "about":"\/flexcontent\/about"
   },
   "release":{
-    "number":"0.23",
-    "date":"2013-02-24",
+    "number":"0.24",
+    "date":"2013-03-13",
     "status":"beta"
   },
   "description":{
@@ -47,16 +47,16 @@
     "extension":{
         "phpmanufaktur":{
             "Basic":{
-                "release":"0.83"
+                "release":"0.84"
             },
             "Library":{
-                "release":"0.17"
+                "release":"0.20"
             },
             "CKEditor":{
                 "release":"0.23"
             },
             "CommandCollection":{
-                "release":"0.32"
+                "release":"0.33"
             },
             "MediaBrowser":{
                 "release":"0.27"

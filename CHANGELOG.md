@@ -6,6 +6,18 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.24** - 2014-03-13
+
+* fixed invalid check for the target URL
+* added missing import of TOPICS `description` and `keywords` fields
+* removed handling for former planned kitCommand iframe
+* introduce parameter `check_jquery` to enable skipping the jQuery check
+* improved check if needed kitCommands exists in the target URL
+* show also archived articles in the administrative overview
+* auto update the status from BREAKING to PUBLISHED and from PUBLISHED, BREAKING and HIDDEN to ARCHIVED
+* changed parameter handling to enable multiple kitCommands at one target page without conflicts
+* enable a paging mode for flexContent lists
+
 **0.23** - 2014-02-24
 
 * added missing button to remove images from content teaser, tag or category description
