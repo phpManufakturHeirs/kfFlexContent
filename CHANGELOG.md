@@ -6,6 +6,12 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.25** - 2014-03-24
+
+* add the paging also to the default LIST command
+* The templates now also prompt their names
+* added handling for protected CMS pages (private, registered)
+
 **0.24** - 2014-03-13
 
 * fixed invalid check for the target URL
