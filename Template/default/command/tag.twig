@@ -8,6 +8,7 @@
   @license MIT License (MIT) http://www.opensource.org/licenses/MIT
 #}
 {% spaceless %}
+<!-- {{ _self.getTemplateName() }} -->
 {% include '@phpManufaktur/flexContent/Template/default/command/command.header.twig' %}        
 <div id="flexcontent">
   <div class="container">    
@@ -38,6 +39,10 @@
           {% set target = content.redirect_target %}
         {% else %}
           {% set url = permalink_base_url ~ '/' ~ content.permalink %}
+          {% if basic.cms.page_visibility in ['private','registered'] %}
+             {# add the PID for protected pages to enable the permanent link class to authenticate the user #}            
+             {% set url = url ~ '?pid=' ~ basic.pid %}
+          {% endif %}
           {% set target = '_self' %}
         {% endif %}   
         {% if loop.index == 1 %}<div class="row">{% endif %}
