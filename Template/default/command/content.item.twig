@@ -1,3 +1,4 @@
+<!-- {{ _self.getTemplateName() }} -->
 <div class="media">
   {% if parameter.content_image and content.teaser_image|length > 0 %}
     {% set img = image(content.teaser_image, parameter.content_image_small_max_width, parameter.content_image_small_max_height) %}
