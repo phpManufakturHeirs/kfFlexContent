@@ -48,8 +48,8 @@
   {# is a paging enabled? #}
   {% if parameter.previous_page > 0  or parameter.next_page > 0 %}
     <ul class="nav nav-pills pull-right">
-      <li><a href="{{ basic.cms.page_url }}?command=flexcontent&action=list&page={{ parameter.previous_page }}" class="btn btn-default btn-sm"{% if parameter.previous_page < 1 %} disabled="disabled"{% endif %} role="button" title="{{ 'Previous page'|trans }}"><span class="glyphicon glyphicon-chevron-left"></span></a></li>
-      <li><a href="{{ basic.cms.page_url }}?command=flexcontent&action=list&page={{ parameter.next_page }}" class="btn btn-default btn-sm"{% if parameter.next_page < 1 %} disabled="disabled"{% endif %} role="button" title="{{ 'Next page'|trans }}"><span class="glyphicon glyphicon-chevron-right"></span></a></li>
+      <li><a href="{{ basic.cms.page_url }}?command=flexcontent&action={% if parameter.action == 'archive' %}archive{% else %}list{% endif %}&page={{ parameter.previous_page }}" class="btn btn-default btn-sm"{% if parameter.previous_page < 1 %} disabled="disabled"{% endif %} role="button" title="{{ 'Previous page'|trans }}"><span class="glyphicon glyphicon-chevron-left"></span></a></li>
+      <li><a href="{{ basic.cms.page_url }}?command=flexcontent&action={% if parameter.action == 'archive' %}archive{% else %}list{% endif %}&page={{ parameter.next_page }}" class="btn btn-default btn-sm"{% if parameter.next_page < 1 %} disabled="disabled"{% endif %} role="button" title="{{ 'Next page'|trans }}"><span class="glyphicon glyphicon-chevron-right"></span></a></li>
     </ul>
     <div class="clearfix"></div>
   {% endif %}

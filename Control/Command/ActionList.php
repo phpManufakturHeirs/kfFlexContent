@@ -105,9 +105,9 @@ class ActionList extends Basic
         if (is_array($contents)) {
             // count the available contents
             $total = $this->ContentData->count(self::$parameter['content_status']);
-
             if ((self::$parameter['paging'] > 0) && ((sizeof($contents) < self::$parameter['paging']) ||
-                (((self::$parameter['previous_page']+1) * self::$parameter['paging'])+self::$parameter['paging'] == $total))) {
+                (((self::$parameter['previous_page']+1) * self::$parameter['paging'])+self::$parameter['paging'] == $total)) ||
+                (self::$parameter['paging'] == $total)) {
                 // no next page available ...
                 self::$parameter['next_page'] = 0;
             }
