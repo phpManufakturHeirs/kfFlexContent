@@ -230,23 +230,29 @@ class ActionList extends Basic
             self::$parameter['categories_exclude'] = $default_parameter['categories_exclude'];
         }
 
-        // status for the contents specified?
-        if (isset(self::$parameter['content_status']) && !empty(self::$parameter['content_status'])) {
-            $status_string = strtoupper(self::$parameter['content_status']);
-            if (strpos($status_string, ',')) {
-                $explode = explode(',', $status_string);
-                $status = array();
-                foreach ($explode as $item) {
-                    $status[] = trim($item);
-                }
-                self::$parameter['content_status'] = $status;
-            }
-            else {
-                self::$parameter['content_status'] = array(trim(self::$parameter['content_status']));
-            }
+        if (self::$parameter['action'] == 'archive') {
+            // ARCHIVE MODE!
+            self::$parameter['content_status'] = array('ARCHIVED');
         }
         else {
-            self::$parameter['content_status'] = $default_parameter['content_status'];
+            // status for the contents specified?
+            if (isset(self::$parameter['content_status']) && !empty(self::$parameter['content_status'])) {
+                $status_string = strtoupper(self::$parameter['content_status']);
+                if (strpos($status_string, ',')) {
+                    $explode = explode(',', $status_string);
+                    $status = array();
+                    foreach ($explode as $item) {
+                        $status[] = trim($item);
+                    }
+                    self::$parameter['content_status'] = $status;
+                }
+                else {
+                    self::$parameter['content_status'] = array(trim(self::$parameter['content_status']));
+                }
+            }
+            else {
+                self::$parameter['content_status'] = $default_parameter['content_status'];
+            }
         }
 
         // order by

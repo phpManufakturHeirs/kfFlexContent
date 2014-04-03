@@ -87,6 +87,7 @@ class Action extends Basic
             case 'tag':
                 $Tag = new ActionTag();
                 return $Tag->ControllerTag($app);
+            case 'archive':
             case 'list':
                 $List = new ActionList();
                 return $List->ControllerList($app);
