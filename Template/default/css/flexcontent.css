@@ -8,15 +8,10 @@
   @license MIT License (MIT) http://www.opensource.org/licenses/MIT
 */
 
-#flexcontent .container {
-  margin: 0;
-  padding: 0;
-  height: auto;
-  width: auto;
+#flexcontent .container-fluid {
   color: #363636;
-  background-color: transparent;
+  background-color: rgba(255,255,255,0) !important;
 }
-
 #flexcontent .thumbnail {
   background-color: rgba(255,255,255,0.6) !important;
 }
