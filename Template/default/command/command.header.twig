@@ -29,11 +29,14 @@
       function cssAlreadyLoaded(css_url) {
         var styleSheets = document.styleSheets;
         var cssFile = getBasename(css_url);
-        for (var i = 0, max = styleSheets.length; i < max; i++) {
-          var sheetURL = styleSheets[i].href;
-          var basename = getBasename(sheetURL);
-          if ((sheetURL === css_url) || (basename === cssFile)) {
+        var max = styleSheets.length;
+        for (var i=0; i < max; i++) {
+          var sheetURL = styleSheets[i].href; 
+          if (sheetURL !== null) {
+            var basename = getBasename(sheetURL);
+            if ((sheetURL === css_url) || (basename === cssFile)) {
             return true;
+            }
           }
         }
         return false;
