@@ -101,6 +101,10 @@ class Tools
         preg_match_all('%(?!<a[^>]*?>)((\B##(\w{2,64}\b))|(\B#(\w{2,64}\b)))(?![^<]*?</a>)%i', $content, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
             if (isset($match[5])) {
+                if (preg_match('/([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})/i', $match[5]) == 1) {
+                    // ignore hexadecimal color codes ...
+                    continue;
+                }
               if (in_array($match[0], $ignore_hashtags)) {
                 // ignore this already processed hashtag!
                 continue;
