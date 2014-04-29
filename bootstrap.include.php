@@ -68,7 +68,7 @@ if (!in_array($roles, $roles_provided)) {
  */
 $app->get('/flexcontent/cms/{cms_information}', function ($cms_information) use ($app) {
     $administration = new EmbeddedAdministration($app);
-    return $administration->route('/flexcontent/editor/about', $cms_information, 'ROLE_FLEXCONTENT_EDITOR');
+    return $administration->route('/flexcontent/editor', $cms_information, 'ROLE_FLEXCONTENT_EDITOR');
 });
 
 /**
@@ -108,7 +108,7 @@ $app->get('/admin/flexcontent/uninstall',
  */
 
 $app->get('/flexcontent/editor',
-    'phpManufaktur\flexContent\Control\Admin\About::Controller');
+    'phpManufaktur\flexContent\Control\Admin\Admin::ControllerSelectDefaultTab');
 $app->get('/flexcontent/editor/about',
     'phpManufaktur\flexContent\Control\Admin\About::Controller');
 

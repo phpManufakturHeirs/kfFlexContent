@@ -287,6 +287,29 @@ class Update
     }
 
     /**
+     * Release 0.26
+     */
+    protected function release_026()
+    {
+        if (!isset(self::$config['nav_tabs'])) {
+            self::$config['nav_tabs'] = array(
+                'order' => array(
+                    'list',
+                    'edit',
+                    'tags',
+                    'categories',
+                    'rss',
+                    'import',
+                    'about'
+                ),
+                'default' => 'about'
+            );
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+    }
+
+    /**
      * Execute the update for flexContent
      *
      * @param Application $app
@@ -307,22 +330,15 @@ class Update
         $this->Configuration = new Configuration($app);
         self::$config = $this->Configuration->getConfiguration();
 
-        // Release 0.17
         $this->release_017();
-        // Release 0.18
         $this->release_018();
-        // Release 0.19
         $this->release_019();
-        // Release 0.20
         $this->release_020();
-        // Release 0.21
         $this->release_021();
-        // Release 0.22
         $this->release_022();
-        // Release 0.23
         $this->release_023();
-        // Release 0.24
         $this->release_024();
+        $this->release_026();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

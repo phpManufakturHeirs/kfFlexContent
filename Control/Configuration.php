@@ -90,6 +90,18 @@ class Configuration
         $default_language = $cmsSettings->getSetting('default_language');
 
         return array(
+            'nav_tabs' => array(
+                'order' => array(
+                    'list',
+                    'edit',
+                    'tags',
+                    'categories',
+                    'rss',
+                    'import',
+                    'about'
+                ),
+                'default' => 'about'
+            ),
             'content' => array(
                 'field' => array(
                     'title' => array(
