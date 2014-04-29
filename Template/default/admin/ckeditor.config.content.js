@@ -32,13 +32,13 @@ CKEDITOR.editorConfig = function( config ) {
           { name: 'editing', groups: [ 'find', 'selection' ] },
           { name: 'links', items: [ 'Link', 'hashtaglink', 'flexcontentlink', 'cmspagelink', 'Unlink', 'Anchor'] },
           { name: 'insert', items: [ 'Image', 'Table', 'SpecialChar' ] },
+           { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source' ] },
           { name: 'tools', items: [ 'Maximize' ] },
           { name: 'others', items: [ '-' ] },
           '/',
           { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ], items: [ 'Bold', 'Italic', 'Underline', '-', 'RemoveFormat' ] },
-          { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote' ] },
-          { name: 'styles', items: [ 'Styles', 'Format' ] },
-          { name: 'document', groups: [ 'mode', 'document', 'doctools' ], items: [ 'Source' ] }
+          { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align' ], items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock' ] },
+          { name: 'styles', items: [ 'Styles', 'Format' ] }
       ];
 
 
