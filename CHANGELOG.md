@@ -6,6 +6,17 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.26** - 2014-05-02
+
+* added action[archive]
+* fixed a problem of paging logic in list and archive mode
+* generally changed class `container` to `container-fluid`
+* fixed a problem in jQuery for checking if CSS is already loaded
+* all language files are now loaded by the BASIC extension
+* Introduce configurable nav tab order and default nav tab
+* added missing CKE Toolbuttons JustifyLeft, JustifyCenter, JustifyRight and JustifyBlock
+* Avoid hashtag filter to replace hexadecimal color codes
+
 **0.25** - 2014-03-24
 
 * add the paging also to the default LIST command
