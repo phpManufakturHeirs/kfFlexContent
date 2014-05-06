@@ -59,8 +59,10 @@ class Action extends Basic
         $GET = $this->getCMSgetParameters();
 
         if (isset($GET['command']) && (strtolower($GET['command']) == 'flexcontent') &&
-            isset($GET['action']) && ((strtolower($GET['action']) == $parameter['action']) ||
-            ((strtolower($GET['action']) == 'view') && (strtolower($parameter['action']) == 'category')))) {
+            isset($GET['action'])) {
+              // @bugfix: the old check was too strong !!!
+              //&& ((strtolower($GET['action']) == $parameter['action']) ||
+              //((strtolower($GET['action']) == 'view') && (strtolower($parameter['action']) == 'category')))) {
             // the command and parameters are set as GET from the CMS
             foreach ($GET as $key => $value) {
                 if (strtolower($key) == 'command') continue;
