@@ -6,6 +6,10 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.27** - 2014-05-07
+
+* the GET command check for permanent links was too strong and does not recognize i.e. TAG Redirects
+
 **0.26** - 2014-05-02
 
 * added action[archive]

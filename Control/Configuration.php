@@ -29,7 +29,7 @@ class Configuration
     public function __construct(Application $app)
     {
         $this->app = $app;
-        self::$config_path = MANUFAKTUR_PATH.'/flexContent/config.flexcontent.json';
+        self::$config_path = MANUFAKTUR_PATH.'/flexContent/config.flexContent.json';
         $this->readConfiguration();
     }
 
