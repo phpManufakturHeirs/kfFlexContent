@@ -397,7 +397,7 @@ class ContentEdit extends Admin
                         else {
                             if (($property['separator'] == 'comma') && strpos($content[$name], ',')) {
                                 // proper separate the keywords
-                                $explode = explode(',', $content[$name]);
+                                $explode = explode(',', utf8_decode($content[$name]));
                                 $keywords = array();
                                 foreach ($explode as $item) {
                                     $keyword = strtolower(trim($item));
@@ -405,12 +405,13 @@ class ContentEdit extends Admin
                                         $keywords[] = $keyword;
                                     }
                                 }
-                                $data[$name] = implode(', ', $keywords);
+                                $data[$name] = utf8_encode(implode(', ', $keywords));
                             }
                             else {
                                 $data[$name] = !is_null($content[$name]) ? $content[$name] : '';
                             }
                         }
+
                         break;
                     case 'permalink':
                         if (!$property['required']) {
