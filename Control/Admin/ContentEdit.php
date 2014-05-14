@@ -375,7 +375,7 @@ class ContentEdit extends Admin
                                 $checked = false;
                             }
                             else {
-                                $explode = explode($separator, $content[$name]);
+                                $explode = explode($separator, utf8_decode($content[$name]));
                                 $keywords = array();
                                 foreach ($explode as $item) {
                                     $keyword = strtolower(trim($item));
@@ -391,7 +391,7 @@ class ContentEdit extends Admin
                                         self::ALERT_TYPE_WARNING);
                                     $checked = false;
                                 }
-                                $data[$name] = implode(($separator == 'comma') ? ', ' : ' ', $keywords);
+                                $data[$name] = utf8_encode(implode(($separator == 'comma') ? ', ' : ' ', $keywords));
                             }
                         }
                         else {
