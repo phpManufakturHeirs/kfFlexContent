@@ -115,7 +115,7 @@ class Tools
                       // replace #tag with a link
                       $search = array('{link}','{description}','{tag}');
                       $replace = array(
-                          $this->getPermalinkBaseURL($language).'/tag/'.$tag['tag_permalink'],
+                          $this->getPermalinkBaseURL($language).'/buzzword/'.$tag['tag_permalink'],
                           (!empty($tag['tag_description'])) ? $this->app['utils']->Ellipsis($tag['tag_description'], $ellipsis) : $tag['tag_name'],
                           ($remove_sharp) ? $tag['tag_name'] : '#'.$tag['tag_name']
                       );

@@ -111,7 +111,7 @@
                   <div class="content-tags">
                     {% for tag in faq.tags %}
                       <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
-                        <a href="{{ permalink_base_url ~ '/tag/' ~ tag.tag_permalink }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
+                        <a href="{{ permalink_base_url ~ '/buzzword/' ~ tag.tag_permalink }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
                       </span>
                     {% endfor %}
                   </div>  

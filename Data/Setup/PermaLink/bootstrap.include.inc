@@ -20,7 +20,7 @@ $app->get('%subdirectory%%permalink%/category/{name}',
     ->value('language', '%default_language%');
 
 // permalink route to a tag
-$app->get('%subdirectory%%permalink%/tag/{name}',
+$app->get('%subdirectory%%permalink%/buzzword/{name}',
     'phpManufaktur\flexContent\Control\PermanentLink::ControllerTagName')
     ->value('language', '%default_language%');
 

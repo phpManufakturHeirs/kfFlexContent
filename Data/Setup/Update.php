@@ -19,6 +19,7 @@ use phpManufaktur\flexContent\Data\Content\RSSChannelStatistic;
 use phpManufaktur\flexContent\Data\Content\RSSViewCounter;
 use phpManufaktur\flexContent\Data\Content\RSSViewStatistic;
 use phpManufaktur\flexContent\Data\Content\Event;
+use Symfony\Component\Finder\Finder;
 
 class Update
 {
@@ -310,6 +311,34 @@ class Update
     }
 
     /**
+     * Release 0.29
+     */
+    protected function release_029()
+    {
+        $twig_files = new Finder();
+        $twig_files->files()->name('*.twig')->in(MANUFAKTUR_PATH.'/flexContent/Template')->exclude(array('default', 'backup'));
+        foreach ($twig_files as $twig_file) {
+            if ($twig_file->isReadable()) {
+                $origin = $twig_file->getRealpath();
+                if (false !== ($content = file_get_contents($origin))) {
+                    if (strpos($content, '/tag/')) {
+                        $backup_path = MANUFAKTUR_PATH.'/flexContent/Template/'.$twig_file->getRelativePath().'/backup';
+                        if (!$this->app['filesystem']->exists($backup_path)) {
+                            $this->app['filesystem']->mkdir($backup_path);
+                        }
+                        if (false !== (file_put_contents($backup_path.'/'.$twig_file->getBasename(), $content))) {
+                            // continue only if a backup was saved
+                            $content = str_replace('/tag/', '/buzzword/', $content);
+                            file_put_contents($origin, $content);
+                            $this->app['monolog']->addDebug('Created Backup and updated Twig file: '.$twig_file->getBasename());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Execute the update for flexContent
      *
      * @param Application $app
@@ -339,6 +368,7 @@ class Update
         $this->release_023();
         $this->release_024();
         $this->release_026();
+        $this->release_029();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

@@ -77,7 +77,7 @@ class Admin extends Alert
                         'name' => 'tags',
                         'text' => 'Hashtags',
                         'hint' => 'Create or edit hashtags',
-                        'link' => FRAMEWORK_URL.'/flexcontent/editor/tag/list'.self::$usage_param,
+                        'link' => FRAMEWORK_URL.'/flexcontent/editor/buzzword/list'.self::$usage_param,
                         'active' => ($active == 'tags')
                     );
                     break;
@@ -158,7 +158,7 @@ class Admin extends Alert
                 $route = '/flexcontent/editor/category/list';
                 break;
             case 'tags':
-                $route = '/flexcontent/editor/tag/list';
+                $route = '/flexcontent/editor/buzzword/list';
                 break;
             case 'edit':
                 $route = '/flexcontent/editor/edit';

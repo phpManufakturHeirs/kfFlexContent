@@ -144,25 +144,25 @@ $app->match('/flexcontent/editor/list/search',
     'phpManufaktur\flexContent\Control\Admin\ContentList::ControllerListSearch');
 
 // #hashtag functions
-$app->get('/flexcontent/editor/tag/autocomplete',
+$app->get('/flexcontent/editor/buzzword/autocomplete',
     'phpManufaktur\flexContent\Control\Admin\TagResponse::ControllerAutocomplete');
-$app->get('/flexcontent/editor/tag/list',
+$app->get('/flexcontent/editor/buzzword/list',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerList');
-$app->get('/flexcontent/editor/tag/list/page/{page}',
+$app->get('/flexcontent/editor/buzzword/list/page/{page}',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerList');
-$app->get('/flexcontent/editor/tag/create',
+$app->get('/flexcontent/editor/buzzword/create',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerEdit');
-$app->post('/flexcontent/editor/tag/language/check',
+$app->post('/flexcontent/editor/buzzword/language/check',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerLanguageCheck');
-$app->get('/flexcontent/editor/tag/edit/id/{tag_id}',
+$app->get('/flexcontent/editor/buzzword/edit/id/{tag_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerEdit');
-$app->post('/flexcontent/editor/tag/edit/check',
+$app->post('/flexcontent/editor/buzzword/edit/check',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerEditCheck');
-$app->post('/flexcontent/editor/tag/image/select',
+$app->post('/flexcontent/editor/buzzword/image/select',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerImage');
-$app->get('/flexcontent/editor/tag/image/check/id/{tag_id}',
+$app->get('/flexcontent/editor/buzzword/image/check/id/{tag_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerImageCheck');
-$app->post('/flexcontent/editor/tag/image/remove/id/{tag_id}',
+$app->post('/flexcontent/editor/buzzword/image/remove/id/{tag_id}',
     'phpManufaktur\flexContent\Control\Admin\ContentTag::ControllerImageRemove');
 
 // category functions

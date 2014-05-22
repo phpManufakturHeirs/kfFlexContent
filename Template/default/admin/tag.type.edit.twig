@@ -81,7 +81,7 @@
           </div>
           <div class="form-group">
             <label>&nbsp;</label>
-            <input class="form-control btn btn-default" type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/tag/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
+            <input class="form-control btn btn-default" type="button" name="save_content" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/buzzword/edit/check?usage={{ usage }}');" value="{{ 'Save'|trans }}" />
           </div>
 
         </div>
@@ -91,9 +91,9 @@
             <img class="img-rounded img-responsive" src="{{ FRAMEWORK_URL ~ form.tag_image.vars.value }}" />
           {% endif %}
           <div class="height-15"></div>
-          <input class="form-control btn btn-default" type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/tag/image/select?usage={{ usage }}');" value="{{ 'Select tag type image'|trans }}" />
+          <input class="form-control btn btn-default" type="button" name="image" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/buzzword/image/select?usage={{ usage }}');" value="{{ 'Select tag type image'|trans }}" />
           {% if form.tag_image.vars.value|length > 0 %}
-            &nbsp;<a class="form-control btn btn-default" href="#" name="image_remove" role="button" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/tag/image/remove/id/{{ form.tag_id.vars.value }}?usage={{ usage }}');" title="{{ 'Remove image'|trans }}"><i class="fa fa-trash-o"></i></a>
+            &nbsp;<a class="form-control btn btn-default" href="#" name="image_remove" role="button" onclick="submitForm('{{ FRAMEWORK_URL }}/flexcontent/editor/buzzword/image/remove/id/{{ form.tag_id.vars.value }}?usage={{ usage }}');" title="{{ 'Remove image'|trans }}"><i class="fa fa-trash-o"></i></a>
           {% endif %}
         </div>
       </div>

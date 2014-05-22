@@ -214,7 +214,7 @@ class cmsSearch
                             'success' => true,
                             'page' => array(
                                 'title' => $title,
-                                'url' => $permanent_link_base_url.'/tag/'.$tag['tag_permalink']
+                                'url' => $permanent_link_base_url.'/buzzword/'.$tag['tag_permalink']
                             ),
                             'image_link' => $image_link
                         );

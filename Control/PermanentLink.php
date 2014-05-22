@@ -642,7 +642,8 @@ class PermanentLink
             'category_id' => self::$category_id,
             'content_id' => self::$content_id,
             'tag_id' => self::$tag_id,
-            'language' => strtolower(self::$language)
+            'language' => strtolower(self::$language),
+            'robots' => 'noindex,follow'
         );
 
         if (null !== ($highlight = $this->app['request']->query->get('highlight'))) {
@@ -821,11 +822,11 @@ class PermanentLink
 
         if (false === (self::$tag_id = $this->TagTypeData->selectTagIDbyPermaLink($name, self::$language))) {
             // this permalink does not exists
-            $this->app['monolog']->addError('The permalink /tag/'.$name.' does not exists!', array(__METHOD__, __LINE__));
+            $this->app['monolog']->addError('The permalink /buzzword/'.$name.' does not exists!', array(__METHOD__, __LINE__));
             return $this->app['twig']->render($this->app['utils']->getTemplateFile(
                 '@phpManufaktur/Basic/Template', 'kitcommand/bootstrap/noframe/alert.twig'),
                 array(
-                    'content' => $this->app['translator']->trans('The permalink <b>/tag/%permalink%</b> does not exists!',
+                    'content' => $this->app['translator']->trans('The permalink <b>/buzzword/%permalink%</b> does not exists!',
                         array('%permalink%' => $name)),
                     'type' => 'alert-danger'
                 ));

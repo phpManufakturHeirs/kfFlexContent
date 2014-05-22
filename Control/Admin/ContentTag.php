@@ -61,9 +61,9 @@ class ContentTag extends Admin
         }
         self::$current_page = 1;
         self::$route =  array(
-            'pagination' => '/flexcontent/editor/tag/list/page/{page}?order={order}&direction={direction}&usage='.self::$usage,
-            'edit' => '/flexcontent/editor/tag/edit/id/{tag_id}?usage='.self::$usage,
-            'create' => '/flexcontent/editor/tag/create?usage='.self::$usage,
+            'pagination' => '/flexcontent/editor/buzzword/list/page/{page}?order={order}&direction={direction}&usage='.self::$usage,
+            'edit' => '/flexcontent/editor/buzzword/edit/id/{tag_id}?usage='.self::$usage,
+            'create' => '/flexcontent/editor/buzzword/create?usage='.self::$usage,
             'edit_content' => '/flexcontent/editor/edit/id/{content_id}?usage='.self::$usage
         );
 
@@ -130,7 +130,7 @@ class ContentTag extends Admin
 
         // show the permalink URL
         $language = (isset($data['language'])) ? $data['language'] : self::$language;
-        $permalink_url = CMS_URL.str_ireplace('{language}', strtolower($language), self::$config['content']['permalink']['directory']).'/tag/';
+        $permalink_url = CMS_URL.str_ireplace('{language}', strtolower($language), self::$config['content']['permalink']['directory']).'/buzzword/';
 
         $form = $this->app['form.factory']->createBuilder('form')
         ->add('tag_id', 'hidden', array(
@@ -322,7 +322,7 @@ class ContentTag extends Admin
                 'alert' => $this->getAlert(),
                 'form' => $form->createView(),
                 'config' => self::$config,
-                'action' => '/flexcontent/editor/tag/language/check'
+                'action' => '/flexcontent/editor/buzzword/language/check'
             ));
     }
 
@@ -427,7 +427,7 @@ class ContentTag extends Admin
         $subRequest = Request::create('/admin/mediabrowser', 'GET', array(
             'usage' => self::$usage,
             'start' => self::$config['content']['images']['directory']['start'],
-            'redirect' => '/flexcontent/editor/tag/image/check/id/'.self::$tag_id,
+            'redirect' => '/flexcontent/editor/buzzword/image/check/id/'.self::$tag_id,
             'mode' => 'public',
             'directory' => self::$config['content']['images']['directory']['select']
         ));
