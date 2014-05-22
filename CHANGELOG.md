@@ -6,6 +6,10 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.29** - 2014-05-15
+
+* changed for SEO reasons the permalink subdirectoty for Hashtags from `/tag/` to `/buzzword/`
+
 **0.28** - 2014-05-15
 
 * fixed a strong typo in `Configuration.php`
