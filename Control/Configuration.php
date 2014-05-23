@@ -293,6 +293,20 @@ class Configuration
                 )
             ),
             'kitcommand' => array(
+                'permalink' => array(
+                    'category' => array(
+                        'robots' => 'index,follow'
+                    ),
+                    'content' => array(
+                        'robots' => 'index,follow',
+                    ),
+                    'faq' => array(
+                        'robots' => 'index,follow'
+                    ),
+                    'tag' => array(
+                        'robots' => 'noindex,follow'
+                    )
+                ),
                 'parameter' => array(
                     'action' => array(
                         'view' => array(

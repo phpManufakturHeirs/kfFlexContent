@@ -317,7 +317,8 @@ class PermanentLink
             'action' => 'view',
             'content_id' => self::$content_id,
             'set_header' => self::$content_id,
-            'language' => strtolower(self::$language)
+            'language' => strtolower(self::$language),
+            'robots' => self::$config['kitcommand']['permalink']['content']['robots']
         );
 
         if (self::$config['search']['result']['highlight'] &&
@@ -422,7 +423,8 @@ class PermanentLink
             'action' => 'category',
             'category_id' => self::$category_id,
             'content_id' => self::$content_id,
-            'language' => strtolower(self::$language)
+            'language' => strtolower(self::$language),
+            'robots' => self::$config['kitcommand']['permalink']['category']['robots']
         );
 
         if (self::$config['search']['result']['highlight'] &&
@@ -518,7 +520,8 @@ class PermanentLink
             'command' => 'flexcontent',
             'action' => 'faq',
             'category_id' => self::$category_id,
-            'language' => strtolower(self::$language)
+            'language' => strtolower(self::$language),
+            'robots' => self::$config['kitcommand']['permalink']['faq']['robots']
         );
 
         if (self::$config['search']['result']['highlight'] &&
@@ -643,7 +646,7 @@ class PermanentLink
             'content_id' => self::$content_id,
             'tag_id' => self::$tag_id,
             'language' => strtolower(self::$language),
-            'robots' => 'noindex,follow'
+            'robots' => self::$config['kitcommand']['permalink']['tag']['robots']
         );
 
         if (null !== ($highlight = $this->app['request']->query->get('highlight'))) {

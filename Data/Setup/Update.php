@@ -339,6 +339,31 @@ class Update
     }
 
     /**
+     * Release 0.30
+     */
+    protected function release_030()
+    {
+        if (!isset(self::$config['kitcommand']['permalink'])) {
+            self::$config['kitcommand']['permalink'] = array(
+                'category' => array(
+                    'robots' => 'index,follow'
+                ),
+                'content' => array(
+                    'robots' => 'index,follow',
+                ),
+                'faq' => array(
+                    'robots' => 'index,follow'
+                ),
+                'tag' => array(
+                    'robots' => 'noindex,follow'
+                )
+            );
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+    }
+
+    /**
      * Execute the update for flexContent
      *
      * @param Application $app
@@ -369,6 +394,7 @@ class Update
         $this->release_024();
         $this->release_026();
         $this->release_029();
+        $this->release_030();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));
