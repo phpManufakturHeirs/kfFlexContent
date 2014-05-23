@@ -6,6 +6,10 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.30** - 2014-05-23
+
+* completed settings for robots (SEO configuration for category, content, buzzword and faq)
+
 **0.29** - 2014-05-15
 
 * changed for SEO reasons the permalink subdirectoty for Hashtags from `/tag/` to `/buzzword/`
