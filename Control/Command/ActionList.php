@@ -165,7 +165,8 @@ class ActionList extends Basic
 
         // check the CMS GET parameters
         $GET = $this->getCMSgetParameters();
-        if (isset($GET['command']) && ($GET['command'] == 'flexcontent')) {
+        if (isset($GET['command']) && ($GET['command'] == 'flexcontent')
+            && isset($GET['action']) && ($GET['action'] == 'list')) {
             // the command and parameters are set as GET from the CMS
             foreach ($GET as $key => $value) {
                 if ($key == 'command') {
