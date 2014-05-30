@@ -244,7 +244,7 @@ EOD;
     }
 
     /**
-     * Select the target URL for the given flexContent ID
+     * Select the target URL for the given flexContent ID by the primary assigned category
      *
      * @param integer $content_id
      * @throws \Exception
@@ -255,7 +255,8 @@ EOD;
         try {
             $category_table = self::$table_name;
             $type_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category_type';
-            $SQL = "SELECT `target_url` FROM $category_table, $type_table WHERE $category_table.category_id=$type_table.category_id AND `content_id`='$content_id'";
+            $SQL = "SELECT `target_url` FROM $category_table, $type_table WHERE $category_table.category_id=$type_table.category_id ".
+                "AND $category_table.is_primary=1 AND `content_id`=$content_id";
             $target_url = $this->app['db']->fetchColumn($SQL);
             return (!empty($target_url)) ? $target_url : false;
         } catch (\Doctrine\DBAL\DBALException $e) {
