@@ -12,6 +12,7 @@
 namespace phpManufaktur\flexContent\Data\Content;
 
 use Silex\Application;
+use phpManufaktur\Contact\Control\Contact;
 
 class Content
 {
@@ -185,7 +186,8 @@ EOD;
                             }
                             elseif (in_array($event_key, array('event_organizer', 'event_location'))) {
                                 $content[$event_key]['contact_id'] = $event_value;
-                                if (($event_value > 0) && (false !== ($contact = $this->app['contact']->selectOverview($event_value)))) {
+                                $ContactData = new Contact($this->app);
+                                if (($event_value > 0) && (false !== ($contact = $ContactData->selectOverview($event_value)))) {
                                     // add the contact overview
                                     $content[$event_key] = $contact;
                                 }
