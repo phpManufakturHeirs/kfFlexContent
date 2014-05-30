@@ -60,10 +60,8 @@ class Action extends Basic
 
         if (isset($GET['command']) && (strtolower($GET['command']) == 'flexcontent') &&
             isset($GET['action']) && (($GET['action'] == $parameter['action']) ||
-            (($GET['action'] == 'view') && ($parameter['action'] == 'category')))) {
-              // @bugfix: the old check was too strong !!!
-              //&& ((strtolower($GET['action']) == $parameter['action']) ||
-              //((strtolower($GET['action']) == 'view') && (strtolower($parameter['action']) == 'category')))) {
+            (($GET['action'] == 'view') && ($parameter['action'] == 'category')) ||
+            (($GET['action'] == 'tag') && ($parameter['action'] == 'category')))) {
             // the command and parameters are set as GET from the CMS
             foreach ($GET as $key => $value) {
                 if (strtolower($key) == 'command') continue;
