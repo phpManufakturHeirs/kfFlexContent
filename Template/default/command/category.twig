@@ -25,7 +25,13 @@
           {% if parameter.category_name %}
             <h{{ parameter.title_level|default('1') }} class="media-heading">{{ category.category_name|default('') }}</h{{ parameter.title_level|default('1') }}>
           {% endif %}
-          {{ category.category_description|default('') }}
+          {% if config.kitcommand.content.kitcommand.enabled %}  
+            {# enable kitCommands in config.flexcontent.json if you want to execute 
+               kitCommands within the flexContent categories ... #}
+            {{ kitCommandParser(category.category_description|default('')) }}
+          {% else %}
+            {{ category.category_description|default('') }}
+          {% endif %} 
         </div>
       </div>
     {% elseif parameter.category_name %}
