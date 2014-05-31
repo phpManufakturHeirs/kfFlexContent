@@ -25,6 +25,7 @@ use phpManufaktur\flexContent\Data\Content\RSSViewCounter;
 use Symfony\Component\HttpFoundation\Response;
 use phpManufaktur\Basic\Data\kitCommandParameter;
 use phpManufaktur\Basic\Data\CMS\Users;
+use phpManufaktur\flexContent\Control\Command\Tools;
 
 class PermanentLink
 {
@@ -38,6 +39,7 @@ class PermanentLink
     protected $RSSChannelData = null;
     protected $RSSChannelCounter = null;
     protected $app = null;
+    protected $Tools = null;
 
     protected static $content_id = null;
     protected static $language = null;
@@ -70,6 +72,7 @@ class PermanentLink
         $this->RSSChannelControl = new RSSChannelControl($app);
         $this->RSSChannelData = new RSSChannelData($app);
         $this->RSSChannelCounter = new RSSChannelCounter($app);
+        $this->Tools = new Tools($app);
     }
 
     /**
@@ -318,7 +321,8 @@ class PermanentLink
             'content_id' => self::$content_id,
             'set_header' => self::$content_id,
             'language' => strtolower(self::$language),
-            'robots' => self::$config['kitcommand']['permalink']['content']['robots']
+            'robots' => self::$config['kitcommand']['permalink']['content']['robots'],
+            'canonical' => $this->Tools->getPermalinkBaseURL(self::$language).'/'.$content['permalink']
         );
 
         if (self::$config['search']['result']['highlight'] &&
@@ -424,7 +428,8 @@ class PermanentLink
             'category_id' => self::$category_id,
             'content_id' => self::$content_id,
             'language' => strtolower(self::$language),
-            'robots' => self::$config['kitcommand']['permalink']['category']['robots']
+            'robots' => self::$config['kitcommand']['permalink']['category']['robots'],
+            'canonical' => $this->Tools->getPermalinkBaseURL(self::$language).'/category/'.$category['category_permalink']
         );
 
         if (self::$config['search']['result']['highlight'] &&
@@ -521,7 +526,8 @@ class PermanentLink
             'action' => 'faq',
             'category_id' => self::$category_id,
             'language' => strtolower(self::$language),
-            'robots' => self::$config['kitcommand']['permalink']['faq']['robots']
+            'robots' => self::$config['kitcommand']['permalink']['faq']['robots'],
+            'canonical' => $this->Tools->getPermalinkBaseURL(self::$language).'/faq/'.$category['category_permalink']
         );
 
         if (self::$config['search']['result']['highlight'] &&
@@ -646,7 +652,8 @@ class PermanentLink
             'content_id' => self::$content_id,
             'tag_id' => self::$tag_id,
             'language' => strtolower(self::$language),
-            'robots' => self::$config['kitcommand']['permalink']['tag']['robots']
+            'robots' => self::$config['kitcommand']['permalink']['tag']['robots'],
+            'canonical' => $this->Tools->getPermalinkBaseURL(self::$language).'/buzzword/'.$tag['tag_permalink']
         );
 
         if (null !== ($highlight = $this->app['request']->query->get('highlight'))) {
