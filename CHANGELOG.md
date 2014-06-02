@@ -6,6 +6,15 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.31** - 2014-06-02
+
+* Again the handling of GET parameters for the permanent links: check is now more precise and strong again!
+* Selecting the URL by content_id does not return the primary target for the category, fixed!
+* A bit unclear: seems that $app['contact'] is not initialized in some situations, so we init `Contact` directly
+* extended CKEditor layout for the category editing
+* added canonical link to each permanent link (SEO)
+* load schema.org for each event also in categories and lists (SEO)
+
 **0.30** - 2014-05-23
 
 * completed settings for robots (SEO configuration for category, content, buzzword and faq)
