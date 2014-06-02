@@ -37,6 +37,7 @@
           {% else %}
             {{ date_from }}
           {% endif %}
+          {% include '@phpManufaktur/flexContent/Template/default/command/content.schema.org.twig' %}
         </div>
       {% endif %}
       {% if parameter.content_description and content.description|length > 0 %}
