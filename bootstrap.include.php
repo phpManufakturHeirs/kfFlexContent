@@ -11,14 +11,18 @@
 
 use phpManufaktur\Basic\Control\CMS\EmbeddedAdministration;
 
-// not really needed but make error control more easy ...
-//global $app;
-
 // grant the ROLE hierarchy for the flexContent ROLES
 $roles = $app['security.role_hierarchy'];
 if (!in_array('ROLE_FLEXCONTENT_ADMIN', $roles)) {
     $roles['ROLE_ADMIN'][] = 'ROLE_FLEXCONTENT_ADMIN';
     $roles['ROLE_FLEXCONTENT_ADMIN'][] = 'ROLE_FLEXCONTENT_EDITOR';
+    $roles['ROLE_FLEXCONTENT_ADMIN'][] = 'ROLE_MEDIABROWSER_ADMIN';
+    $app['security.role_hierarchy'] = $roles;
+}
+$roles = $app['security.role_hierarchy'];
+if (!in_array('ROLE_FLEXCONTENT_EDITOR', $roles)) {
+    $roles[] = array('ROLE_FLEXCONTENT_EDITOR');
+    $roles['ROLE_FLEXCONTENT_EDITOR'][] = 'ROLE_MEDIABROWSER_USER';
     $app['security.role_hierarchy'] = $roles;
 }
 
