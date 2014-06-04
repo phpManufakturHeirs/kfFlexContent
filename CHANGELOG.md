@@ -6,6 +6,10 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.32** - 2014-06-04
+
+* changed roles and authentication check for the `/media` directory
+
 **0.31** - 2014-06-02
 
 * Again the handling of GET parameters for the permanent links: check is now more precise and strong again!
