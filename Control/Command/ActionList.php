@@ -28,6 +28,7 @@ class ActionList extends Basic
     protected $CategoryData = null;
     protected $TagData = null;
     protected $Tools = null;
+    protected $Remote = null;
 
     protected static $view_array = array('content', 'teaser','none');
 
@@ -48,6 +49,7 @@ class ActionList extends Basic
         $this->CategoryData = new Category($app);
         $this->TagData = new Tag($app);
         $this->Tools = new Tools($app);
+        $this->Remote = new getRemote($app);
     }
 
     /**
@@ -100,6 +102,11 @@ class ActionList extends Basic
             self::$parameter['categories'], self::$parameter['categories_exclude'], self::$parameter['content_status'],
             self::$parameter['order_by'], self::$parameter['order_direction'], $type, $paging_from, self::$parameter['paging']))) {
             $this->setAlert('This list does not contain any contents!');
+        }
+
+        if (isset(self::$parameter['remote']) && (false !== ($remote_contents = $this->Remote->getContent(
+            self::$parameter, self::$config, self::$language)))) {
+            // merge the contents
         }
 
         if (is_array($contents)) {

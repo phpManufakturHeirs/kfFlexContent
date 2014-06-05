@@ -35,7 +35,7 @@
 {% endblock stylesheet %}
 
 {% block content %}
-  <div class="container-fluid">
+  <div class="container{% if usage != 'framework'%}-fluid{% endif %}">
     {% include '@phpManufaktur/flexContent/Template/default/admin/toolbar.twig' %}
     <div id="edit"></div>
     <div class="height-15"></div>

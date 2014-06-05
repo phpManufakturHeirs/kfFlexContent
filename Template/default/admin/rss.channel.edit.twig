@@ -29,7 +29,7 @@
 {% endblock jquery %}
 
 {% block content %}
-  <div class="container-fluid">
+  <div class="container{% if usage != 'framework'%}-fluid{% endif %}">
     {% include '@phpManufaktur/flexContent/Template/default/admin/toolbar.twig' %}
     <div class="height-15"></div>
 
