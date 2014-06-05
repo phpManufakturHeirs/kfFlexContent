@@ -21,14 +21,14 @@
       <meta name="viewport" content="{% block viewport %}width=device-width, initial-scale=1.0{% endblock viewport %}">
       {% block stylesheet %}
         {# Bootstrap #}
-        <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/bootstrap/3.1.0/css/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/bootstrap/latest/css/bootstrap.min.css" />
         {% if usage != 'WebsiteBaker' %}
           <style type="text/css">
             {# the bootstrap container should use all available space #}
             .container {width: 100%;}
           </style>
         {% endif %}
-        <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/font-awesome/4.0.3/css/font-awesome.min.css" />
+        <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL }}/font-awesome/latest/css/font-awesome.min.css" />
       {% endblock stylesheet %}
       {% block jquery %}
         {# if possible load jQuery files in block footer_jquery above the </body> tag to improve page loading speed! #}
@@ -45,8 +45,8 @@
       {% block content %}{% endblock content %}
     </div>
     {% block footer_jquery %}
-      <script src="{{ LIBRARY_URL }}/jquery/jquery/1.11.0/jquery.min.js"></script>
-      <script src="{{ LIBRARY_URL }}/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+      <script src="{{ LIBRARY_URL }}/jquery/jquery/latest/jquery.min.js"></script>
+      <script src="{{ LIBRARY_URL }}/bootstrap/latest/js/bootstrap.min.js"></script>
     {% endblock footer_jquery %}
     {% block footer %}
       <script type="text/javascript">

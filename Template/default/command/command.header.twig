@@ -17,7 +17,7 @@
         else {
           var jq = document.createElement('script');
           jq.setAttribute('type', 'text/javascript');
-          jq.setAttribute('src', '{{ LIBRARY_URL ~ '/bootstrap/3.1.0/js/bootstrap.min.js'}}');
+          jq.setAttribute('src', '{{ LIBRARY_URL ~ '/bootstrap/latest/js/bootstrap.min.js'}}');
           document.getElementsByTagName('head')[0].appendChild(jq);
         }
       {% endif %}  
@@ -42,21 +42,21 @@
         return false;
       }
       
-      if (!cssAlreadyLoaded('{{ LIBRARY_URL ~ '/bootstrap/3.1.0/css/bootstrap.min.css' }}')) {
+      if (!cssAlreadyLoaded('{{ LIBRARY_URL ~ '/bootstrap/latest/css/bootstrap.min.css' }}')) {
         var css = document.createElement('link');
         css.setAttribute('rel', 'stylesheet');
         css.setAttribute('type', 'text/css');
         css.setAttribute('media', 'all');
-        css.setAttribute('href', '{{ LIBRARY_URL ~ '/bootstrap/3.1.0/css/bootstrap.min.css' }}');
+        css.setAttribute('href', '{{ LIBRARY_URL ~ '/bootstrap/latest/css/bootstrap.min.css' }}');
         document.getElementsByTagName('head')[0].appendChild(css);
       }
 
-      if (!cssAlreadyLoaded('{{ LIBRARY_URL ~ '/font-awesome/4.0.3/css/font-awesome.min.css' }}')) {  
+      if (!cssAlreadyLoaded('{{ LIBRARY_URL ~ '/font-awesome/latest/css/font-awesome.min.css' }}')) {  
         var css = document.createElement('link');
         css.setAttribute('rel', 'stylesheet');
         css.setAttribute('type', 'text/css');
         css.setAttribute('media', 'all');
-        css.setAttribute('href', '{{ LIBRARY_URL ~ '/font-awesome/4.0.3/css/font-awesome.min.css' }}');
+        css.setAttribute('href', '{{ LIBRARY_URL ~ '/font-awesome/latest/css/font-awesome.min.css' }}');
         document.getElementsByTagName('head')[0].appendChild(css);
       }
 
