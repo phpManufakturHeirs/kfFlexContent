@@ -452,7 +452,7 @@ class RSSChannel extends Admin
         $app['filesystem']->mkdir(FRAMEWORK_PATH.self::$config['content']['images']['directory']['select']);
 
         // exec the MediaBrowser
-        $subRequest = Request::create('/admin/mediabrowser', 'GET', array(
+        $subRequest = Request::create('/mediabrowser', 'GET', array(
             'usage' => self::$usage,
             'start' => self::$config['content']['images']['directory']['start'],
             'redirect' => '/flexcontent/editor/rss/channel/image/check/id/'.self::$channel_id,
