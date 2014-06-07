@@ -17,6 +17,7 @@ use phpManufaktur\flexContent\Control\Configuration;
 use phpManufaktur\flexContent\Data\Content\Content;
 use phpManufaktur\flexContent\Data\Content\Category;
 use phpManufaktur\flexContent\Data\Content\Tag;
+use phpManufaktur\flexContent\Control\RemoteClient;
 
 class ActionList extends Basic
 {
@@ -49,7 +50,7 @@ class ActionList extends Basic
         $this->CategoryData = new Category($app);
         $this->TagData = new Tag($app);
         $this->Tools = new Tools($app);
-        $this->Remote = new getRemote($app);
+        $this->Remote = new RemoteClient($app);
     }
 
     /**
@@ -77,8 +78,8 @@ class ActionList extends Basic
      */
     protected function showList()
     {
-        if (self::$parameter['paging'] > 0) {
-            // PAGING is enabled
+        if (!isset(self::$parameter['remote']) && (self::$parameter['paging'] > 0)) {
+            // PAGING is enabled and REMOTE is not active
             if (isset(self::$parameter['page'])) {
                 self::$parameter['previous_page'] = self::$parameter['page']-1;
                 self::$parameter['next_page'] = self::$parameter['page']+1;
@@ -95,19 +96,14 @@ class ActionList extends Basic
             self::$parameter['previous_page'] = 0;
             self::$parameter['next_page'] = 0;
             $paging_from = 0;
+            // set the paging explicit to zero (in case REMOTE is active)
+            self::$parameter['paging'] = 0;
         }
 
         $type = (strtoupper(self::$parameter['type']) == 'EVENT') ? 'EVENT' : 'DEFAULT';
-        if (false === ($contents = $this->ContentData->selectContentList(self::$language, self::$parameter['content_limit'],
+        $contents = $this->ContentData->selectContentList(self::$language, self::$parameter['content_limit'],
             self::$parameter['categories'], self::$parameter['categories_exclude'], self::$parameter['content_status'],
-            self::$parameter['order_by'], self::$parameter['order_direction'], $type, $paging_from, self::$parameter['paging']))) {
-            $this->setAlert('This list does not contain any contents!');
-        }
-
-        if (isset(self::$parameter['remote']) && (false !== ($remote_contents = $this->Remote->getContent(
-            self::$parameter, self::$config, self::$language)))) {
-            // merge the contents
-        }
+            self::$parameter['order_by'], self::$parameter['order_direction'], $type, $paging_from, self::$parameter['paging']);
 
         if (is_array($contents)) {
             // count the available contents
@@ -136,6 +132,28 @@ class ActionList extends Basic
                 $this->Tools->linkTags($contents[$i]['teaser'], self::$language);
                 $this->Tools->linkTags($contents[$i]['content'], self::$language);
             }
+        }
+
+        if (isset(self::$parameter['remote']) && (false !== ($remote_contents = $this->Remote->getContent(
+            self::$parameter, self::$config, self::$language)))) {
+            if (is_array($remote_contents) && !empty($remote_contents)) {
+                if (is_array($contents)) {
+                    // merge the contents
+                    $contents = array_merge($contents, $remote_contents);
+                    foreach ($contents as $index => $row) {
+                        $order_by[$index] = $row[self::$parameter['order_by']];
+                    }
+                    $direction = (self::$parameter['order_direction'] == 'DESC') ? SORT_DESC : SORT_ASC;
+                    array_multisort($order_by, $direction, $contents);
+                }
+                else {
+                    $contents = $remote_contents;
+                }
+            }
+        }
+
+        if (!is_array($contents) || empty($contents)) {
+            $this->setAlert('This list does not contain any contents!');
         }
 
         if (self::$parameter['type'] == 'default') {

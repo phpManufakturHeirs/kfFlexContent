@@ -244,3 +244,10 @@ $app->get('/command/flexcontent/canonical/id/{content_id}',
 
 $app->get('/flexcontent/action',
     'phpManufaktur\flexContent\Control\Command\Action::controllerAction');
+
+/**
+ * RemoteServer
+ */
+
+$app->post('/flexcontent/json',
+    'phpManufaktur\flexcontent\Control\RemoteServer::Controller');

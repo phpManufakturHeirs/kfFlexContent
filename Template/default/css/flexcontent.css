@@ -74,3 +74,15 @@
   font-weight: bold;
   margin: 0 0 15px 0;
 }
+
+/*
+  Server Info 
+*/
+#flexcontent .category-id {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+#flexcontent .category-description {
+  font-style: italic;
+}

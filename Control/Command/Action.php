@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
 use phpManufaktur\flexContent\Control\Configuration;
 use phpManufaktur\flexContent\Data\Content\Content;
+use phpManufaktur\flexContent\Control\RemoteClient;
 
 class Action extends Basic
 {
@@ -95,6 +96,15 @@ class Action extends Basic
             case 'faq':
                 $FAQ = new ActionFAQ();
                 return $FAQ->ControllerFAQ($app);
+            case 'info':
+                if (isset($parameter['remote'])) {
+                    $Remote = new RemoteClient($app);
+                    if (false === ($result = $Remote->getInfo($parameter, self::$config,
+                        $this->getCMSlocale(), $this->getBasicSettings()))) {
+                        $result = $this->getAlert();
+                    }
+                    return $result;
+                }
             default:
                 $this->setAlert('The parameter <code>%parameter%[%value%]</code> for the kitCommand <code>~~ %command% ~~</code> is unknown, please check the parameter and the given value!',
                     array('%parameter%' => 'action', '%value%' => $parameter['action'], '%command%' => 'flexContent'), self::ALERT_TYPE_DANGER);

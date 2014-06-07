@@ -1,0 +1,42 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2014 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+{% spaceless %}
+<!-- {{ _self.getTemplateName() }} -->
+{% include '@phpManufaktur/flexContent/Template/default/command/command.header.twig' %}        
+<div id="flexcontent">
+  <div class="container-fluid">    
+    <h2>{{ 'flexContent Server Info for <em>%server_name%</em>'|trans({'%server_name%':server_name}) }}</h2>
+      
+    {{ basic.alert }}
+    
+    {% if response|length > 0 %}
+      {# loop through the categories #}
+      {% for category in response %}
+        <div class="media">
+          <div class="pull-left">
+            <img class="media-object img-thumbnail" {% if category.category_image|length < 1 %}src="{{ MANUFAKTUR_URL ~ '/Basic/Template/default/pattern/image/empty-image.svg' }}" height="150"{% else %}src="{{ server_url ~ category.category_image }}"{% endif %} width="150" alt="...">
+          </div>
+          <div class="media-body">
+            <h4 class="media-heading">{{ category.category_name }}</h4>
+            <div class="category-id">{{ 'Category ID'|trans }}: {{ category.category_id }}</div>
+            <div class="category-description">{{ category.category_description }}</div>
+          </div>
+        </div>
+      {% endfor %}  
+    {% else %}
+      <div class="alert {{ type|default('alert-warning') }}">
+        <a class="close" data-dismiss="alert" href="#" aria-hidden="true">&times;</a>
+        {{ 'The server response is empty!'|trans }}
+      </div>
+    {% endif %}  
+  </div>
+</div>
+{% include '@phpManufaktur/flexContent/Template/default/command/command.footer.twig' %}       
+{% endspaceless %}    
