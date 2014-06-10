@@ -60,15 +60,37 @@ class ActionTag extends Basic
     public function promptAlert()
     {
         if (!isset(self::$parameter['load_css'])) {
-            self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['view']['load_css'];
+            self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['tag']['load_css'];
         }
-        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+        if (!isset(self::$parameter['check_jquery'])) {
+            self::$parameter['check_jquery'] = self::$config['kitcommand']['parameter']['action']['tag']['check_jquery'];
+        }
+        $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'command/alert.twig',
             $this->getPreferredTemplateStyle()),
             array(
                 'basic' => $this->getBasicSettings(),
                 'parameter' => self::$parameter
             ));
+
+        $params = array();
+        if (self::$parameter['check_jquery']) {
+            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+        }
+        if (self::$parameter['load_css']) {
+            if (isset($params['library'])) {
+                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
+            }
+            else {
+                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
+            }
+            $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
+        }
+        $params['robots'] = 'noindex,follow';
+        return $this->app->json(array(
+            'parameter' => $params,
+            'response' => $result
+        ));
     }
 
     /**
@@ -102,7 +124,7 @@ class ActionTag extends Basic
             }
         }
 
-        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+        $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'command/tag.twig',
             $this->getPreferredTemplateStyle()),
             array(
@@ -113,6 +135,25 @@ class ActionTag extends Basic
                 'tag' => $tag_type,
                 'contents' => $contents
             ));
+
+        $params = array();
+        if (self::$parameter['check_jquery']) {
+            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+        }
+        if (self::$parameter['load_css']) {
+            if (isset($params['library'])) {
+                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
+            }
+            else {
+                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
+            }
+            $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
+        }
+        $params['robots'] = 'noindex,follow';
+        return $this->app->json(array(
+            'parameter' => $params,
+            'response' => $result
+        ));
     }
 
     /**

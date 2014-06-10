@@ -18,6 +18,7 @@ use phpManufaktur\flexContent\Data\Content\Category;
 use phpManufaktur\flexContent\Data\Content\CategoryType;
 use phpManufaktur\flexContent\Data\Content\Content;
 use phpManufaktur\flexContent\Data\Content\Tag;
+use phpManufaktur\flexContent\Control\RemoteClient;
 
 class ActionCategory extends Basic
 {
@@ -61,15 +62,37 @@ class ActionCategory extends Basic
     public function promptAlert()
     {
         if (!isset(self::$parameter['load_css'])) {
-            self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['view']['load_css'];
+            self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['category']['load_css'];
         }
-        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+        if (!isset(self::$parameter['check_jquery'])) {
+            self::$parameter['check_jquery'] = self::$config['kitcommand']['parameter']['action']['category']['check_jquery'];
+        }
+        $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'command/alert.twig',
             $this->getPreferredTemplateStyle()),
             array(
                 'basic' => $this->getBasicSettings(),
                 'parameter' => self::$parameter
             ));
+
+        $params = array();
+        if (self::$parameter['check_jquery']) {
+            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+        }
+        if (self::$parameter['load_css']) {
+            if (isset($params['library'])) {
+                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
+            }
+            else {
+                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
+            }
+            $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
+        }
+        $params['robots'] = 'noindex,follow';
+        return $this->app->json(array(
+            'parameter' => $params,
+            'response' => $result
+        ));
     }
 
     /**
@@ -79,50 +102,65 @@ class ActionCategory extends Basic
      */
     protected function showCategoryID()
     {
-        if (false === ($category_type = $this->CategoryTypeData->select(self::$parameter['category_id']))) {
-            $this->setAlert('The Category with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!',
-                array('%id%' => self::$parameter['category_id'], '%language%' => self::$language),
-                self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
-            return $this->promptAlert();
-        }
-
-        // highlight search results?
-        if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
-            foreach (self::$parameter['highlight'] as $highlight) {
-                $this->Tools->highlightSearchResult($highlight, $category_type['category_description']);
+        if (isset(self::$parameter['remote'])) {
+            // request the category from a remote server
+            $Remote = new RemoteClient($this->app);
+            if (false === ($response = $Remote->getContent(self::$parameter, self::$config, self::$language))) {
+                // something went terribly wrong ...
+                return $this->promptAlert();
             }
         }
-        // replace #hashtags
-        $this->Tools->linkTags($category_type['category_description'], self::$language);
+        else {
+            $response = array(
+                'category' => array(),
+                'contents' => array()
+            );
+            // default - query the local category data
+            if (false === ($response['category'] = $this->CategoryTypeData->select(self::$parameter['category_id']))) {
+                $this->setAlert('The Category with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!',
+                    array('%id%' => self::$parameter['category_id'], '%language%' => self::$language),
+                    self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
+                return $this->promptAlert();
+            }
 
-        if (false === ($contents = $this->ContentData->selectContentsByCategoryID(self::$parameter['category_id'],
-            self::$parameter['content_status'], self::$parameter['content_limit']))) {
-            $this->setAlert('The Category %category_name% does not contain any active contents',
-                array('%category_name%' => $category_type['category_name']), self::ALERT_TYPE_WARNING,
-                array(__METHOD__, __LINE__));
-        }
-
-        if (is_array($contents)) {
-            for ($i=0; $i < sizeof($contents); $i++) {
-                $contents[$i]['categories'] = $this->CategoryData->selectCategoriesByContentID($contents[$i]['content_id']);
-                $contents[$i]['tags'] = $this->TagData->selectTagArrayForContentID($contents[$i]['content_id']);
-
-                // highlight search results?
-                if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
-                    foreach (self::$parameter['highlight'] as $highlight) {
-                        $this->Tools->highlightSearchResult($highlight, $contents[$i]['teaser']);
-                        $this->Tools->highlightSearchResult($highlight, $contents[$i]['content']);
-                        $this->Tools->highlightSearchResult($highlight, $contents[$i]['description']);
-                    }
+            // highlight search results?
+            if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
+                foreach (self::$parameter['highlight'] as $highlight) {
+                    $this->Tools->highlightSearchResult($highlight, $response['category']['category_description']);
                 }
+            }
+            // replace #hashtags
+            $this->Tools->linkTags($response['category']['category_description'], self::$language);
 
-                // replace #hashtags
-                $this->Tools->linkTags($contents[$i]['teaser'], self::$language);
-                $this->Tools->linkTags($contents[$i]['content'], self::$language);
+            if (false === ($contents = $this->ContentData->selectContentsByCategoryID(self::$parameter['category_id'],
+                self::$parameter['content_status'], self::$parameter['content_limit']))) {
+                $this->setAlert('The Category %category_name% does not contain any active contents',
+                    array('%category_name%' => $response['category']['category_name']), self::ALERT_TYPE_WARNING,
+                    array(__METHOD__, __LINE__));
+            }
+
+            if (is_array($contents)) {
+                for ($i=0; $i < sizeof($contents); $i++) {
+                    $contents[$i]['categories'] = $this->CategoryData->selectCategoriesByContentID($contents[$i]['content_id']);
+                    $contents[$i]['tags'] = $this->TagData->selectTagArrayForContentID($contents[$i]['content_id']);
+
+                    // highlight search results?
+                    if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
+                        foreach (self::$parameter['highlight'] as $highlight) {
+                            $this->Tools->highlightSearchResult($highlight, $contents[$i]['teaser']);
+                            $this->Tools->highlightSearchResult($highlight, $contents[$i]['content']);
+                            $this->Tools->highlightSearchResult($highlight, $contents[$i]['description']);
+                        }
+                    }
+
+                    // replace #hashtags
+                    $this->Tools->linkTags($contents[$i]['teaser'], self::$language);
+                    $this->Tools->linkTags($contents[$i]['content'], self::$language);
+                }
+                $response['contents'] = $contents;
             }
         }
-
-        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+        $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'command/category.twig',
             $this->getPreferredTemplateStyle()),
             array(
@@ -130,9 +168,29 @@ class ActionCategory extends Basic
                 'config' => self::$config,
                 'parameter' => self::$parameter,
                 'permalink_base_url' => CMS_URL.str_ireplace('{language}', strtolower(self::$language), self::$config['content']['permalink']['directory']),
-                'category' => $category_type,
-                'contents' => $contents
+                'category' => $response['category'],
+                'contents' => $response['contents']
             ));
+
+        $params = array();
+        if (self::$parameter['check_jquery']) {
+            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+        }
+        if (self::$parameter['load_css']) {
+            if (isset($params['library'])) {
+                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
+            }
+            else {
+                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
+            }
+            $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
+        }
+        $params['canonical'] = $this->Tools->getPermalinkBaseURL(self::$language).'/category/'.$response['category']['category_permalink'];
+        return $this->app->json(array(
+            'parameter' => $params,
+            'response' => $result
+        ));
+
     }
 
     /**

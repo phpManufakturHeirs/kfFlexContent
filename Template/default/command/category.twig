@@ -9,7 +9,6 @@
 #}
 {% spaceless %}
 <!-- {{ _self.getTemplateName() }} -->
-{% include '@phpManufaktur/flexContent/Template/default/command/command.header.twig' %}        
 <div id="flexcontent">
   <div class="container-fluid">    
       
@@ -18,8 +17,14 @@
     {% if parameter.category_description and category.category_description|length > 0 %}
       <div class="media">
         {% if parameter.category_image and category.category_image|length > 0 %}
-          {% set img = image(category.category_image, parameter.category_image_max_width, parameter.category_image_max_height) %}
-          <img class="media-object pull-right img-thumbnail" src="{{ img.src }}" width="{{ img.width }}" height="{{ img.height }}" alt="{{ category.category_name }}" title="{{ category.category_name }}" />
+          <div class="media-object pull-right" style="max-width:{{ parameter.category_image_max_width+30 }}px;max-height:{{ parameter.category_image_max_height+30 }}px;">
+          {% if category.category_image_url is defined %}
+            <img class="img-thumbnail" src="{{ category.category_image_url }}" alt="{{ category.category_name }}" title="{{ category.category_name }}" />
+          {% else %}
+            {% set img = image(category.category_image, parameter.category_image_max_width, parameter.category_image_max_height) %}
+            <img class="media-object pull-right img-thumbnail" src="{{ img.src }}" width="{{ img.width }}" height="{{ img.height }}" alt="{{ category.category_name }}" title="{{ category.category_name }}" />
+          {% endif %}          
+          </div>
         {% endif %}
         <div class="media-body">
           {% if parameter.category_name %}
@@ -69,5 +74,4 @@
   </div>
   
 </div>
-{% include '@phpManufaktur/flexContent/Template/default/command/command.footer.twig' %}        
 {% endspaceless %}

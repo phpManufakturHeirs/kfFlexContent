@@ -61,15 +61,37 @@ class ActionView extends Basic
     public function promptAlert()
     {
         if (!isset(self::$parameter['load_css'])) {
-            $parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['view']['load_css'];
+            self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['view']['load_css'];
         }
-        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+        if (!isset(self::$parameter['check_jquery'])) {
+            self::$parameter['check_jquery'] = self::$config['kitcommand']['parameter']['action']['view']['check_jquery'];
+        }
+        $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'command/alert.twig',
             $this->getPreferredTemplateStyle()),
             array(
                 'basic' => $this->getBasicSettings(),
                 'parameter' => self::$parameter
             ));
+
+        $params = array();
+        if (self::$parameter['check_jquery']) {
+            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+        }
+        if (self::$parameter['load_css']) {
+            if (isset($params['library'])) {
+                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
+            }
+            else {
+                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
+            }
+            $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
+        }
+        $params['robots'] = 'noindex,follow';
+        return $this->app->json(array(
+            'parameter' => $params,
+            'response' => $result
+        ));
     }
 
     /**
@@ -111,50 +133,57 @@ class ActionView extends Basic
      */
     protected function showID()
     {
-        if (false === ($content = $this->ContentData->select(self::$parameter['content_id'], self::$language))) {
-            $this->setAlert('The flexContent record with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!',
-                array('%id%' => self::$parameter['content_id'], '%language%' => self::$language),
-                self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
-            return $this->promptAlert();
+        if (isset(self::$parameter['remote']) && !empty(self::$parameter['remote'])) {
+            // retrieve the content from a remote server
+
+            // dont forget to set the page settings!
+
         }
-
-        if (!$this->canShowContent($content)) {
-            return $this->promptAlert();
-        }
-
-        // ok - gather the content ...
-        $this->setPageTitle($content['title']);
-        $this->setPageDescription($content['description']);
-        $this->setPageKeywords($content['keywords']);
-
-        // highlight search results?
-        if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
-            foreach (self::$parameter['highlight'] as $highlight) {
-                $this->Tools->highlightSearchResult($highlight, $content['teaser']);
-                $this->Tools->highlightSearchResult($highlight, $content['content']);
-                $this->Tools->highlightSearchResult($highlight, $content['description']);
+        else {
+            if (false === ($content = $this->ContentData->select(self::$parameter['content_id'], self::$language))) {
+                $this->setAlert('The flexContent record with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!',
+                    array('%id%' => self::$parameter['content_id'], '%language%' => self::$language),
+                    self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
+                return $this->promptAlert();
             }
+
+            if (!$this->canShowContent($content)) {
+                return $this->promptAlert();
+            }
+
+            // ok - gather the content ...
+            $this->setPageTitle($content['title']);
+            $this->setPageDescription($content['description']);
+            $this->setPageKeywords($content['keywords']);
+
+            // highlight search results?
+            if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
+                foreach (self::$parameter['highlight'] as $highlight) {
+                    $this->Tools->highlightSearchResult($highlight, $content['teaser']);
+                    $this->Tools->highlightSearchResult($highlight, $content['content']);
+                    $this->Tools->highlightSearchResult($highlight, $content['description']);
+                }
+            }
+
+            // create links for the tags
+            $this->Tools->linkTags($content['teaser'], self::$language);
+            $this->Tools->linkTags($content['content'], self::$language);
+
+            // get the categories for this content ID
+            $content['categories'] = $this->CategoryData->selectCategoriesByContentID(self::$parameter['content_id']);
+
+            // get the tags for this content ID
+            $content['tags'] = $this->TagData->selectTagArrayForContentID(self::$parameter['content_id']);
+
+            // select the previous and the next content
+            $previous_content = $this->ContentData->selectPreviousContentForID(self::$parameter['content_id'], self::$language);
+            $next_content = $this->ContentData->selectNextContentForID(self::$parameter['content_id'], self::$language);
+
+            // get the primary category
+            $primary_category_id = $this->CategoryData->selectPrimaryCategoryIDbyContentID(self::$parameter['content_id']);
+            $primary_category = $this->CategoryTypeData->select($primary_category_id);
         }
-
-        // create links for the tags
-        $this->Tools->linkTags($content['teaser'], self::$language);
-        $this->Tools->linkTags($content['content'], self::$language);
-
-        // get the categories for this content ID
-        $content['categories'] = $this->CategoryData->selectCategoriesByContentID(self::$parameter['content_id']);
-
-        // get the tags for this content ID
-        $content['tags'] = $this->TagData->selectTagArrayForContentID(self::$parameter['content_id']);
-
-        // select the previous and the next content
-        $previous_content = $this->ContentData->selectPreviousContentForID(self::$parameter['content_id'], self::$language);
-        $next_content = $this->ContentData->selectNextContentForID(self::$parameter['content_id'], self::$language);
-
-        // get the primary category
-        $primary_category_id = $this->CategoryData->selectPrimaryCategoryIDbyContentID(self::$parameter['content_id']);
-        $primary_category = $this->CategoryTypeData->select($primary_category_id);
-
-        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+        $response = $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'command/content.twig',
             $this->getPreferredTemplateStyle()),
             array(
@@ -170,6 +199,24 @@ class ActionView extends Basic
                 ),
                 'author' => $this->app['account']->getDisplayNameByUsername($content['author_username'])
             ));
+        $params = array();
+        if (self::$parameter['check_jquery']) {
+            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+        }
+        if (self::$parameter['load_css']) {
+            if (isset($params['library'])) {
+                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
+            }
+            else {
+                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
+            }
+            $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
+        }
+        $params['canonical'] = $this->Tools->getPermalinkBaseURL(self::$language).'/'.$content['permalink'];
+        return $this->app->json(array(
+            'parameter' => $params,
+            'response' => $response
+        ));
     }
 
     /**

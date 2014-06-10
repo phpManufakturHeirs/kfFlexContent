@@ -8,9 +8,14 @@
       </div>
     {% endif %}
     {% if parameter.content_image and content.teaser_image|length > 0 %}
-      {% set img = image(content.teaser_image, parameter.content_image_max_width, parameter.content_image_max_height) %}
+      {% if content.teaser_image_url is defined %}
+        {% set img_url = content.teaser_image_url %}
+      {% else %}
+        {% set img = image(content.teaser_image, parameter.content_image_max_width, parameter.content_image_max_height) %}
+        {% set img_url = img.src %}
+      {% endif %}
       <a href="{{ url }}" target="{{ target }}">
-        <img class="img-responsive img-rounded" src="{{ img.src }}" alt="{{ content.title }}" title="{{ content.title }}" />
+        <img class="img-responsive img-rounded" src="{{ img_url }}" alt="{{ content.title }}" title="{{ content.title }}" />
       </a>
     {% endif %}
     <div class="caption">
@@ -19,7 +24,7 @@
           {% for category in content.categories %}
             <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
               {# attach the actual content ID with ?i= #}
-              <a href="{{ permalink_base_url ~ '/category/' ~ category.category_permalink }}" title="{{ category.category_description|ellipsis }}">{{ category.category_name }}</a>
+              <a href="{% if category.category_permalink_url is defined %}{{ category.category_permalink_url }}{% else %}{{ permalink_base_url ~ '/category/' ~ category.category_permalink }}{% endif %}" title="{{ category.category_description|ellipsis }}">{{ category.category_name }}</a>
             </span>
           {% endfor %}
         </div>
@@ -60,7 +65,7 @@
           {% for tag in content.tags %}
             <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
               {# attach the primary category ?c= and the actual content ID &i= #}
-              <a href="{{ permalink_base_url ~ '/buzzword/' ~ tag.tag_permalink }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
+              <a href="{% if tag.tag_permalink_url is defined %}{{ tag.tag_permalink_url }}{% else %}{{ permalink_base_url ~ '/buzzword/' ~ tag.tag_permalink }}{% endif %}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
             </span>
           {% endfor %}
         </div> 

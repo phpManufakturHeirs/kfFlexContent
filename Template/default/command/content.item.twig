@@ -1,11 +1,16 @@
 <!-- {{ _self.getTemplateName() }} -->
 <div class="media">
   {% if parameter.content_image and content.teaser_image|length > 0 %}
-    {% set img = image(content.teaser_image, parameter.content_image_small_max_width, parameter.content_image_small_max_height) %}
+    {% if content.teaser_image_url is defined %}
+      {% set img_url = content.teaser_image_url %}
+    {% else %}
+      {% set img = image(content.teaser_image, parameter.content_image_small_max_width, parameter.content_image_small_max_height) %}
+      {% set img_url = img.src %}
+    {% endif %}   
     {# add the margin, padding and border of img-thumbnail to the min-width! #}
-    <div class="pull-left media-object" style="min-width:{{ parameter.content_image_small_max_width+30 }}px;min-height:{{ parameter.content_image_small_max_height }}px;">
+    <div class="pull-left media-object" style="max-width:{{ parameter.content_image_small_max_width+30 }}px;max-height:{{ parameter.content_image_small_max_height+30 }}px;">
       <a href="{{ url }}" target="{{ target }}">
-        <img class="img-responsive img-thumbnail" src="{{ img.src }}" alt="{{ content.title }}" title="{{ content.title }}" />
+        <img class="img-responsive img-thumbnail" src="{{ img_url }}" alt="{{ content.title }}" title="{{ content.title }}" />
       </a>
     </div>
   {% endif %}
@@ -40,7 +45,7 @@
           {% for tag in content.tags %}
             <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
               {# attach the primary category ?c= and the actual content ID &i= #}
-              <a href="{{ permalink_base_url ~ '/buzzword/' ~ tag.tag_permalink }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
+              <a href="{% if tag.tag_permalink_url is defined %}{{ tag.tag_permalink_url }}{% else %}{{ permalink_base_url ~ '/buzzword/' ~ tag.tag_permalink }}{% endif %}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
             </span>
           {% endfor %}
         </div> 

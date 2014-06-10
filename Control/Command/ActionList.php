@@ -60,15 +60,37 @@ class ActionList extends Basic
     public function promptAlert()
     {
         if (!isset(self::$parameter['load_css'])) {
-            self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['view']['load_css'];
+            self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['list']['load_css'];
         }
-        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+        if (!isset(self::$parameter['check_jquery'])) {
+            self::$parameter['check_jquery'] = self::$config['kitcommand']['parameter']['action']['list']['check_jquery'];
+        }
+        $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'command/alert.twig',
             $this->getPreferredTemplateStyle()),
             array(
                 'basic' => $this->getBasicSettings(),
                 'parameter' => self::$parameter
             ));
+
+        $params = array();
+        if (self::$parameter['check_jquery']) {
+            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+        }
+        if (self::$parameter['load_css']) {
+            if (isset($params['library'])) {
+                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
+            }
+            else {
+                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
+            }
+            $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
+        }
+        $params['robots'] = 'noindex,follow';
+        return $this->app->json(array(
+            'parameter' => $params,
+            'response' => $result
+        ));
     }
 
     /**
@@ -140,11 +162,14 @@ class ActionList extends Basic
                 if (is_array($contents)) {
                     // merge the contents
                     $contents = array_merge($contents, $remote_contents);
+                    // order the merged array by the given order field
                     foreach ($contents as $index => $row) {
                         $order_by[$index] = $row[self::$parameter['order_by']];
                     }
                     $direction = (self::$parameter['order_direction'] == 'DESC') ? SORT_DESC : SORT_ASC;
                     array_multisort($order_by, $direction, $contents);
+                    // limit the array to given content_limit
+                    $contents = array_splice($contents, 0, self::$parameter['content_limit']);
                 }
                 else {
                     $contents = $remote_contents;
@@ -163,7 +188,7 @@ class ActionList extends Basic
             $template = 'command/list.simple.twig';
         }
 
-        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+        $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', $template,
             $this->getPreferredTemplateStyle()),
             array(
@@ -173,6 +198,25 @@ class ActionList extends Basic
                 'permalink_base_url' => CMS_URL.str_ireplace('{language}', strtolower(self::$language), self::$config['content']['permalink']['directory']),
                 'contents' => $contents
             ));
+
+        $params = array();
+        if (self::$parameter['check_jquery']) {
+            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+        }
+        if (self::$parameter['load_css']) {
+            if (isset($params['library'])) {
+                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
+            }
+            else {
+                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
+            }
+            $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
+        }
+        $params['robots'] = 'noindex,follow';
+        return $this->app->json(array(
+            'parameter' => $params,
+            'response' => $result
+        ));
     }
 
     /**

@@ -9,7 +9,6 @@
 #}
 {% spaceless %}
 <!-- {{ _self.getTemplateName() }} -->
-{% include '@phpManufaktur/flexContent/Template/default/command/command.header.twig' %}   
 {% if category|length > 0 %}
   {% if parameter.category_description and category.category_description|length > 0 %}
     <div class="media">
@@ -51,17 +50,22 @@
                     {% for category in faq.categories %}
                       <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
                         {# attach the actual content ID with ?i= #}
-                        <a href="{{ permalink_base_url ~ '/category/' ~ category.category_permalink }}" title="{{ category.category_description|ellipsis }}">{{ category.category_name }}</a>
+                        <a href="{% if category.category_permalink_url is defined %}{{ category.category_permalink_url }}{% else %}{{ permalink_base_url ~ '/category/' ~ category.category_permalink }}{% endif %}" title="{{ category.category_description|ellipsis }}">{{ category.category_name }}</a>
                       </span>
                     {% endfor %}
                   </div>
                 {% endif %}
 
                 {% if parameter.content_image and faq.teaser_image|length > 0 %}
-                  {% set img = image(faq.teaser_image, parameter.content_image_max_width, parameter.content_image_max_height) %}
-                  {# add the margin, padding and border of img-thumbnail to the min-width! #}
-                  <div class="pull-right" style="min-width:{{ parameter.content_image_max_width+30 }}px;min-height:{{ parameter.content_image_max_height }}px;">
-                    <img class="img-responsive img-thumbnail" src="{{ img.src }}" alt="{{ faq.title }}" title="{{ faq.title }}" />
+                  {% if faq.teaser_image_url is defined %}
+                    {% set img_url = faq.teaser_image_url %}
+                  {% else %}
+                    {% set img = image(faq.teaser_image, parameter.content_image_max_width, parameter.content_image_max_height) %}
+                    {% set img_url = img.src %}
+                  {% endif %}
+                  {# add the margin, padding and border of img-thumbnail to the max-width! #}
+                  <div class="pull-right" style="max-width:{{ parameter.content_image_max_width+30 }}px;max-height:{{ parameter.content_image_max_height }}px;">
+                    <img class="img-responsive img-thumbnail" src="{{ img_url }}" alt="{{ faq.title }}" title="{{ faq.title }}" />
                   </div>
                 {% endif %}
                 
@@ -74,7 +78,11 @@
                       {% set url = faq.redirect_url %}
                       {% set target = faq.redirect_target %}
                     {% else %}
-                      {% set url = permalink_base_url ~ '/' ~ faq.permalink %}
+                      {% if faq.permalink_url is defined %}
+                        {% set url = faq.permalink_url %}
+                      {% else %}
+                        {% set url = permalink_base_url ~ '/' ~ faq.permalink %}
+                      {% endif %}
                       {% if basic.cms.page_visibility in ['private','registered'] %}
                         {# add the PID for protected pages to enable the permanent link class to authenticate the user #}            
                         {% set url = url ~ '?pid=' ~ basic.pid %}
@@ -111,7 +119,7 @@
                   <div class="content-tags">
                     {% for tag in faq.tags %}
                       <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
-                        <a href="{{ permalink_base_url ~ '/buzzword/' ~ tag.tag_permalink }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
+                        <a href="{% if tag.tag_permalink_url is defined %}{{ tag.tag_permalink_url }}{% else %}{{ permalink_base_url ~ '/buzzword/' ~ tag.tag_permalink }}{% endif %}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
                       </span>
                     {% endfor %}
                   </div>  
@@ -151,5 +159,4 @@
     {% endif %}
   </div>
 </div>
-{% include '@phpManufaktur/flexContent/Template/default/command/command.footer.twig' %}    
 {% endspaceless %}

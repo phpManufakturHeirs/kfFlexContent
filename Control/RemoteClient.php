@@ -23,6 +23,7 @@ class RemoteClient extends Alert
     protected static $token = null;
     protected static $server_url = null;
     protected static $server_request_url = null;
+    protected static $action = null;
 
     /**
      * Execute the Remote Server Query
@@ -91,6 +92,13 @@ class RemoteClient extends Alert
         self::$config = $config;
         self::$locale = strtolower($locale);
 
+        if (!isset(self::$parameter['action']) || empty(self::$parameter['action'])) {
+            $this->setAlert('Missing the parameter: %parameter%', array('%parameter%' => 'action'),
+                self::ALERT_TYPE_DANGER);
+            return false;
+        }
+        self::$action = $parameter['action'];
+
         if (!isset(self::$parameter['remote']) ||
             empty(self::$parameter['remote']) ||
             !isset(self::$config['remote']) ||
@@ -146,7 +154,14 @@ class RemoteClient extends Alert
         return true;
     }
 
-
+    /**
+     * Get the content from a remote connection
+     *
+     * @param array $parameter
+     * @param array $config
+     * @param string $locale
+     * @return boolean|array
+     */
     public function getContent($parameter, $config, $locale)
     {
         // initialize the client
@@ -154,9 +169,49 @@ class RemoteClient extends Alert
             return false;
         }
 
-        if (false === ($result = $this->cURLexec(array(
-            'action' => $parameter['action'],
-        )))) {
+        $query = array();
+        switch (self::$action) {
+            case 'list':
+                $query = array(
+                    'action' => self::$action,
+                    'content_status' => isset($parameter['content_status']) ? $parameter['content_status'] : array('BREAKING', 'PUBLISHED'),
+                    'content_limit' => isset($parameter['content_limit']) ? $parameter['content_limit'] : 100,
+                    'order_by' => isset($parameter['order_by']) ? $parameter['order_by'] : 'publish_from',
+                    'order_direction' => isset($parameter['order_direction']) ? $parameter['order_direction'] : 'DESC',
+                    'category_type' => isset($parameter['category_type']) ? $parameter['category_type'] : 'DEFAULT'
+                );
+                break;
+            case 'category':
+                $query = array(
+                    'action' => self::$action,
+                    'category_id' => isset($parameter['category_id']) ? $parameter['category_id'] : -1,
+                    'content_status' => isset($parameter['content_status']) ? $parameter['content_status'] : array('BREAKING', 'PUBLISHED'),
+                    'content_limit' => isset($parameter['content_limit']) ? $parameter['content_limit'] : 100
+                );
+                break;
+            case 'faq':
+                $query = array(
+                    'action' => 'faq',
+                    'category_id' => isset($parameter['category_id']) ? $parameter['category_id'] : -1,
+                    'faq_ids' => isset($parameter['faq_ids']) ? $parameter['faq_ids'] : array(),
+                    'content_status' => isset($parameter['content_status']) ? $parameter['content_status'] : array('BREAKING', 'PUBLISHED'),
+                    'content_limit' => isset($parameter['content_limit']) ? $parameter['content_limit'] : 100
+                );
+                break;
+            case 'view':
+                $query = array(
+                    'action' => 'view',
+                    'content_id' => isset($parameter['content_id']) ? $parameter['content_id'] : -1,
+                    'content_permalink' => isset($parameter['content_permalink']) ? $parameter['content_permalink'] : '',
+                );
+                break;
+            default:
+                $this->setAlert('The parameter action[%action%] is not supported for remote connections!',
+                    array('%action%' => self::$action), self::ALERT_TYPE_DANGER);
+                return false;
+        }
+
+        if (false === ($result = $this->cURLexec($query))) {
             return false;
         }
 

@@ -9,7 +9,6 @@
 #}
 {% spaceless %}
 <!-- {{ _self.getTemplateName() }} -->
-{% include '@phpManufaktur/flexContent/Template/default/command/command.header.twig' %}        
 <div id="flexcontent">
   <div class="container-fluid">    
     <h2>{{ 'flexContent Server Info for <em>%server_name%</em>'|trans({'%server_name%':server_name}) }}</h2>
@@ -38,5 +37,4 @@
     {% endif %}  
   </div>
 </div>
-{% include '@phpManufaktur/flexContent/Template/default/command/command.footer.twig' %}       
 {% endspaceless %}    

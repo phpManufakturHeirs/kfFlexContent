@@ -18,6 +18,7 @@ use phpManufaktur\flexContent\Control\Configuration;
 use phpManufaktur\flexContent\Data\Content\Category;
 use phpManufaktur\flexContent\Data\Content\CategoryType;
 use phpManufaktur\flexContent\Data\Content\Tag;
+use phpManufaktur\flexContent\Control\RemoteClient;
 
 class ActionFAQ extends Basic
 {
@@ -60,97 +61,158 @@ class ActionFAQ extends Basic
     public function promptAlert()
     {
         if (!isset(self::$parameter['load_css'])) {
-            $parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['view']['load_css'];
+            self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['faq']['load_css'];
         }
-        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+        if (!isset(self::$parameter['check_jquery'])) {
+            self::$parameter['check_jquery'] = self::$config['kitcommand']['parameter']['action']['faq']['check_jquery'];
+        }
+        $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'command/alert.twig',
             $this->getPreferredTemplateStyle()),
             array(
                 'basic' => $this->getBasicSettings(),
                 'parameter' => self::$parameter
             ));
+
+        $params = array();
+        if (self::$parameter['check_jquery']) {
+            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+        }
+        if (self::$parameter['load_css']) {
+            if (isset($params['library'])) {
+                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
+            }
+            else {
+                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
+            }
+            $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
+        }
+        $params['robots'] = 'noindex,follow';
+        return $this->app->json(array(
+            'parameter' => $params,
+            'response' => $result
+        ));
     }
 
+    /**
+     * Return the content prepared as FAQ
+     *
+     * @return string
+     */
     protected function showFAQ()
     {
         $faqs = array();
-        if (!empty(self::$parameter['faq_ids'])) {
-            // get the FAQs by the given content IDs
-            foreach (self::$parameter['faq_ids'] as $id) {
-                if (false === ($content = $this->ContentData->select($id, self::$language))) {
-                    $this->setAlert('The flexContent record with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!',
-                        array('%id%' => $id, '%language%' => self::$language),
-                        self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
-                    return $this->promptAlert();
-                }
-                // create links for the tags
-                $this->Tools->linkTags($content['teaser'], self::$language);
-                $this->Tools->linkTags($content['content'], self::$language);
-                // get the categories for this content ID
-                $content['categories'] = $this->CategoryData->selectCategoriesByContentID($id);
 
-                // get the tags for this content ID
-                $content['tags'] = $this->TagData->selectTagArrayForContentID($id);
+        $response = array(
+            'faq' => array(),
+            'category' => array()
+        );
 
-                // get the author name
-                $content['author'] = $this->app['account']->getDisplayNameByUsername($content['author_username']);
-
-                $faqs[] = $content;
+        if (isset(self::$parameter['remote'])) {
+            // request the FAQ from a remote server
+            $Remote = new RemoteClient($this->app);
+            if (false === ($response = $Remote->getContent(self::$parameter, self::$config, self::$language))) {
+                // something went terribly wrong ...
+                return $this->promptAlert();
             }
         }
-        elseif (self::$parameter['category_id'] > 0) {
-            // get the FAQs from the given category
-            if (false !== ($contents = $this->ContentData->selectContentsByCategoryID(
-                    self::$parameter['category_id'],
-                    self::$parameter['content_status'],
-                    self::$parameter['content_limit'],
-                    self::$parameter['order_by'],
-                    self::$parameter['order_direction']))) {
-                foreach ($contents as $content) {
+        else {
+            if (!empty(self::$parameter['faq_ids'])) {
+                // get the FAQs by the given content IDs
+                foreach (self::$parameter['faq_ids'] as $id) {
+                    if (false === ($content = $this->ContentData->select($id, self::$language))) {
+                        $this->setAlert('The flexContent record with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!',
+                            array('%id%' => $id, '%language%' => self::$language),
+                            self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
+                        return $this->promptAlert();
+                    }
                     // create links for the tags
                     $this->Tools->linkTags($content['teaser'], self::$language);
                     $this->Tools->linkTags($content['content'], self::$language);
                     // get the categories for this content ID
-                    $content['categories'] = $this->CategoryData->selectCategoriesByContentID($content['content_id']);
+                    $content['categories'] = $this->CategoryData->selectCategoriesByContentID($id);
 
                     // get the tags for this content ID
-                    $content['tags'] = $this->TagData->selectTagArrayForContentID($content['content_id']);
+                    $content['tags'] = $this->TagData->selectTagArrayForContentID($id);
 
                     // get the author name
                     $content['author'] = $this->app['account']->getDisplayNameByUsername($content['author_username']);
 
-                    $faqs[] = $content;
+                    $response['faqs'][] = $content;
                 }
             }
-            else {
-                // this category has no active contents
-                $this->setAlert('The Category %category_name% does not contain any active contents',
-                    array('%category_name%' => self::$parameter['category_id']), self::ALERT_TYPE_WARNING);
-                return $this->promptAlert();
+            elseif (self::$parameter['category_id'] > 0) {
+                // get the FAQs from the given category
+                if (false !== ($contents = $this->ContentData->selectContentsByCategoryID(
+                        self::$parameter['category_id'],
+                        self::$parameter['content_status'],
+                        self::$parameter['content_limit'],
+                        self::$parameter['order_by'],
+                        self::$parameter['order_direction']))) {
+                    foreach ($contents as $content) {
+                        // create links for the tags
+                        $this->Tools->linkTags($content['teaser'], self::$language);
+                        $this->Tools->linkTags($content['content'], self::$language);
+                        // get the categories for this content ID
+                        $content['categories'] = $this->CategoryData->selectCategoriesByContentID($content['content_id']);
+
+                        // get the tags for this content ID
+                        $content['tags'] = $this->TagData->selectTagArrayForContentID($content['content_id']);
+
+                        // get the author name
+                        $content['author'] = $this->app['account']->getDisplayNameByUsername($content['author_username']);
+
+                        $response['faqs'][] = $content;
+                    }
+                }
+                else {
+                    // this category has no active contents
+                    $this->setAlert('The Category %category_name% does not contain any active contents',
+                        array('%category_name%' => self::$parameter['category_id']), self::ALERT_TYPE_WARNING);
+                    return $this->promptAlert();
+                }
+            }
+
+            $category = array();
+            if (self::$parameter['category_id'] > 0) {
+                if (false === ($response['category'] = $this->CategoryTypeData->select(self::$parameter['category_id']))) {
+                    $this->setAlert('The Category with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!',
+                        array('%id%' => self::$parameter['category_id'], '%language%' => self::$language),
+                        self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
+                    return $this->promptAlert();
+                }
             }
         }
-
-        $category = array();
-        if (self::$parameter['category_id'] > 0) {
-            if (false === ($category = $this->CategoryTypeData->select(self::$parameter['category_id']))) {
-                $this->setAlert('The Category with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!',
-                    array('%id%' => self::$parameter['category_id'], '%language%' => self::$language),
-                    self::ALERT_TYPE_DANGER, true, array(__METHOD__, __LINE__));
-                return $this->promptAlert();
-            }
-        }
-
-        return $this->app['twig']->render($this->app['utils']->getTemplateFile(
+        $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'command/faq.twig',
             $this->getPreferredTemplateStyle()),
             array(
-                'category' => $category,
-                'faqs' => $faqs,
+                'category' => $response['category'],
+                'faqs' => $response['faqs'],
                 'basic' => $this->getBasicSettings(),
                 'parameter' => self::$parameter,
                 'permalink_base_url' => $this->Tools->getPermalinkBaseURL(self::$language),
                 'config' => self::$config
             ));
+
+        $params = array();
+        if (self::$parameter['check_jquery']) {
+            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+        }
+        if (self::$parameter['load_css']) {
+            if (isset($params['library'])) {
+                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
+            }
+            else {
+                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
+            }
+            $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
+        }
+        $params['canonical'] = $this->Tools->getPermalinkBaseURL(self::$language).'/faq/'.$response['category']['category_permalink'];
+        return $this->app->json(array(
+            'parameter' => $params,
+            'response' => $result
+        ));
     }
 
     /**
