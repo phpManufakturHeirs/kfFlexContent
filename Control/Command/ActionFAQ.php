@@ -200,11 +200,12 @@ class ActionFAQ extends Basic
             $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
         }
         if (self::$parameter['load_css']) {
+            $css_files = 'bootstrap/latest/css/bootstrap.min.css,font-awesome/latest/css/font-awesome.min.css';
             if (isset($params['library'])) {
-                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
+                $params['library'] .= ','.$css_files;
             }
             else {
-                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
+                $params['library'] = $css_files;
             }
             $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
         }

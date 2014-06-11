@@ -315,6 +315,8 @@ return array(
         => 'Das Bild wurde entfernt.',
     'The list of RSS Channels for flexContent is empty, please create the first RSS Channel!'
         => 'Es existieren noch keine RSS Kanäle, erstellen Sie den ersten RSS Kanal!',
+    'The permalink <b>%permalink%</b> does not exists!'
+        => 'Der PermanentLink <b>%permalink%</b> existiert nicht!',
     'The permalink %permalink% is already in use, please select another one!'
         => 'Der PermanentLink <b>%permalink%</b> wird bereits verwendet, bitte wählen Sie einen anderen permanenten Link aus!',
     'The permalink %permalink% is already in use by the flexContent record %id%, please select another one!'

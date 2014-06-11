@@ -18,6 +18,7 @@ use phpManufaktur\flexContent\Control\Configuration;
 use phpManufaktur\flexContent\Data\Content\Category;
 use phpManufaktur\flexContent\Data\Content\CategoryType;
 use phpManufaktur\flexContent\Data\Content\Tag;
+use phpManufaktur\flexContent\Control\RemoteClient;
 
 class ActionView extends Basic
 {
@@ -135,11 +136,22 @@ class ActionView extends Basic
     {
         if (isset(self::$parameter['remote']) && !empty(self::$parameter['remote'])) {
             // retrieve the content from a remote server
-
-            // dont forget to set the page settings!
-
+            $Remote = new RemoteClient($this->app);
+            if (false === ($response = $Remote->getContent(self::$parameter, self::$config, self::$language))) {
+                // something went terribly wrong ...
+                return $this->promptAlert();
+            }
         }
         else {
+            // local access
+            if (!empty(self::$parameter['permalink'])) {
+                if (false === (self::$parameter['content_id'] = $this->ContentData->selectContentIDbyPermaLink(self::$parameter['content_permalink'], self::$language))) {
+                    $this->setAlert('The permalink <b>%permalink%</b> does not exists!',
+                        array('%permalink%' => self::$parameter['permalink']), self::ALERT_TYPE_DANGER,
+                        true, array(__METHOD__, __LINE__));
+                    return $this->promptAlert();
+                }
+            }
             if (false === ($content = $this->ContentData->select(self::$parameter['content_id'], self::$language))) {
                 $this->setAlert('The flexContent record with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!',
                     array('%id%' => self::$parameter['content_id'], '%language%' => self::$language),
@@ -150,11 +162,6 @@ class ActionView extends Basic
             if (!$this->canShowContent($content)) {
                 return $this->promptAlert();
             }
-
-            // ok - gather the content ...
-            $this->setPageTitle($content['title']);
-            $this->setPageDescription($content['description']);
-            $this->setPageKeywords($content['keywords']);
 
             // highlight search results?
             if (isset(self::$parameter['highlight']) && is_array(self::$parameter['highlight'])) {
@@ -182,40 +189,51 @@ class ActionView extends Basic
             // get the primary category
             $primary_category_id = $this->CategoryData->selectPrimaryCategoryIDbyContentID(self::$parameter['content_id']);
             $primary_category = $this->CategoryTypeData->select($primary_category_id);
+
+            $content['author'] = $this->app['account']->getDisplayNameByUsername($content['author_username']);
+
+            $response = array(
+                'content' => $content,
+                'control' => array(
+                    'previous' => $previous_content,
+                    'next' => $next_content,
+                    'category' => $primary_category
+                )
+            );
         }
-        $response = $this->app['twig']->render($this->app['utils']->getTemplateFile(
+
+        $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'command/content.twig',
             $this->getPreferredTemplateStyle()),
             array(
                 'basic' => $this->getBasicSettings(),
                 'config' => self::$config,
-                'content' => $content,
+                'content' => $response['content'],
                 'parameter' => self::$parameter,
                 'permalink_base_url' => $this->Tools->getPermalinkBaseURL(self::$language),
-                'control' => array(
-                    'previous' => $previous_content,
-                    'next' => $next_content,
-                    'category' => $primary_category
-                ),
-                'author' => $this->app['account']->getDisplayNameByUsername($content['author_username'])
+                'control' => $response['control'],
+                'author' => $response['content']['author']
             ));
+
         $params = array();
         if (self::$parameter['check_jquery']) {
             $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
         }
         if (self::$parameter['load_css']) {
+            $css_files = 'bootstrap/latest/css/bootstrap.min.css,font-awesome/latest/css/font-awesome.min.css';
             if (isset($params['library'])) {
-                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
+                $params['library'] .= ','.$css_files;
             }
             else {
-                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
+                $params['library'] = $css_files;
             }
             $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
         }
-        $params['canonical'] = $this->Tools->getPermalinkBaseURL(self::$language).'/'.$content['permalink'];
+        $params['canonical'] = $this->Tools->getPermalinkBaseURL(self::$language).'/'.$response['content']['permalink'];
+        $params['set_header'] = $response['content']['content_id'];
         return $this->app->json(array(
             'parameter' => $params,
-            'response' => $response
+            'response' => $result
         ));
     }
 
@@ -265,6 +283,8 @@ class ActionView extends Basic
         // disable the jquery check?
         self::$parameter['check_jquery'] = (isset(self::$parameter['check_jquery']) && ((self::$parameter['check_jquery'] == 0) || (strtolower(self::$parameter['check_jquery']) == 'false'))) ? false : $default_parameter['check_jquery'];
 
+        self::$parameter['permalink'] = (isset(self::$parameter['permalink']) && !empty(self::$parameter['permalink'])) ? self::$parameter['permalink'] : '';
+
         self::$parameter['content_id'] = (isset(self::$parameter['content_id']) && is_numeric(self::$parameter['content_id'])) ? self::$parameter['content_id'] : -1;
 
         if ((self::$parameter['content_id'] > 0) && ('FAQ' == $this->ContentData->getContentType(self::$parameter['content_id']))) {
@@ -310,7 +330,7 @@ class ActionView extends Basic
         self::$parameter['content_comments'] = (isset(self::$parameter['content_comments']) && ((self::$parameter['content_comments'] == 0) || (strtolower(self::$parameter['content_comments']) == 'false'))) ? false : $default_parameter['content_comments']['enabled'];
         self::$parameter['comments_message'] = (isset($GET['message']) && !empty($GET['message'])) ? $GET['message'] : '';
 
-        if (self::$parameter['content_id'] > 0) {
+        if ((self::$parameter['content_id'] > 0) || !empty(self::$parameter['permalink'])) {
             return $this->showID();
         }
 

@@ -356,7 +356,62 @@ class RemoteServer
 
     protected function ResponseView()
     {
-        return __METHOD__;
+        $ContentData = new Content($this->app);
+        $Tools = new Tools($this->app);
+        $CategoryData = new Category($this->app);
+        $CategoryTypeData = new CategoryType($this->app);
+        $TagData = new Tag($this->app);
+
+        if (false !== ($permalink = $this->app['request']->request->get('permalink', false))) {
+            if (false === ($content_id = $ContentData->selectContentIDbyPermaLink($permalink, self::$locale))) {
+                return $this->app['translator']->trans('The permalink <b>%permalink%</b> does not exists!',
+                    array('%permalink%' => $permalink), 'messages', self::$locale);
+            }
+        }
+        else {
+            $content_id = $this->app['request']->request->get('content_id', -1);
+        }
+
+        if (false === ($content = $ContentData->select($content_id, self::$locale))) {
+            return $this->app['translator']->trans('The flexContent record with the ID %id% does not exists!',
+                array('%id%' => $content_id), 'messages', self::$locale);
+        }
+
+        if ((strtotime($content['publish_from']) > time()) || !in_array($content['status'], self::$allowed_status) ||
+            !empty($content['redirect_url'])) {
+            return $this->app['translator']->trans('No active content available!',
+                array(), 'messages', self::$locale);
+        }
+
+        // create links for the tags
+        $Tools->linkTags($content['teaser'], self::$locale);
+        $Tools->linkTags($content['content'], self::$locale);
+
+        // get the categories for this content ID
+        $content['categories'] = $CategoryData->selectCategoriesByContentID($content_id);
+
+        // get the tags for this content ID
+        $content['tags'] = $TagData->selectTagArrayForContentID($content_id);
+
+        // select the previous and the next content
+        $previous_content = $ContentData->selectPreviousContentForID($content_id, self::$locale);
+        $next_content = $ContentData->selectNextContentForID($content_id, self::$locale);
+
+        // get the primary category
+        $primary_category_id = $CategoryData->selectPrimaryCategoryIDbyContentID($content_id);
+        $primary_category = $CategoryTypeData->select($primary_category_id);
+
+        $content['author'] = $this->app['account']->getDisplayNameByUsername($content['author_username']);
+
+        $response = array(
+            'content' => $content,
+            'control' => array(
+                'previous' => $previous_content,
+                'next' => $next_content,
+                'category' => $primary_category
+            )
+        );
+        return $response;
     }
 
     /**

@@ -202,7 +202,7 @@ class RemoteClient extends Alert
                 $query = array(
                     'action' => 'view',
                     'content_id' => isset($parameter['content_id']) ? $parameter['content_id'] : -1,
-                    'content_permalink' => isset($parameter['content_permalink']) ? $parameter['content_permalink'] : '',
+                    'permalink' => isset($parameter['permalink']) ? $parameter['permalink'] : '',
                 );
                 break;
             default:
