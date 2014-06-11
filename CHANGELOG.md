@@ -6,6 +6,17 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.33** - 2014-06-11
+
+* changed library dependencies to `/latest`
+* changed handling of `container` and `container-fluid`
+* fixed route to `/mediabrowser`
+* introduce using of flexContent as Remote Server and Client
+* changed BASIC OutputFilter enable to remove dynamically loading of CSS and JS files
+* changed routes for `/command/flexcontent/getheader` and `/command/flexcontent/canonical/` to POST method
+* massive changes for remote access, and access for the new OutputFilter, changed method `promptAlert()`
+* finished first steps for the remote service
+
 **0.32** - 2014-06-04
 
 * changed roles and authentication check for the `/media` directory
