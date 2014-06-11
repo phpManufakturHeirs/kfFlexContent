@@ -145,7 +145,7 @@ class ActionView extends Basic
         else {
             // local access
             if (!empty(self::$parameter['permalink'])) {
-                if (false === (self::$parameter['content_id'] = $this->ContentData->selectContentIDbyPermaLink(self::$parameter['content_permalink'], self::$language))) {
+                if (false === (self::$parameter['content_id'] = $this->ContentData->selectContentIDbyPermaLink(self::$parameter['permalink'], self::$language))) {
                     $this->setAlert('The permalink <b>%permalink%</b> does not exists!',
                         array('%permalink%' => self::$parameter['permalink']), self::ALERT_TYPE_DANGER,
                         true, array(__METHOD__, __LINE__));
