@@ -441,7 +441,7 @@ class RemoteServer
             ), 403);
         }
 
-        self::$config = $app['utils']->readJSON(MANUFAKTUR_PATH.'/flexcontent/config.flexcontent.json');
+        self::$config = $app['utils']->readJSON(MANUFAKTUR_PATH.'/flexContent/config.flexcontent.json');
 
         // check the name and token
         if (!isset(self::$config['remote']['server'][self::$client_name]) ||

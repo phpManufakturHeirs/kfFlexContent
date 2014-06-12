@@ -252,4 +252,4 @@ $app->get('/flexcontent/action',
  */
 
 $app->post('/flexcontent/json',
-    'phpManufaktur\flexcontent\Control\RemoteServer::Controller');
+    'phpManufaktur\flexContent\Control\RemoteServer::Controller');
