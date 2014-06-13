@@ -86,7 +86,6 @@ class ActionList extends Basic
             }
             $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
         }
-        $params['robots'] = 'noindex,follow';
         return $this->app->json(array(
             'parameter' => $params,
             'response' => $result
@@ -213,7 +212,6 @@ class ActionList extends Basic
             }
             $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
         }
-        $params['robots'] = 'noindex,follow';
         return $this->app->json(array(
             'parameter' => $params,
             'response' => $result
