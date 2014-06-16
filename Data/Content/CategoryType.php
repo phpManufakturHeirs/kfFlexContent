@@ -46,7 +46,7 @@ class CategoryType
         `language` VARCHAR(2) NOT NULL DEFAULT 'EN',
         `category_name` VARCHAR(64) NOT NULL DEFAULT '',
         `category_permalink` VARCHAR(255) NOT NULL DEFAULT '',
-        `category_description` TEXT NOT NULL DEFAULT '',
+        `category_description` TEXT NOT NULL,
         `category_image` TEXT NOT NULL,
         `category_type` ENUM ('DEFAULT','EVENT','FAQ') NOT NULL DEFAULT 'DEFAULT',
         `target_url` TEXT NOT NULL,
