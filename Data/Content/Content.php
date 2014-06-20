@@ -361,6 +361,10 @@ EOD;
                 }
                 $SQL .= " $order_direction";
             }
+
+            if ($limit_from < 0) {
+                $limit_from = 0;
+            }
             $SQL .= " LIMIT $limit_from, $rows_per_page";
             $results = $this->app['db']->fetchAll($SQL);
 
