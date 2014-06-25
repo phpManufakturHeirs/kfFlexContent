@@ -86,7 +86,12 @@ class ImportDialog extends Admin
 
         // set the time limit for the import process
         $timelimit = isset(self::$config['admin']['import']['timelimit']) ? self::$config['admin']['import']['timelimit'] : 60;
-        set_time_limit($timelimit);
+        if (function_exists('set_time_limit') && !$this->app['utils']->isFunctionDisabled('set_time_limit')) {
+            set_time_limit($timelimit);
+        }
+        else {
+            $this->app['monolog']->addDebug('Function `set_time_limit()` is disabled!', array(__METHOD__, __LINE__));
+        }
 
         $cmsPages = new Page($this->app);
         $page_directory = $cmsPages->getPageDirectory();
