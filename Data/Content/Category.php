@@ -296,7 +296,11 @@ EOD;
         try {
             $category_table = self::$table_name;
             $type_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category_type';
-            $SQL = "SELECT * FROM $category_table, $type_table WHERE $category_table.category_id=$type_table.category_id AND `content_id`='$content_id' ORDER BY `is_primary` DESC, `category_name` ASC";
+
+            $SQL = "SELECT * FROM `$category_table` ".
+                "LEFT JOIN `$type_table` ON `$type_table`.`category_id`=`$category_table`.`category_id` ".
+                "WHERE `content_id`=$content_id  ORDER BY `is_primary` DESC, `category_name` ASC";
+
             $results = $this->app['db']->fetchAll($SQL);
             $categories = array();
             foreach ($results as $result) {

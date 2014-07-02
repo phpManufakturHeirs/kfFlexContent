@@ -436,11 +436,11 @@ EOD;
 
             $in_status = "('".implode("','", $status)."')";
 
-            $SQL = "SELECT `tag_name`, `tag_description`, `tag_permalink`, ".
-                "`tag_image`, $tag_type.`tag_id` FROM `$category`, `$content`, `$tag_type`, `$tag` WHERE ".
-                "$category.content_id=$content.content_id AND `category_id`=$category_id AND ".
-                "$tag.content_id=$content.content_id AND $tag.tag_id=$tag_type.tag_id AND ".
-                "($search) AND `status` IN $in_status ORDER BY ".
+            $SQL = "SELECT * FROM `$tag_type` ".
+                "LEFT JOIN `$tag` ON `$tag`.`tag_id`=`$tag_type`.`tag_id` ".
+                "LEFT JOIN `$content` ON `$content`.`content_id`=`$tag`.`content_id` ".
+                "LEFT JOIN `$category` ON `$category`.`content_id`=`$content`.`content_id` ".
+                "WHERE `category_id`=$category_id AND ($search) AND `status` IN $in_status ORDER BY ".
                 "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), ".
                 "`publish_from` DESC";
 
@@ -458,6 +458,14 @@ EOD;
         }
     }
 
+    /**
+     * Select the Hashtag list for the usage in the CKEditor
+     *
+     * @param string $language
+     * @param unknown $status
+     * @throws \Exception
+     * @return Ambigous <boolean, multitype:multitype:unknown  >
+     */
     public function selectHashtagLinkList($language=null, $status=array('PUBLISHED','BREAKING','HIDDEN','ARCHIVED'))
     {
         try {
@@ -466,15 +474,18 @@ EOD;
             $content = FRAMEWORK_TABLE_PREFIX.'flexcontent_content';
             $in_status = "('".implode("','", $status)."')";
             if (is_null($language)) {
-                $SQL = "SELECT DISTINCT $tagtype.tag_id, `tag_name`, `tag_permalink`, `tag_description`, $tagtype.`language` ".
-                    "FROM `$tagtype`,`$tag`,`$content` WHERE $tagtype.tag_id=$tag.tag_id AND `status` IN $in_status ".
-                    "AND $tag.content_id=$content.content_id ORDER BY `tag_name` ASC";
+                $SQL = "SELECT * FROM `$tagtype` ".
+                    "LEFT JOIN `$tag` ON `$tag`.`tag_id`=`$tagtype`.`tag_id` ".
+                    "LEFT JOIN `$content` ON `$content`.`content_id`= `$tag`.`content_id` ".
+                    "WHERE `status` IN $in_status GROUP BY `tag_name` ORDER BY `tag_name` ASC";
             }
             else {
-                $SQL = "SELECT DISTINCT $tagtype.tag_id, `tag_name`, `tag_permalink`, `tag_description`, $tagtype.`language` ".
-                    "FROM `$tagtype`,`$tag`,`$content` WHERE $tagtype.tag_id=$tag.tag_id AND `status` IN $in_status ".
-                    "AND $tag.content_id=$content.content_id AND $tagtype.`language`='$language' ORDER BY `tag_name` ASC";
+                $SQL = "SELECT * FROM `$tagtype` ".
+                    "LEFT JOIN `$tag` ON `$tag`.`tag_id`=`$tagtype`.`tag_id` ".
+                    "LEFT JOIN `$content` ON `$content`.`content_id`= `$tag`.`content_id` ".
+                    "WHERE `status` IN $in_status AND `$tagtype`.`language`='$language' GROUP BY `tag_name` ORDER BY `tag_name` ASC";
             }
+
             $results = $this->app['db']->fetchAll($SQL);
             $list = array();
             foreach ($results as $result) {

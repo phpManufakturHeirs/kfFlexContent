@@ -211,7 +211,11 @@ EOD;
         try {
             $tag_table = self::$table_name;
             $type_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_tag_type';
-            $SQL = "SELECT $type_table.`tag_id`, `tag_name`  FROM `$tag_table`, `$type_table` WHERE $tag_table.`tag_id`=$type_table.`tag_id` AND `content_id`='$content_id' ORDER BY `position` ASC";
+
+            $SQL = "SELECT `$type_table`.`tag_id`, `$type_table`.`tag_name` FROM `$type_table` ".
+                "LEFT JOIN `$tag_table` ON `$tag_table`.`tag_id`=`$type_table`.`tag_id` ".
+                "WHERE `content_id`='$content_id' ORDER BY `position` ASC";
+
             $results = $this->app['db']->fetchAll($SQL);
             $tags = array();
             foreach ($results as $result) {
@@ -239,7 +243,11 @@ EOD;
         try {
             $tag_table = self::$table_name;
             $type_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_tag_type';
-            $SQL = "SELECT *  FROM `$tag_table`, `$type_table` WHERE $tag_table.`tag_id`=$type_table.`tag_id` AND `content_id`='$content_id' ORDER BY `position` ASC";
+
+            $SQL = "SELECT * FROM `$type_table` ".
+                "LEFT JOIN `$tag_table` ON `$tag_table`.`tag_id`=`$type_table`.`tag_id` ".
+                "WHERE `content_id`='$content_id' ORDER BY `position` ASC";
+
             $results = $this->app['db']->fetchAll($SQL);
             $tags = array();
             foreach ($results as $result) {
@@ -271,11 +279,15 @@ EOD;
             $content_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_content';
             $category_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
             $category_type_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category_type';
-            $SQL = "SELECT `target_url`, $content_table.content_id, $category_table.category_id FROM $tag_table, $content_table, $category_table, $category_type_table WHERE ".
-                "$content_table.content_id=$category_table.content_id AND $category_table.category_id=$category_type_table.category_id AND ".
-                "$tag_table.content_id=$content_table.content_id AND $category_table.is_primary=1 AND ".
-                "`tag_id`='$tag_id' AND $content_table.status != 'UNPUBLISHED' AND $content_table.status != 'DELETED' ".
-                "ORDER BY `position` ASC, $content_table.publish_from DESC LIMIT 1";
+
+            $SQL = "SELECT `target_url`, $content_table.content_id, $category_table.category_id FROM `$content_table` ".
+                "LEFT JOIN `$category_table` ON `$category_table`.`content_id`=`$content_table`.`content_id` ".
+                "LEFT JOIN `$category_type_table` ON `$category_type_table`.`category_id`=`$category_table`.`category_id` ".
+                "LEFT JOIN `$tag_table` ON `$tag_table`.`content_id`=`$content_table`.`content_id` ".
+                "WHERE `$category_table`.`is_primary`=1 AND `tag_id`=$tag_id AND `$content_table`.`status` != 'UNPUBLISHED' AND ".
+                "`$content_table`.`status` != 'DELETED' ".
+                "ORDER BY `position` ASC, `$content_table`.`publish_from` DESC LIMIT 1";
+
             $result = $this->app['db']->fetchAssoc($SQL);
             $category_id = (isset($result['category_id'])) ? $result['category_id'] : -1;
             $content_id = (isset($result['content_id'])) ? $result['content_id'] : -1;

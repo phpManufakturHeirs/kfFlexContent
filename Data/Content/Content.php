@@ -320,11 +320,13 @@ EOD;
             $content = self::$table_name;
             $category = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
             $category_type = FRAMEWORK_TABLE_PREFIX.'flexcontent_category_type';
-            $SQL = "SELECT * FROM `$content`, `$category`, `$category_type` ";
-            $SQL .= "WHERE `$category`.content_id=`$content`.content_id AND `$category`.is_primary=1 AND `$category`.category_id=`$category_type`.category_id";
+
+            $SQL = "SELECT * FROM `$content` ".
+                "LEFT JOIN `$category` ON `$category`.`content_id`=`$content`.`content_id` ".
+                "LEFT JOIN `$category_type` ON `$category_type`.`category_id`=`$category`.`category_id` ".
+                "WHERE `$category`.`is_primary`=1";
 
             if (is_array($select_status) && !empty($select_status)) {
-                //$SQL .= " WHERE ";
                 $SQL .= " AND ";
                 $use_status = false;
                 if (is_array($select_status) && !empty($select_status)) {
@@ -529,9 +531,11 @@ EOD;
                 $direction = 'ASC';
             }
 
-            $SQL = "SELECT * FROM $category_table, $content_table WHERE $category_table.content_id=$content_table.content_id AND $content_table.content_id != '$content_id' AND ".
-                "category_id='$category_id' AND is_primary=1 AND '$published_from' $select `publish_from` AND status !='UNPUBLISHED' AND status != 'DELETED' ".
-                "AND `language`='$language' ORDER BY publish_from $direction LIMIT 1";
+            $SQL = "SELECT * FROM `$content_table` ".
+                "LEFT JOIN `$category_table` ON `$category_table`.`content_id`=`$content_table`.`content_id` ".
+                "WHERE `$content_table`.`content_id` != $content_id AND `category_id`=$category_id AND `is_primary`=1 AND ".
+                "'$published_from' $select `publish_from` AND `status` != 'UNPUBLISHED' AND `status` != 'DELETED' AND ".
+                "`language`='$language' ORDER BY `publish_from` $direction LIMIT 1";
 
             $result = $this->app['db']->fetchAssoc($SQL);
 
@@ -585,16 +589,19 @@ EOD;
             $category_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
             $in_status = "('".implode("','", $status)."')";
             if (in_array($order_by, array('publish_from','breaking_to','archive_from','timestamp'))) {
-                $SQL = "SELECT * FROM `$category_table`, `$content_table` WHERE $content_table.content_id = $category_table.content_id ".
-                    "AND `category_id`=$category_id AND `status` IN $in_status ORDER BY ".
+                $SQL = "SELECT * FROM `$content_table` ".
+                    "LEFT JOIN `$category_table` ON `$category_table`.`content_id`=`$content_table`.`content_id` ".
+                    "WHERE `category_id`=$category_id AND `status` IN $in_status ORDER BY ".
                     "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), ".
                     "`$order_by` $order_direction LIMIT $limit";
             }
             else {
-                $SQL = "SELECT * FROM `$category_table`, `$content_table` WHERE $content_table.content_id = $category_table.content_id ".
-                    "AND `category_id`=$category_id AND `status` IN $in_status ORDER BY ".
+                $SQL = "SELECT * FROM `$content_table` ".
+                    "LEFT JOIN `$category_table` ON `$category_table`.`content_id`=`$content_table`.`content_id` ".
+                    "WHERE `category_id`=$category_id AND `status` IN $in_status ORDER BY ".
                     "`$content_table`.`$order_by` $order_direction LIMIT $limit";
             }
+
             $results = $this->app['db']->fetchAll($SQL);
             $contents = array();
             foreach ($results as $result) {
@@ -622,8 +629,9 @@ EOD;
             $content_table = self::$table_name;
             $tag_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_tag';
             $in_status = "('".implode("','", $status)."')";
-            $SQL = "SELECT * FROM `$tag_table`, `$content_table` WHERE $content_table.content_id = $tag_table.content_id ".
-                "AND `tag_id`=$tag_id AND `status` IN $in_status ORDER BY `position` ASC, ".
+            $SQL = "SELECT * FROM `$content_table` ".
+                "LEFT JOIN `$tag_table` ON `$tag_table`.`content_id`=`$content_table`.`content_id` ".
+                "WHERE `tag_id`=$tag_id AND `status` IN $in_status ORDER BY `position` ASC, ".
                 "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), `publish_from` DESC ".
                 "LIMIT $limit";
             $results = $this->app['db']->fetchAll($SQL);
@@ -667,9 +675,9 @@ EOD;
 
             $in_status = "('".implode("','", $status)."')";
 
-            $SQL = "SELECT * FROM `$category_table`, `$content_table` WHERE ".
-                "$category_table.content_id=$content_table.content_id AND `category_id`=$category_id ".
-                "AND `is_primary`=1 AND ($search) AND `status` IN $in_status ORDER BY ".
+            $SQL = "SELECT * FROM `$content_table` ".
+                "LEFT JOIN `$category_table` ON `$category_table`.`content_id`=`$content_table`.`content_id` ".
+                "WHERE `category_id`=$category_id AND `is_primary`=1 AND ($search) AND `status` IN $in_status ORDER BY ".
                 "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), ".
                 "`publish_from` DESC";
 
@@ -713,8 +721,10 @@ EOD;
 
         $in_status = "('".implode("','", $status)."')";
 
-        $SQL = "SELECT * FROM `$category_table`,`$content_table`, `$category_type_table` WHERE `$content_table`.content_id=`$category_table`.content_id ".
-            "AND `$content_table`.`language`='$language' ";
+        $SQL = "SELECT * FROM `$content_table` ".
+            "LEFT JOIN `$category_table` ON `$category_table`.`content_id`=`$content_table`.`content_id` ".
+            "LEFT JOIN `$category_type_table` ON `$category_type_table`.`category_id`=`$category_table`.`category_id` ".
+            "WHERE `$content_table`.`language`='$language' ";
 
         if (!empty($categories)) {
             $cats = "('".implode("','", $categories)."')";
@@ -726,14 +736,12 @@ EOD;
         }
 
         if ($category_type != 'DEFAULT') {
-            $SQL .= "AND `$category_table`.`content_id`=`$content_table`.`content_id` AND ".
-                "`$category_table`.`is_primary`='1' AND `$category_type_table`.`category_id`=`$category_table`.`category_id` AND ".
-                "`$category_type_table`.`category_type`='$category_type' ";
+            $SQL .= "AND `$category_table`.`is_primary`='1' AND `$category_type_table`.`category_type`='$category_type' ";
         }
 
         // and the rest - GROUP BY prevents duplicate entries!
         $order_table = (in_array($order_by, $this->getColumns())) ? $content_table : $category_table;
-        $SQL .= "AND `status` IN $in_status GROUP BY `$content_table`.content_id ORDER BY ".
+        $SQL .= "AND `status` IN $in_status GROUP BY `$content_table`.`content_id` ORDER BY ".
             "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), `$order_table`.`$order_by` $order_direction ";
 
         if (($paging_from == 0) && ($paging_limit == 0)) {
@@ -900,9 +908,12 @@ EOD;
             $content = self::$table_name;
             $category = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
             $category_type = FRAMEWORK_TABLE_PREFIX.'flexcontent_category_type';
-            $SQL = "SELECT `category_type` FROM `$content`, `$category`, `$category_type` WHERE ".
-                "`$content`.`content_id`='$content_id' AND `$content`.`content_id`=`$category`.`content_id` AND ".
-                "`$category`.`is_primary`=1 AND `$category_type`.`category_id`=`$category`.`category_id`";
+
+            $SQL = "SELECT `category_type` FROM `$category_type` ".
+                "LEFT JOIN `$category` ON `$category`.`category_id`=`$category_type`.`category_id` ".
+                "LEFT JOIN `$content` ON `$content`.`content_id`=`$category`.`content_id` ".
+                "WHERE `$content`.`content_id`=$content_id";
+
             $result = $this->app['db']->fetchColumn($SQL);
             return (!is_null($result)) ? $result : false;
         } catch (\Doctrine\DBAL\DBALException $e) {
