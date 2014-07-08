@@ -6,6 +6,16 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.34** - 2014-07-08
+
+* fixed two small but strong typo in `RemoteServer.php` and `bootstrap.include.php`
+* changed handling for small content images
+* removed robots directive for `action[list]`
+* improved SQL table definition for the category type
+* avoid setting `paging[]` at negative value in `action[list]`
+* add check if function `set_time_limit()` is enabled
+* add `config.allowedContent = true` to enable extra tags and scripts in the main content
+
 **0.33** - 2014-06-11
 
 * changed library dependencies to `/latest`
