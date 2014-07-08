@@ -54,4 +54,7 @@ CKEDITOR.editorConfig = function( config ) {
     config.basicEntities = false;
     config.entities_greek = false;
     config.entities_latin = false;
+    
+    // allow all contents, also <script> etc. !
+    config.allowedContent = true;
 };
