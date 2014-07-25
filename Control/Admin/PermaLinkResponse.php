@@ -14,7 +14,7 @@ namespace phpManufaktur\flexContent\Control\Admin;
 use Silex\Application;
 use phpManufaktur\flexContent\Data\Content\Content as ContentData;
 use phpManufaktur\flexContent\Data\Content\CategoryType as CategoryTypeData;
-use phpManufaktur\flexcontent\data\content\TagType as TagTypeData;
+use phpManufaktur\flexContent\Data\Content\TagType as TagTypeData;
 use phpManufaktur\flexContent\Data\Content\RSSChannel;
 
 class PermaLinkResponse
