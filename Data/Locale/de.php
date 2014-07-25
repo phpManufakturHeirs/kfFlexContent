@@ -349,6 +349,8 @@ return array(
         => 'Die Überschrift wird immer benötigt und kann nicht in den Einstellungen ausgeschaltet werden. Bitte prüfen Sie die Konfiguration!',
     'The title should have a length between %minimum% and %maximum% characters (actual: %length%).'
         => 'Der Titel sollte eine Länge zwischen %minimum% und %maximum% Zeichen haben, zur Zeit sind es %length% Zeichen.',
+    'There a no tags available for a listing!'
+        => 'Es sind keine Schlagworte für eine Auflistung verfügbar!',
     'There was no image selected.'
         => 'Es wurde kein Bild ausgewählt.',
 

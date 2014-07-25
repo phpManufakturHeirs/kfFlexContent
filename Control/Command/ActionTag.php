@@ -158,6 +158,57 @@ class ActionTag extends Basic
     }
 
     /**
+     * Return an enumeration for the available tags
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     */
+    protected function getTagListing()
+    {
+        self::$parameter['limit'] = isset(self::$parameter['limit']) ? (int) self::$parameter['limit'] : null;
+        self::$parameter['order_by'] = isset(self::$parameter['order_by']) ? strtolower(self::$parameter['order_by']) : 'tag_count';
+        self::$parameter['order_direction'] = (isset(self::$parameter['order_direction']) && in_array(strtoupper(self::$parameter['order_direction'], array('ASC', 'DESC')))) ? strtoupper(self::$parameter['order_direction']) : null;
+        self::$parameter['mode'] = isset(self::$parameter['mode']) ? strtolower(self::$parameter['mode']) : 'enumeration';
+
+        if (false !== ($tags = $this->TagData->selectTags(
+            self::$language, self::$parameter['limit'], self::$parameter['order_by'], self::$parameter['order_direction']))) {
+
+            $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
+                '@phpManufaktur/flexContent/Template', 'command/tag.enumeration.twig',
+                $this->getPreferredTemplateStyle()),
+                array(
+                    'basic' => $this->getBasicSettings(),
+                    'config' => self::$config,
+                    'parameter' => self::$parameter,
+                    'permalink_base_url' => CMS_URL.str_ireplace('{language}', strtolower(self::$language), self::$config['content']['permalink']['directory']),
+                    'tags' => $tags
+                ));
+
+            $params = array();
+            if (self::$parameter['check_jquery']) {
+                $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+            }
+            if (self::$parameter['load_css']) {
+                $css_files = 'bootstrap/latest/css/bootstrap.min.css,font-awesome/latest/css/font-awesome.min.css';
+                if (isset($params['library'])) {
+                    $params['library'] .= ','.$css_files;
+                }
+                else {
+                    $params['library'] = $css_files;
+                }
+                $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
+            }
+            return $this->app->json(array(
+                'parameter' => $params,
+                'response' => $result
+            ));
+        }
+        else {
+            $this->setAlert('There a no tags available for a listing!', array(), self::ALERT_TYPE_INFO);
+            return $this->promptAlert();
+        }
+    }
+
+    /**
      * Controller to handle the TAG overview
      *
      * @param Application $app
@@ -291,6 +342,11 @@ class ActionTag extends Basic
         // show content date?
         self::$parameter['content_date'] = (isset(self::$parameter['content_date']) && ((self::$parameter['content_date'] == 0) || (strtolower(self::$parameter['content_date']) == 'false'))) ? false : $default_parameter['content_date'];
 
+        self::$parameter['type'] = (isset(self::$parameter['type'])) ? strtolower(self::$parameter['type']) : 'contents';
+
+        if (self::$parameter['type'] !== 'contents') {
+            return $this->getTagListing();
+        }
 
         if (self::$parameter['tag_id'] > 0) {
             return $this->showTagID();

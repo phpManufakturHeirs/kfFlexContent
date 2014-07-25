@@ -20,11 +20,12 @@
   background-color: transparent;
 }
 
+#flexcontent .enumeration-tags,
 #flexcontent .content-tags {
   margin: 10px 0 10px 0;
   width: auto;
   height: auto;
-  line-break:loose;
+  line-break: loose;
 }
 #flexcontent .content-date {
   margin: 0 0 5px 0;

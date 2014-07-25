@@ -314,4 +314,68 @@ EOD;
             throw new \Exception($e);
         }
     }
+
+    /**
+     * Select #tags counting the usage
+     *
+     * @param string $locale
+     * @param integer $limit
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     */
+    public function selectTags($locale='EN', $limit=null, $order_by='tag_count', $order_direction=null)
+    {
+        try {
+            if (in_array(strtolower($order_by), array('tag_count', 'tag_name'))) {
+                switch (strtolower($order_by)) {
+                    case 'tag_id':
+                        $order_by = 'tags.tag_id';
+                        break;
+                    case 'tag_name':
+                        $order_by = 'tag_name';
+                        break;
+                    case 'tag_count':
+                    default:
+                        $order_by = 'tags_2.tag_count';
+                        break;
+                }
+            }
+            if (!is_null($order_direction)) {
+                $order_direction = strtoupper($order_direction);
+            }
+            elseif ($order_by == 'tags_2.tag_count') {
+                $order_direction = 'DESC';
+            }
+            else {
+                $order_direction = 'ASC';
+            }
+            $SQL = "SELECT tags.id, tags.tag_id, tags_2.tag_count, language, tag_name, tag_permalink, tag_description, tag_image ".
+                "FROM `".self::$table_name."` tags ".
+                "JOIN (SELECT tag_id, COUNT(*) AS tag_count FROM `".self::$table_name."` GROUP BY tag_id) tags_2 ON (tags_2.tag_id = tags.tag_id) ".
+                "LEFT JOIN `".FRAMEWORK_TABLE_PREFIX.'flexcontent_tag_type'."` type ON type.tag_id = tags.tag_id ".
+                "WHERE language = '$locale' ".
+                "GROUP BY `tag_id` ".
+                "ORDER BY $order_by $order_direction";
+            if (!is_null($limit)) {
+                $SQL .= " LIMIT $limit";
+            }
+
+            $results = $this->app['db']->fetchAll($SQL);
+            $tag_array = array();
+            if (is_array($results)) {
+                foreach ($results as $result) {
+                    $item = array();
+                    foreach ($result as $key => $value) {
+                        $item[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                    }
+                    $tag_array[] = $item;
+                }
+            }
+            return (!empty($tag_array)) ? $tag_array : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+
 }
