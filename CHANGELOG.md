@@ -6,10 +6,14 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.36** - 2014-07-26
+
+* introduce #hashtag wordcloud
+
 **0.35** - 2014-07-25
 
 * fixed a namespace typo in the permalink class
-* introduce tag enumeration for embedding in frontpage (experimental)
+* introduce #hashtag enumeration for embedding in frontpage (experimental)
 
 **0.34** - 2014-07-08
 
