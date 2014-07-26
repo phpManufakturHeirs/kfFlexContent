@@ -9,18 +9,14 @@
 #}
 {% spaceless %}
   <!-- {{ _self.getTemplateName() }} -->
-  <div id="flexcontent">
-    <div class="container-fluid">          
-      {{ basic.alert }}
-      {% if tags|length > 0 %}
-        <div class="enumeration-tags">
-          {% for tag in tags %}
-            <span class="label {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
-              <a href="{{ permalink_base_url ~ '/buzzword/' ~ tag.tag_permalink }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
-            </span>
-          {% endfor %}
-        </div>
-      {% endif %}
+  {{ basic.alert }}
+  {% if tags|length > 0 %}
+    <div id="enumeration-tags">
+      {% for tag in tags %}
+        <span class="label tag {% if loop.first %}label-primary{% elseif loop.index < 4 %}label-info{% else %}label-default{% endif %}">
+          <a href="{{ permalink_base_url ~ '/buzzword/' ~ tag.tag_permalink }}" title="{{ tag.tag_description|ellipsis }}">{{ tag.tag_name }}</a>
+        </span>
+      {% endfor %}
     </div>
-  </div>
+  {% endif %}
 {% endspaceless %}

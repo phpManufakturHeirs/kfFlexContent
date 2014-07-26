@@ -254,7 +254,13 @@ EOD;
                         }
                     }
                 }
-                $insert[$this->app['db']->quoteIdentifier($key)] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
+                $insert[$key] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
+            }
+            $check_array = array('tag_description', 'tag_image');
+            foreach ($check_array as $key) {
+                if (!isset($insert[$key])) {
+                    $insert[$key] = '';
+                }
             }
             $this->app['db']->insert(self::$table_name, $insert);
             $tag_id = $this->app['db']->lastInsertId();

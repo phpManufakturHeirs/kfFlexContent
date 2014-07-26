@@ -20,12 +20,16 @@
   background-color: transparent;
 }
 
-#flexcontent .enumeration-tags,
+#enumeration-tags,
 #flexcontent .content-tags {
   margin: 10px 0 10px 0;
   width: auto;
   height: auto;
   line-break: loose;
+}
+#enumeration-tags .label {
+  display: inline-block !important;
+  margin-right: 5px;
 }
 #flexcontent .content-date {
   margin: 0 0 5px 0;
@@ -86,4 +90,13 @@
 }
 #flexcontent .category-description {
   font-style: italic;
+}
+
+/*
+  WordCloud
+*/
+#wordcloud {
+  width: 100%;
+  margin: 10px;
+  padding: 0;
 }

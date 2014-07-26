@@ -1,0 +1,52 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2014 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+{% spaceless %}
+  <!-- {{ _self.getTemplateName() }} -->
+  {{ basic.alert }}
+  {% if tags|length > 0 %}
+    <div id="wordcloud" style="height:{{ parameter.height }}px;">
+      {% for tag in tags %}
+        {% set weight = tag.tag_count * 5 %}{#{ tag.tag_count }}#}
+        <span data-weight="{{ weight }}">
+          <a href="{{ permalink_base_url ~ '/buzzword/' ~ tag.tag_permalink }}">{{ tag.tag_name }}</a>
+        </span>
+      {% endfor %}
+    </div>
+  {% endif %}
+  {% if parameter.check_jquery %}
+    <script type="text/javascript">
+      if (typeof 'jQuery' !== 'undefined') {
+        $(document).ready(function() {
+          var settings = {
+            "size": {
+              "grid":{{ parameter.size_grid }},
+              "factor":{{ parameter.size_factor }},
+              "normalize": true
+            },
+            "color": {
+              "background": "{{ parameter.color_background }}",
+              "start": "{{ parameter.color_start }}",
+              "end": "{{ parameter.color_end }}"
+            },
+            "options": {
+              "color": "{{ parameter.color_option }}",
+              "rotationRatio": 0.3,
+              "printMultiplier": 3,
+              "sort": "{{ parameter.sort }}"
+            },
+            "font": "Helvetica, Verdana, Arial, sans-serif",
+            "shape": "circle"
+          };
+          $("#wordcloud").awesomeCloud(settings);
+        });
+      }
+    </script>
+  {% endif %}
+{% endspaceless %}

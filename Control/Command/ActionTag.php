@@ -168,12 +168,96 @@ class ActionTag extends Basic
         self::$parameter['order_by'] = isset(self::$parameter['order_by']) ? strtolower(self::$parameter['order_by']) : 'tag_count';
         self::$parameter['order_direction'] = (isset(self::$parameter['order_direction']) && in_array(strtoupper(self::$parameter['order_direction'], array('ASC', 'DESC')))) ? strtoupper(self::$parameter['order_direction']) : null;
         self::$parameter['mode'] = isset(self::$parameter['mode']) ? strtolower(self::$parameter['mode']) : 'enumeration';
+        self::$parameter['size_grid'] = (isset(self::$parameter['size_grid']) && is_integer(self::$parameter['size_grid'])) ? intval(self::$parameter['size_grid']) : 8;
+        self::$parameter['size_factor'] = (isset(self::$parameter['size_factor']) && is_integer(self::$parameter['size_factor'])) ? intval(self::$parameter['size_factor']) : 0;
+
+        if (isset(self::$parameter['color_background'])) {
+            $color = self::$parameter['color_background'];
+            if (strpos($color, '#') === 0) {
+                self::$parameter['color_background'] = $color;
+            }
+            elseif (strpos($color, ',')) {
+                if (substr_count($color, ',') == 2) {
+                    self::$parameter['color_background'] = $this->app['utils']->rgb2hex($color);
+                }
+                elseif (substr_count($color, ',') == 3) {
+                    $rgba = explode(',', $color);
+                    self::$parameter['color_background'] = sprintf('rgba(%d,%d,%d,%f)', $rgba[0], $rgba[1], $rgba[2], $rgba[3]);
+                }
+                else {
+                    self::$parameter['color_background'] = 'rgba(255,255,255,0)';
+                }
+            }
+            else {
+                self::$parameter['color_background'] = 'rgba(255,255,255,0)';
+            }
+        }
+        else {
+            self::$parameter['color_background'] = 'rgba(255,255,255,0)';
+        }
+
+        if (isset(self::$parameter['color_start'])) {
+            $color = self::$parameter['color_start'];
+            if (strpos($color, '#')) {
+                self::$parameter['color_start'] = $color;
+            }
+            elseif (strpos($color, ',')) {
+                if (substr_count($color, ',') == 2) {
+                    self::$parameter['color_start'] = $this->app['utils']->rgb2hex($color);
+                }
+                else {
+                    self::$parameter['color_start'] = '#33ffff';
+                }
+            }
+            else {
+                self::$parameter['color_start'] = '#33ffff';
+            }
+        }
+        else {
+            self::$parameter['color_start'] = '#33ffff';
+        }
+
+        if (isset(self::$parameter['color_end'])) {
+            $color = self::$parameter['color_end'];
+            if (strpos($color, '#')) {
+                self::$parameter['color_end'] = $color;
+            }
+            elseif (strpos($color, ',')) {
+                if (substr_count($color, ',') == 2) {
+                    self::$parameter['color_end'] = $this->app['utils']->rgb2hex($color);
+                }
+                else {
+                    self::$parameter['color_end'] = '#000';
+                }
+            }
+            else {
+                self::$parameter['color_end'] = '#000';
+            }
+        }
+        else {
+            self::$parameter['color_end'] = '#000';
+        }
+
+        self::$parameter['color_option'] = (isset(self::$parameter['color_option']) && in_array(strtolower(self::$parameter['color_option']), array('gradient', 'random-light', 'random-dark'))) ? strtolower(self::$parameter['color_option']) : 'random-dark';
+        self::$parameter['sort'] = (isset(self::$parameter['sort']) && in_array(strtolower(self::$parameter['sort']), array('highest', 'lowest', 'random'))) ? strtolower(self::$parameter['sort']) : 'highest';
+
+        self::$parameter['height'] = isset(self::$parameter['height']) ? intval(self::$parameter['height']) : 400;
 
         if (false !== ($tags = $this->TagData->selectTags(
             self::$language, self::$parameter['limit'], self::$parameter['order_by'], self::$parameter['order_direction']))) {
 
+            switch (self::$parameter['mode']) {
+                case 'cloud':
+                    $twig_template = 'command/tag.cloud.twig';
+                    break;
+                case 'enumeration':
+                default:
+                    $twig_template = 'command/tag.enumeration.twig';
+                    break;
+            }
+
             $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
-                '@phpManufaktur/flexContent/Template', 'command/tag.enumeration.twig',
+                '@phpManufaktur/flexContent/Template', $twig_template,
                 $this->getPreferredTemplateStyle()),
                 array(
                     'basic' => $this->getBasicSettings(),
@@ -186,6 +270,9 @@ class ActionTag extends Basic
             $params = array();
             if (self::$parameter['check_jquery']) {
                 $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+                if (self::$parameter['mode'] === 'cloud') {
+                    $params['library'] .= ',jquery/awesomecloud/latest/jquery.awesomeCloud.min.js';
+                }
             }
             if (self::$parameter['load_css']) {
                 $css_files = 'bootstrap/latest/css/bootstrap.min.css,font-awesome/latest/css/font-awesome.min.css';
