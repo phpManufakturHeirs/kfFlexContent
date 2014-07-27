@@ -6,6 +6,11 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.37** - 2014-07-27
+
+* handling for libraries is now defined in `config.flexcontent.json`
+* in content embedded kitCommands can now load additional libraries
+
 **0.36** - 2014-07-26
 
 * introduce #hashtag wordcloud
