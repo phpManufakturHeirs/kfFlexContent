@@ -216,17 +216,58 @@ class ActionView extends Basic
             ));
 
         $params = array();
+        $params['library'] = null;
         if (self::$parameter['check_jquery']) {
-            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+            if (self::$config['kitcommand']['libraries']['enabled'] &&
+                !empty(self::$config['kitcommand']['libraries']['jquery'])) {
+                // load all predefined jQuery files for flexContent
+                foreach (self::$config['kitcommand']['libraries']['jquery'] as $library) {
+                    if (!empty($params['library'])) {
+                        $params['library'] .= ',';
+                    }
+                    $params['library'] .= $library;
+                }
+            }
+
+            if (self::$config['kitcommand']['content']['kitcommand']['enabled'] &&
+                self::$config['kitcommand']['content']['kitcommand']['libraries']['enabled'] &&
+                !empty(self::$config['kitcommand']['content']['kitcommand']['libraries']['jquery'])) {
+                // load additional jQuery libraries
+                foreach (self::$config['kitcommand']['content']['kitcommand']['libraries']['jquery'] as $library) {
+                    if (!empty($params['library'])) {
+                        $params['library'] .= ',';
+                    }
+                    $params['library'] .= $library;
+                }
+            }
         }
         if (self::$parameter['load_css']) {
-            $css_files = 'bootstrap/latest/css/bootstrap.min.css,font-awesome/latest/css/font-awesome.min.css';
-            if (isset($params['library'])) {
-                $params['library'] .= ','.$css_files;
+            if (self::$config['kitcommand']['libraries']['enabled'] &&
+                !empty(self::$config['kitcommand']['libraries']['css'])) {
+                // load all predefined CSS files for flexContent
+                foreach (self::$config['kitcommand']['libraries']['css'] as $library) {
+                    if (!empty($params['library'])) {
+                        $params['library'] .= ',';
+                    }
+                    // attach to 'library' not to 'css' !!!
+                    $params['library'] .= $library;
+                }
             }
-            else {
-                $params['library'] = $css_files;
+
+            if (self::$config['kitcommand']['content']['kitcommand']['enabled'] &&
+                self::$config['kitcommand']['content']['kitcommand']['libraries']['enabled'] &&
+                !empty(self::$config['kitcommand']['content']['kitcommand']['libraries']['css'])) {
+                // load additional CSS files
+                foreach (self::$config['kitcommand']['content']['kitcommand']['libraries']['css'] as $library) {
+                    if (!empty($params['library'])) {
+                        $params['library'] .= ',';
+                    }
+                    // attach to 'library' not to 'css' !!!
+                    $params['library'] .= $library;
+                }
             }
+
+            // set the CSS parameter
             $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
         }
         $params['canonical'] = $this->Tools->getPermalinkBaseURL(self::$language).'/'.$response['content']['permalink'];

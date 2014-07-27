@@ -364,6 +364,26 @@ class Update
     }
 
     /**
+     * Release 0.37
+     */
+    protected function release_037()
+    {
+        if (!isset(self::$config['kitcommand']['content']['kitcommand']['libraries'])) {
+            $default = $this->Configuration->getDefaultConfigArray();
+            self::$config['kitcommand']['content']['kitcommand']['libraries'] = $default['kitcommand']['content']['kitcommand']['libraries'];
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+
+        if (!isset(self::$config['kitcommand']['libraries'])) {
+            $default = $this->Configuration->getDefaultConfigArray();
+            self::$config['kitcommand']['libraries'] = $default['kitcommand']['libraries'];
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+    }
+
+    /**
      * Execute the update for flexContent
      *
      * @param Application $app
@@ -395,6 +415,7 @@ class Update
         $this->release_026();
         $this->release_029();
         $this->release_030();
+        $this->release_037();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

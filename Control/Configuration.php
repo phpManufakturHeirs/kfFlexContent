@@ -503,7 +503,27 @@ class Configuration
                 ),
                 'content' => array(
                     'kitcommand' => array(
-                        'enabled' => true
+                        'enabled' => true,
+                        'libraries' => array(
+                            'enabled' => false,
+                            'jquery' => array(
+                                'jquery/awesomecloud/latest/jquery.awesomeCloud.min.js'
+                            ),
+                            'css' => array(
+
+                            )
+                        )
+                    )
+                ),
+                'libraries' => array(
+                    'enabled' => true,
+                    'jquery' => array(
+                        'jquery/jquery/latest/jquery.min.js',
+                        'bootstrap/latest/js/bootstrap.min.js'
+                    ),
+                    'css' => array(
+                        'bootstrap/latest/css/bootstrap.min.css',
+                        'font-awesome/latest/css/font-awesome.min.css'
                     )
                 )
             ),

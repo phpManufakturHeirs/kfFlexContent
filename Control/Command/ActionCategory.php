@@ -76,16 +76,33 @@ class ActionCategory extends Basic
             ));
 
         $params = array();
+        $params['library'] = null;
         if (self::$parameter['check_jquery']) {
-            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+            if (self::$config['kitcommand']['libraries']['enabled'] &&
+                !empty(self::$config['kitcommand']['libraries']['jquery'])) {
+                // load all predefined jQuery files for flexContent
+                foreach (self::$config['kitcommand']['libraries']['jquery'] as $library) {
+                    if (!empty($params['library'])) {
+                        $params['library'] .= ',';
+                    }
+                    $params['library'] .= $library;
+                }
+            }
         }
         if (self::$parameter['load_css']) {
-            if (isset($params['library'])) {
-                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
+            if (self::$config['kitcommand']['libraries']['enabled'] &&
+                !empty(self::$config['kitcommand']['libraries']['css'])) {
+                // load all predefined CSS files for flexContent
+                foreach (self::$config['kitcommand']['libraries']['css'] as $library) {
+                    if (!empty($params['library'])) {
+                        $params['library'] .= ',';
+                    }
+                    // attach to 'library' not to 'css' !!!
+                    $params['library'] .= $library;
+                }
             }
-            else {
-                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
-            }
+
+            // set the CSS parameter
             $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
         }
         $params['robots'] = 'noindex,follow';
