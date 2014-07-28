@@ -6,6 +6,11 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.38** - 2014-07-28
+
+* changed `promptAlert()` handling
+* fixed some smaller issues, reformatted parts of code
+
 **0.37** - 2014-07-27
 
 * handling for libraries is now defined in `config.flexcontent.json`
