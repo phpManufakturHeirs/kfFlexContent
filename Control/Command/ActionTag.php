@@ -57,7 +57,7 @@ class ActionTag extends Basic
      * (non-PHPdoc)
      * @see \phpManufaktur\Basic\Control\Pattern\Alert::promptAlert()
      */
-    public function promptAlert()
+ /*   public function promptAlert()
     {
         if (!isset(self::$parameter['load_css'])) {
             self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['tag']['load_css'];
@@ -92,7 +92,7 @@ class ActionTag extends Basic
             'response' => $result
         ));
     }
-
+*/
     /**
      * Collect the information for the given tag for an overview
      *
@@ -137,17 +137,33 @@ class ActionTag extends Basic
             ));
 
         $params = array();
+        $params['library'] = null;
         if (self::$parameter['check_jquery']) {
-            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
+            if (self::$config['kitcommand']['libraries']['enabled'] &&
+                !empty(self::$config['kitcommand']['libraries']['jquery'])) {
+                // load all predefined jQuery files for flexContent
+                foreach (self::$config['kitcommand']['libraries']['jquery'] as $library) {
+                    if (!empty($params['library'])) {
+                        $params['library'] .= ',';
+                    }
+                    $params['library'] .= $library;
+                }
+            }
         }
         if (self::$parameter['load_css']) {
-            $css_files = 'bootstrap/latest/css/bootstrap.min.css,font-awesome/latest/css/font-awesome.min.css';
-            if (isset($params['library'])) {
-                $params['library'] .= ','.$css_files;
+            if (self::$config['kitcommand']['libraries']['enabled'] &&
+            !empty(self::$config['kitcommand']['libraries']['css'])) {
+                // load all predefined CSS files for flexContent
+                foreach (self::$config['kitcommand']['libraries']['css'] as $library) {
+                    if (!empty($params['library'])) {
+                        $params['library'] .= ',';
+                    }
+                    // attach to 'library' not to 'css' !!!
+                    $params['library'] .= $library;
+                }
             }
-            else {
-                $params['library'] = $css_files;
-            }
+
+            // set the CSS parameter
             $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
         }
         $params['robots'] = 'noindex,follow';
@@ -170,6 +186,7 @@ class ActionTag extends Basic
         self::$parameter['mode'] = isset(self::$parameter['mode']) ? strtolower(self::$parameter['mode']) : 'enumeration';
         self::$parameter['size_grid'] = (isset(self::$parameter['size_grid']) && is_integer(self::$parameter['size_grid'])) ? intval(self::$parameter['size_grid']) : 8;
         self::$parameter['size_factor'] = (isset(self::$parameter['size_factor']) && is_integer(self::$parameter['size_factor'])) ? intval(self::$parameter['size_factor']) : 0;
+        self::$parameter['rotation_ratio'] = isset(self::$parameter['rotation_ratio']) ? floatval(self::$parameter['rotation_ratio']) : 0.3;
 
         if (isset(self::$parameter['color_background'])) {
             $color = self::$parameter['color_background'];
@@ -278,6 +295,15 @@ class ActionTag extends Basic
                             $params['library'] .= ',';
                         }
                         $params['library'] .= $library;
+                    }
+                    // load additional jQuery for the Cloud!
+                    if (!empty(self::$config['kitcommand']['libraries']['extra']['cloud']['jquery'])) {
+                        foreach (self::$config['kitcommand']['libraries']['extra']['cloud']['jquery'] as $library) {
+                            if (!empty($params['library'])) {
+                                $params['library'] .= ',';
+                            }
+                            $params['library'] .= $library;
+                        }
                     }
                 }
             }

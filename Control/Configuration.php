@@ -524,6 +524,13 @@ class Configuration
                     'css' => array(
                         'bootstrap/latest/css/bootstrap.min.css',
                         'font-awesome/latest/css/font-awesome.min.css'
+                    ),
+                    'extra' => array(
+                        'cloud' => array(
+                            'jquery' => array(
+                                'jquery/awesomecloud/latest/jquery.awesomeCloud.min.js'
+                            )
+                        )
                     )
                 )
             ),

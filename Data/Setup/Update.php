@@ -384,6 +384,23 @@ class Update
     }
 
     /**
+     * Release 0.38
+     */
+    protected function release_038()
+    {
+        if (!isset(self::$config['kitcommand']['libraries']['extra'])) {
+            $default = $this->Configuration->getDefaultConfigArray();
+            self::$config['kitcommand']['libraries']['extra'] = $default['kitcommand']['libraries']['extra'];
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+
+        if ($this->app['filesystem']->exists(MANUFAKTUR_PATH.'/flexContent/Template/default/command/alert.twig')) {
+            $this->app['filesystem']->remove(MANUFAKTUR_PATH.'/flexContent/Template/default/command/alert.twig');
+        }
+    }
+
+    /**
      * Execute the update for flexContent
      *
      * @param Application $app
@@ -416,6 +433,7 @@ class Update
         $this->release_029();
         $this->release_030();
         $this->release_037();
+        $this->release_038();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

@@ -13,14 +13,11 @@
   {% if tags|length > 0 %}
     <div id="wordcloud" style="height:{{ parameter.height }}px;">
       {% for tag in tags %}
-        {% set weight = tag.tag_count * 5 %}{#{ tag.tag_count }}#}
-        <span data-weight="{{ weight }}">
+        <span data-weight="{{ tag.tag_count }}">
           <a href="{{ permalink_base_url ~ '/buzzword/' ~ tag.tag_permalink }}">{{ tag.tag_name }}</a>
         </span>
       {% endfor %}
     </div>
-  {% endif %}
-  {% if parameter.check_jquery %}
     <script type="text/javascript">
       if (typeof 'jQuery' !== 'undefined') {
         $(document).ready(function() {
@@ -37,7 +34,7 @@
             },
             "options": {
               "color": "{{ parameter.color_option }}",
-              "rotationRatio": 0.3,
+              "rotationRatio": {{ parameter.rotation_ratio }},
               "printMultiplier": 3,
               "sort": "{{ parameter.sort }}"
             },
@@ -48,5 +45,5 @@
         });
       }
     </script>
-  {% endif %}
+  {% endif %}  
 {% endspaceless %}
