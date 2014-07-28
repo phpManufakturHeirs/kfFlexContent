@@ -56,46 +56,6 @@ class ActionView extends Basic
     }
 
     /**
-     * (non-PHPdoc)
-     * @see \phpManufaktur\Basic\Control\Pattern\Alert::promptAlert()
-     */
-    public function promptAlert()
-    {
-        if (!isset(self::$parameter['load_css'])) {
-            self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['view']['load_css'];
-        }
-        if (!isset(self::$parameter['check_jquery'])) {
-            self::$parameter['check_jquery'] = self::$config['kitcommand']['parameter']['action']['view']['check_jquery'];
-        }
-        $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
-            '@phpManufaktur/flexContent/Template', 'command/alert.twig',
-            $this->getPreferredTemplateStyle()),
-            array(
-                'basic' => $this->getBasicSettings(),
-                'parameter' => self::$parameter
-            ));
-
-        $params = array();
-        if (self::$parameter['check_jquery']) {
-            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
-        }
-        if (self::$parameter['load_css']) {
-            if (isset($params['library'])) {
-                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
-            }
-            else {
-                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
-            }
-            $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
-        }
-        $params['robots'] = 'noindex,follow';
-        return $this->app->json(array(
-            'parameter' => $params,
-            'response' => $result
-        ));
-    }
-
-    /**
      * Check if the content can be shown at the frontend
      *
      * @param array $content active content record
@@ -229,6 +189,7 @@ class ActionView extends Basic
                 }
             }
 
+            // for action[view] we can enable the additional loading of jQuery libraries for embedded kitCommands
             if (self::$config['kitcommand']['content']['kitcommand']['enabled'] &&
                 self::$config['kitcommand']['content']['kitcommand']['libraries']['enabled'] &&
                 !empty(self::$config['kitcommand']['content']['kitcommand']['libraries']['jquery'])) {
@@ -254,6 +215,7 @@ class ActionView extends Basic
                 }
             }
 
+            // for action[view] we can enable the additional loading of jQuery libraries for embedded kitCommands
             if (self::$config['kitcommand']['content']['kitcommand']['enabled'] &&
                 self::$config['kitcommand']['content']['kitcommand']['libraries']['enabled'] &&
                 !empty(self::$config['kitcommand']['content']['kitcommand']['libraries']['css'])) {

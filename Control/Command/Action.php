@@ -109,13 +109,7 @@ class Action extends Basic
             default:
                 $this->setAlert('The parameter <code>%parameter%[%value%]</code> for the kitCommand <code>~~ %command% ~~</code> is unknown, please check the parameter and the given value!',
                     array('%parameter%' => 'action', '%value%' => $parameter['action'], '%command%' => 'flexContent'), self::ALERT_TYPE_DANGER);
-                return $this->app['twig']->render($this->app['utils']->getTemplateFile(
-                    '@phpManufaktur/flexContent/Template', 'command/alert.twig',
-                    $this->getPreferredTemplateStyle()),
-                    array(
-                        'basic' => $this->getBasicSettings(),
-                        'parameter' => $parameter
-                    ));
+                return $this->promptAlert();
         }
     }
 
