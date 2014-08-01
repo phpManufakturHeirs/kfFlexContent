@@ -57,8 +57,8 @@ class Admin extends Alert
                 case 'list':
                     $toolbar[$tab] = array(
                         'name' => 'list',
-                        'text' => 'List',
-                        'hint' => 'List of all flexContent articles',
+                        'text' => $this->app['translator']->trans('List'),
+                        'hint' => $this->app['translator']->trans('List of all flexContent articles'),
                         'link' => FRAMEWORK_URL.'/flexcontent/editor/list'.self::$usage_param,
                         'active' => ($active == 'list')
                     );
@@ -66,8 +66,8 @@ class Admin extends Alert
                 case 'edit':
                     $toolbar[$tab] = array(
                         'name' => 'edit',
-                        'text' => 'Edit',
-                        'hint' => 'Create or edit a flexContent article',
+                        'text' => $this->app['translator']->trans('Edit'),
+                        'hint' => $this->app['translator']->trans('Create or edit a flexContent article'),
                         'link' => FRAMEWORK_URL.'/flexcontent/editor/edit'.self::$usage_param,
                         'active' => ($active == 'edit')
                     );
@@ -75,8 +75,8 @@ class Admin extends Alert
                 case 'tags':
                     $toolbar[$tab] = array(
                         'name' => 'tags',
-                        'text' => 'Hashtags',
-                        'hint' => 'Create or edit hashtags',
+                        'text' => $this->app['translator']->trans('Hashtags'),
+                        'hint' => $this->app['translator']->trans('Create or edit hashtags'),
                         'link' => FRAMEWORK_URL.'/flexcontent/editor/buzzword/list'.self::$usage_param,
                         'active' => ($active == 'tags')
                     );
@@ -84,8 +84,8 @@ class Admin extends Alert
                 case 'categories':
                     $toolbar[$tab] = array(
                         'name' => 'categories',
-                        'text' => 'Categories',
-                        'hint' => 'Create or edit categories',
+                        'text' => $this->app['translator']->trans('Categories'),
+                        'hint' => $this->app['translator']->trans('Create or edit categories'),
                         'link' => FRAMEWORK_URL.'/flexcontent/editor/category/list'.self::$usage_param,
                         'active' => ($active == 'categories')
                     );
@@ -93,8 +93,8 @@ class Admin extends Alert
                 case 'rss':
                     $toolbar[$tab] = array(
                         'name' => 'rss',
-                        'text' => 'RSS',
-                        'hint' => 'Organize RSS Feeds for the flexContent articles',
+                        'text' => $this->app['translator']->trans('RSS'),
+                        'hint' => $this->app['translator']->trans('Organize RSS Feeds for the flexContent articles'),
                         'link' => FRAMEWORK_URL.'/flexcontent/editor/rss/channel/list'.self::$usage_param,
                         'active' => ($active == 'rss')
                     );
@@ -102,8 +102,8 @@ class Admin extends Alert
                 case 'import':
                     $toolbar[$tab] = array(
                         'name' => 'import',
-                        'text' => 'Import',
-                        'hint' => 'Import WYSIWYG and Blog contents',
+                        'text' => $this->app['translator']->trans('Import'),
+                        'hint' => $this->app['translator']->trans('Import WYSIWYG and Blog contents'),
                         'link' => FRAMEWORK_URL.'/flexcontent/editor/import/list'.self::$usage_param,
                         'active' => ($active == 'import')
                     );
@@ -111,8 +111,8 @@ class Admin extends Alert
                 case 'about':
                     $toolbar[$tab] = array(
                         'name' => 'about',
-                        'text' => 'About',
-                        'hint' => 'Information about the flexContent extension',
+                        'text' => $this->app['translator']->trans('About'),
+                        'hint' => $this->app['translator']->trans('Information about the flexContent extension'),
                         'link' => FRAMEWORK_URL.'/flexcontent/editor/about'.self::$usage_param,
                         'active' => ($active == 'about')
                     );
