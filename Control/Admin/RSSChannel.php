@@ -168,7 +168,9 @@ class RSSChannel extends Admin
         }
         else {
             // general error (timeout, CSFR ...)
-            $this->setAlert('The form is not valid, please check your input and try again!', array(), self::ALERT_TYPE_DANGER);
+            $this->setAlert('The form is not valid, please check your input and try again!', array(),
+                self::ALERT_TYPE_DANGER, true, array('form_errors' => $form->getErrorsAsString(),
+                    'method' => __METHOD__, 'line' => __LINE__));
         }
 
         $form = $this->getRSSChannelForm($data);
@@ -353,7 +355,9 @@ class RSSChannel extends Admin
         }
         else {
             // general error (timeout, CSFR ...)
-            $this->setAlert('The form is not valid, please check your input and try again!', array(), self::ALERT_TYPE_DANGER);
+            $this->setAlert('The form is not valid, please check your input and try again!', array(),
+                self::ALERT_TYPE_DANGER, true, array('form_errors' => $form->getErrorsAsString(),
+                    'method' => __METHOD__, 'line' => __LINE__));
         }
         return false;
     }

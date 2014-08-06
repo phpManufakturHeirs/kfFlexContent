@@ -95,8 +95,6 @@ return array(
         => 'keine Änderung des importierten Inhalt',
     'Data handling'
         => 'Datenbearbeitung',
-    'DE'
-        => 'Deutsch',
     'DEFAULT'
         => 'Standard',
     'delete this category type'
@@ -108,8 +106,6 @@ return array(
     'Dutch'
         => 'Niederländisch',
 
-    'EN'
-        => 'Englisch',
     'English'
         => 'Englisch',
     'EVENT'
@@ -125,8 +121,6 @@ return array(
         => 'Fataler Fehler: die Kategorie ID wurde nicht übergeben!',
     'Fatal error: Missing the content ID!'
         => 'Fataler Fehler: die flexContent ID wurde nicht übergeben!',
-    'FR'
-        => 'Französisch',
     'French'
         => 'Französisch',
 
