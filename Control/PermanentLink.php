@@ -868,8 +868,8 @@ class PermanentLink
             return $this->app['twig']->render($this->app['utils']->getTemplateFile(
                 '@phpManufaktur/Basic/Template', 'kitcommand/bootstrap/noframe/alert.twig'),
                 array(
-                    'content' => $this->app['translator']->trans('The RSS Channel <b>/'.$language.'/rss/%permalink%</b> does not exists or is not active!',
-                        array('%permalink%' => $channel)),
+                    'content' => $this->app['translator']->trans('The RSS Channel <b>/%language%/rss/%permalink%</b> does not exists or is not active!',
+                        array('%permalink%' => $channel, '%language%' => $language)),
                     'type' => 'alert-danger'
                 ));
         }
