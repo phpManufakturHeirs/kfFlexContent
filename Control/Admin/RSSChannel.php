@@ -212,14 +212,14 @@ class RSSChannel extends Admin
             'data' => isset($data['channel_title']) ? $data['channel_title'] : '',
             'required' => true,
             'attr' => array(
-                'help' => 'A title for this RSS Channel'
+                'help' => $this->app['translator']->trans('A title for this RSS Channel')
             )
         ))
         ->add('channel_description', 'textarea', array(
             'data' => isset($data['channel_description']) ? $data['channel_description'] : '',
             'required' => true,
             'attr' => array(
-                'help' => 'A brief description of this RSS Channel'
+                'help' => $this->app['translator']->trans('A brief description of this RSS Channel')
             )
         ))
         ->add('channel_link', 'text', array(
@@ -244,28 +244,28 @@ class RSSChannel extends Admin
             'expanded' => true,
             'data' => isset($data['content_categories']) ? is_array($data['content_categories']) ? $data['content_categories'] : explode(',', $data['content_categories']) : null,
             'attr' => array(
-                'help' => 'Select the categories which are assigned to this RSS Channel'
+                'help' => $this->app['translator']->trans('Select the categories which are assigned to this RSS Channel')
             )
         ))
         ->add('channel_category', 'text', array(
             'data' => isset($data['channel_category']) ? $data['channel_category'] : '',
             'required' => false,
             'attr' => array(
-                'help' => 'If you are providing multiple RSS Channels you can also define a category'
+                'help' => $this->app['translator']->trans('If you are providing multiple RSS Channels you can also define a category')
             )
         ))
         ->add('channel_copyright', 'text', array(
             'data' => isset($data['channel_copyright']) ? $data['channel_copyright'] : '',
             'required' => false,
             'attr' => array(
-                'help' => 'You can specify a copyright hint for the RSS Channel'
+                'help' => $this->app['translator']->trans('You can specify a copyright hint for the RSS Channel')
             )
         ))
         ->add('channel_webmaster', 'email', array(
             'data' => isset($data['channel_webmaster']) ? $data['channel_webmaster'] : '',
             'required' => false,
             'attr' => array(
-                'help' => 'You can specify the email address of the webmaster for this RSS Channel'
+                'help' => $this->app['translator']->trans('You can specify the email address of the webmaster for this RSS Channel')
             )
         ))
         ;

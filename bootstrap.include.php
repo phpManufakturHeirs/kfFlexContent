@@ -40,7 +40,7 @@ if (!in_array('ROLE_FLEXCONTENT_EDITOR', $entry_points)) {
         array(
             'route' => '/flexcontent/editor',
             'name' => 'flexContent',
-            'info' => 'Organize and present contents in a flexible way',
+            'info' => $app['translator']->trans('Organize and present contents in a flexible way'),
             'icon' => array(
                 'path' => '/extension/phpmanufaktur/phpManufaktur/flexContent/extension.jpg',
                 'url' => MANUFAKTUR_URL.'/flexContent/extension.jpg'

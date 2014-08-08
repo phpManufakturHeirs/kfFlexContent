@@ -40,7 +40,10 @@ class ImportDialog extends Admin
             'data' => self::$import_id
         ))
         ->add('data_handling', 'choice', array(
-            'choices' => array('UNCHANGED' => 'DATA_UNCHANGED', 'CLEAN_UP' => 'DATA_CLEAN_UP', 'STRIP_TAGS' => 'DATA_STRIP_TAGS'),
+            'choices' => array(
+                'UNCHANGED' => $this->app['translator']->trans('DATA_UNCHANGED'),
+                'CLEAN_UP' => $this->app['translator']->trans('DATA_CLEAN_UP'),
+                'STRIP_TAGS' => $this->app['translator']->trans('DATA_STRIP_TAGS')),
             'expanded' => true,
             'data' => self::$config['admin']['import']['data']['handling']
         ))
