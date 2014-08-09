@@ -47,8 +47,6 @@ return array(
     => 'Beschreibung',
   'Category id'
     => 'ID',
-  'Category ID'
-    => 'Kategorie ID',
   'Category name'
     => 'Kategorie',
   'Category permalink'
@@ -86,8 +84,6 @@ return array(
   'Content categories'
     => 'Inhalte',
   'Content id'
-    => 'ID',
-  'Content ID'
     => 'ID',
   'Copied kitCommand to clipboard:'
     => 'kitCommand in die Zwischenablage kopiert:',
@@ -261,9 +257,9 @@ return array(
     => 'Aus der Liste entfernen',
   'Remove image'
     => 'Bild entfernen',
-  'Rss'
-    => 'RSS',
   'RSS'
+    => 'RSS',
+  'Rss'
     => 'RSS',
   'RSS Channel Image'
     => 'Abbildung',
@@ -313,10 +309,10 @@ return array(
     => 'Hashtag (#hashtag)',
   'Tag description'
     => 'Beschreibung',
-  'Tag ID'
-    => 'ID',
   'Tag id'
     => 'Tag ID',
+  'Tag ID'
+    => 'ID',
   'Tag image'
     => 'Abbildung',
   'Tag name'
@@ -325,9 +321,9 @@ return array(
     => 'Permanenter Link',
   'tag_name'
     => 'Bezeichner',
-  'Target url'
-    => 'Ziel URL',
   'Target URL'
+    => 'Ziel URL',
+  'Target url'
     => 'Ziel URL',
   'Teaser'
     => 'Anreisser',
@@ -377,8 +373,6 @@ return array(
     => 'Das Bild wurde entfernt.',
   'The list of RSS Channels for flexContent is empty, please create the first RSS Channel!'
     => 'Es existieren noch keine RSS Kanäle, erstellen Sie den ersten RSS Kanal!',
-  'The parameter <code>%parameter%[%value%]</code> for the kitCommand <code>~~ %command% ~~</code> is unknown,'
-    => 'Der Parameter <code>%parameter%[%value%]</code> für das kitCommand <code>~~ %command% ~~</code> ist unbekannt.',
   'The parameter action[%action%] is not supported for remote connections!'
     => 'Der Parameter action[%action%] wird für entfernte Verbindungen nicht unterstützt!',
   'The permalink <b>%permalink%</b> does not exists!'
@@ -473,5 +467,5 @@ return array(
     => 'Sie müssen eine <strong>Server URL</strong> für die entfernte Verbindung in der <em>config.flexcontent.json</em> festlegen!',
   'You must specify the <strong>token</strong> for the remote connection in the config.flexcontent.json!'
     => 'Sie müssen eine <strong>Kennung</strong> (token) für die entfernte Verbindung in der <em>config.flexcontent.json</em> festlegen!',
-  
+
 );

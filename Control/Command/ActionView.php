@@ -274,8 +274,7 @@ class ActionView extends Basic
 
         if (!in_array(self::$parameter['content_view'], self::$view_array)) {
             // unknown value for the view[] parameter
-            $this->setAlert('The parameter <code>%parameter%[%value%]</code> for the kitCommand <code>~~ %command% ~~</code> is unknown, '.
-                'please check the parameter and the given value!',
+            $this->setAlert('The parameter <code>%parameter%[%value%]</code> for the kitCommand <code>~~ %command% ~~</code> is unknown, please check the parameter and the given value!',
                 array('%parameter%' => 'content_view', '%value%' => self::$parameter['content_view'], '%command%' => 'flexContent'), self::ALERT_TYPE_DANGER,
                 true, array(__METHOD__, __LINE__));
             return $this->promptAlert();

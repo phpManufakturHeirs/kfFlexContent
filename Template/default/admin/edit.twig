@@ -71,7 +71,7 @@
           <div class="row">
             <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 no-padding-left">
               <div class="form-group">
-                <label>{{ 'Content ID'|trans }}</label>
+                <label>{{ 'content_id'|humanize|trans }}</label>
                 <div>
                 {% if form.content_id.vars.value > 0 %}
                   {{ '%05d'|format(form.content_id.vars.value) }}&nbsp;
