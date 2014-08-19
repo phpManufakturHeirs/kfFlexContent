@@ -427,7 +427,8 @@ EOD;
     public function existsPermaLink($permalink, $language)
     {
         try {
-            $SQL = "SELECT `permalink` FROM `".self::$table_name."` WHERE `permalink`='$permalink' AND `language`='$language'";
+            $SQL = "SELECT `permalink` FROM `".self::$table_name."` WHERE `permalink`='$permalink' ".
+                "AND `language`='$language' AND `status`!='DELETED'";
             $result = $this->app['db']->fetchColumn($SQL);
             return ($result == $permalink);
         } catch (\Doctrine\DBAL\DBALException $e) {
@@ -444,7 +445,8 @@ EOD;
     public function countPermaLinksLikeThis($permalink, $language)
     {
         try {
-            $SQL = "SELECT COUNT(`permalink`) FROM `".self::$table_name."` WHERE `permalink` LIKE '$permalink%' AND `language`='$language'";
+            $SQL = "SELECT COUNT(`permalink`) FROM `".self::$table_name."` WHERE `permalink` LIKE '$permalink%' ".
+                "AND `language`='$language' `status`!='DELETED'";
             return $this->app['db']->fetchColumn($SQL);
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
