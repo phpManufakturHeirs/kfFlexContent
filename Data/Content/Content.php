@@ -430,7 +430,7 @@ EOD;
             $SQL = "SELECT `permalink` FROM `".self::$table_name."` WHERE `permalink`='$permalink' ".
                 "AND `language`='$language' AND `status`!='DELETED'";
             $result = $this->app['db']->fetchColumn($SQL);
-            return ($result == $permalink);
+            return (strtolower($result) === strtolower($permalink));
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }
