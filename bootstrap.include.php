@@ -217,7 +217,8 @@ $app->post('/flexcontent/editor/rss/channel/check',
 $app->post('/flexcontent/editor/rss/channel/image/select',
     'phpManufaktur\flexContent\Control\Admin\RSSChannel::ControllerImage');
 $app->get('/flexcontent/editor/rss/channel/image/check/id/{channel_id}',
-    'phpManufaktur\flexContent\Control\Admin\RSSChannel::ControllerImageCheck');
+    'phpManufaktur\flexContent\Control\Admin\RSSChannel::ControllerImageCheck')
+    ->assert('channel_id', '\d+');
 
 /**
  * CMS Search function
@@ -238,11 +239,13 @@ $app->post('/command/flexcontent',
 $app->post('/command/flexcontent/getheader/id/{content_id}',
     // return header information to set title, description and keywords
     // will be accessed by \Basic\Control\kitCommand\Parser::setHeader
-    'phpManufaktur\flexContent\Control\Command\getHeader::controllerGetHeader');
+    'phpManufaktur\flexContent\Control\Command\getHeader::controllerGetHeader')
+    ->assert('content_id', '\d+');
 $app->post('/command/flexcontent/canonical/id/{content_id}',
     // return the permanent link URL of the given content ID to create a canonical link
     // will be accessed by \Basic\Control\kitCommand\Parser::setCanonicalLink
-    'phpManufaktur\flexContent\Control\Command\getCanonicalLink::controllerGetCanonicalLink');
+    'phpManufaktur\flexContent\Control\Command\getCanonicalLink::controllerGetCanonicalLink')
+    ->assert('content_id', '\d+');
 
 $app->get('/flexcontent/action',
     'phpManufaktur\flexContent\Control\Command\Action::controllerAction');
