@@ -6,6 +6,12 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.40** - 2014-09-03
+
+* exclude records marked as 'DELETED' from permanent link check
+* improve permanent link comparison
+* not SET DEFAULT for TEXT fields! (table import_control)
+
 **0.39** - 2014-08-11
 
 * improved translation handling, added support for i18nEditor
