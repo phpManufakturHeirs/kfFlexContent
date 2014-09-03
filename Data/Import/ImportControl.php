@@ -51,7 +51,7 @@ class ImportControl
         `identifier_type` ENUM('WYSIWYG','NEWS','TOPICS','UNKNOWN') DEFAULT 'UNKNOWN',
         `identifier_id` INT(11) NOT NULL DEFAULT '-1',
         `identifier_language` VARCHAR(2) NOT NULL DEFAULT 'EN',
-        `identifier_link` TEXT NOT NULL DEFAULT '',
+        `identifier_link` TEXT NOT NULL,
         `flexcontent_id` INT(11) NOT NULL DEFAULT -1,
         `import_status` ENUM('PENDING','IGNORE','IMPORTED','DELETED') DEFAULT 'PENDING',
         `timestamp` TIMESTAMP,
