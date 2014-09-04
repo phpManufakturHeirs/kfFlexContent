@@ -96,7 +96,7 @@ EOD;
         $enums = $this->app['db.utils']->getEnumValues(self::$table_name, 'status');
         $result = array();
         foreach ($enums as $enum) {
-            $result[$enum] = $enum;
+            $result[$enum] = $this->app['utils']->humanize($enum);
         }
         return $result;
     }
@@ -225,6 +225,12 @@ EOD;
                     $value = trim(strip_tags($value));
                 }
                 $insert[$key] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
+            }
+            $not_null = array('redirect_url', 'teaser', 'teaser_image', 'content');
+            foreach ($not_null as $field) {
+                if (!isset($insert[$field]) || is_null($insert[$field])) {
+                    $insert[$field] = '';
+                }
             }
             $this->app['db']->insert(self::$table_name, $insert);
             $content_id = $this->app['db']->lastInsertId();
