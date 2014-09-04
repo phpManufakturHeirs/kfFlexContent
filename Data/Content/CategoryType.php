@@ -238,6 +238,12 @@ EOD;
                 }
                 $insert[$this->app['db']->quoteIdentifier($key)] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
             }
+            $not_null = array('category_description', 'category_image', 'target_url');
+            foreach ($not_null as $field) {
+                if (!isset($insert[$field]) || is_null($insert[$field])) {
+                    $insert[$field] = '';
+                }
+            }
             $this->app['db']->insert(self::$table_name, $insert);
             $category_id = $this->app['db']->lastInsertId();
         } catch (\Doctrine\DBAL\DBALException $e) {
