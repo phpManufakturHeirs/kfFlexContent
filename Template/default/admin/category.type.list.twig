@@ -75,7 +75,7 @@
                   {% endif %}
                   <th class="{{ head_class }}">
                     {% if head == 'used_by_content_id' %}
-                      {{ head|trans }}
+                      {{ head|humanize|trans }}
                     {% else %}
                       {% if 'active asc' in head_class %}
                         <i class="fa fa-sort-alpha-asc"></i>&nbsp;

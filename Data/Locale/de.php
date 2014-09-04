@@ -17,6 +17,16 @@ if ('á' != "\xc3\xa1") {
 }
 
 return array(
+    'Unpublished'
+    => 'Unveröffentlicht',
+    'Published'
+    => 'Veröffentlicht',
+    'Breaking'
+        => 'Hervorgehoben',
+    'Hidden'
+    => 'Versteckt',
+    'Used by content id'
+        => 'Verwendet von',
   '- new entry -'
     => '- neuer Datensatz -',
   '[flexContent] Successfull installed flexContent as CMS Page Section'
