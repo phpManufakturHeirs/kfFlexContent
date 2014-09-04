@@ -17,20 +17,10 @@ if ('á' != "\xc3\xa1") {
 }
 
 return array(
-    'Unpublished'
-    => 'Unveröffentlicht',
-    'Published'
-    => 'Veröffentlicht',
-    'Breaking'
-        => 'Hervorgehoben',
-    'Hidden'
-    => 'Versteckt',
-    'Used by content id'
-        => 'Verwendet von',
   '- new entry -'
     => '- neuer Datensatz -',
   '[flexContent] Successfull installed flexContent as CMS Page Section'
-    => '[flexContent] Successfull installed flexContent as CMS Page Section',
+    => '[flexContent] Erfolgreich als CMS Seitenabschnitt installiert',
   'A brief description of this RSS Channel'
     => 'Kurze Beschreibung dieses RSS Kanal',
   'A title for this RSS Channel'
@@ -45,6 +35,8 @@ return array(
     => 'Der Hashtag <b>%tag%</b> wurde diesem flexContent Inhalt zugeordnet.',
   'At least must it exists some text within the teaser or the content, at the moment the Teaser and the Content are empty!'
     => 'Es muss zumindest im Anreisser oder im Inhalt ein Text vorhanden sein, momentan sind beide Felder leer!',
+  'Breaking'
+    => 'Hervorgehoben',
   'Breaking to'
     => 'Hervorheben bis',
   'Can not handle the requested redirect at this place - use the <a href="%permalink%" target="_blank">permanent link</a> instead!'
@@ -161,6 +153,8 @@ return array(
     => 'flexContent Server Information für <em>%server_name%</em>',
   'Hashtags'
     => 'Schlagwörter',
+  'Hidden'
+    => 'Versteckt',
   'If you are providing multiple RSS Channels you can also define a category'
     => 'Wenn Sie mehrere RSS Kanäle betreiben können Sie zusätzlich eine Kategorie angeben',
   'Ignore this item'
@@ -255,6 +249,8 @@ return array(
     => 'Problem: \'%first%\' muss vor dem Eintrag \'%second%\' festgelegt werden, bitte prüfen Sie die Konfiguration!',
   'Publish from'
     => 'Veröffentlichen ab',
+  'Published'
+    => 'Veröffentlicht',
   'read more'
     => 'mehr',
   'Redirect target'
@@ -267,9 +263,9 @@ return array(
     => 'Aus der Liste entfernen',
   'Remove image'
     => 'Bild entfernen',
-  'RSS'
-    => 'RSS',
   'Rss'
+    => 'RSS',
+  'RSS'
     => 'RSS',
   'RSS Channel Image'
     => 'Abbildung',
@@ -331,9 +327,9 @@ return array(
     => 'Permanenter Link',
   'tag_name'
     => 'Bezeichner',
-  'Target URL'
-    => 'Ziel URL',
   'Target url'
+    => 'Ziel URL',
+  'Target URL'
     => 'Ziel URL',
   'Teaser'
     => 'Anreisser',
@@ -459,12 +455,16 @@ return array(
     => 'Diese Auswahl enthält keine Einträge!',
   'To make use of the <strong>remote</strong> feature you must define a <strong>remote</strong> section in the config.flexcontent.json!'
     => 'Um das <strong>remote</strong> Feature nutzen zu können, müssen Sie zunächst einen <strong>remote</strong> Abschnitt in der <em>config.flexcontent.json</em> definieren.',
+  'Unpublished'
+    => 'Unveröffentlicht',
   'Updated the category type %category%'
     => 'Die Kategorie <b>%category%</b> wurde aktualisiert.',
   'Updated the RSS Channel %title%.'
     => 'Der RSS Kanal %title% wurde aktualisiert.',
   'Updated the tag type %tag%'
     => 'Der Hashtag <b>%tag%</b> wurde aktualisiert.',
+  'Used by content id'
+    => 'Verwendet von',
   'You can specify a copyright hint for the RSS Channel'
     => 'Sie können einen Copyright Hinweis für die Artikel des RSS Kanal angeben',
   'You can specify the email address of the webmaster for this RSS Channel'
@@ -477,5 +477,5 @@ return array(
     => 'Sie müssen eine <strong>Server URL</strong> für die entfernte Verbindung in der <em>config.flexcontent.json</em> festlegen!',
   'You must specify the <strong>token</strong> for the remote connection in the config.flexcontent.json!'
     => 'Sie müssen eine <strong>Kennung</strong> (token) für die entfernte Verbindung in der <em>config.flexcontent.json</em> festlegen!',
-
+  
 );
