@@ -131,7 +131,7 @@
                         <td class="{{ column }}">{{ value|date('DATETIME_FORMAT'|trans) }}</td>
                       {% elseif (column == 'status') %}
                         {# translate this column value #}
-                        <td class="{{ column }}">{{ value|trans }}</td>
+                        <td class="{{ column }}">{{ value|humanize|trans }}</td>
                       {% else %}
                         <td class="{{ column }}">{{ value }}</td>
                       {% endif %}
