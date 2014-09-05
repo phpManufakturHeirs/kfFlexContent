@@ -111,7 +111,7 @@ EOD;
         $enums = $this->app['db.utils']->getEnumValues(self::$table_name, 'rss');
         $result = array();
         foreach ($enums as $enum) {
-            $result[$enum] = $enum;
+            $result[$enum] = $this->app['utils']->humanize($enum);
         }
         return $result;
     }
