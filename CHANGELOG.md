@@ -6,6 +6,14 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.41** - 2014-09-05
+
+* fixed NOT NULL at insert new record (Category Type)
+* fixed translation for flexContent status
+* improved #hashtag check in content
+* load proxy settings only for external URL
+* improved translation
+
 **0.40** - 2014-09-03
 
 * exclude records marked as 'DELETED' from permanent link check
