@@ -216,8 +216,12 @@ class PermanentLink
 
         curl_setopt_array($ch, $options);
 
-        // set proxy if needed
-        $this->app['utils']->setCURLproxy($ch);
+        $cms_host = strtolower(parse_url(CMS_URL, PHP_URL_HOST));
+        $url_host = strtolower(parse_url($url, PHP_URL_HOST));
+        if ($cms_host !== $url_host) {
+            // set proxy if needed
+            $this->app['utils']->setCURLproxy($ch);
+        }
 
         if (false === ($result = curl_exec($ch))) {
             // cURL error
