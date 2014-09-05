@@ -93,6 +93,8 @@ return array(
     => 'Das vollständige kitCommand<br /><code>%command%</code><br />in die Zwischenablage kopieren. Verwendungszweck:<br />%purpose%.',
   'Create a new article'
     => 'Einen neuen Artikel erstellen',
+  'Create a new category'
+    => 'Eine neue Kategorie anlegen',
   'Create a new RSS Channel'
     => 'Einen neuen RSS Kanal erstellen',
   'Create a new tag'
@@ -119,6 +121,10 @@ return array(
     => 'dieses Schlagwort aus der Datenbank entfernen',
   'delete this tag type'
     => 'diesen Hashtag löschen',
+  'Event date from'
+    => 'Beginn der Veranstaltung',
+  'Event date to'
+    => 'Ende der Veranstaltung',
   'Event location'
     => 'Veranstaltungsort',
   'Event organizer'
@@ -263,9 +269,9 @@ return array(
     => 'Aus der Liste entfernen',
   'Remove image'
     => 'Bild entfernen',
-  'Rss'
-    => 'RSS',
   'RSS'
+    => 'RSS',
+  'Rss'
     => 'RSS',
   'RSS Channel Image'
     => 'Abbildung',
@@ -315,10 +321,10 @@ return array(
     => 'Hashtag (#hashtag)',
   'Tag description'
     => 'Beschreibung',
-  'Tag id'
-    => 'Tag ID',
   'Tag ID'
     => 'ID',
+  'Tag id'
+    => 'Tag ID',
   'Tag image'
     => 'Abbildung',
   'Tag name'
