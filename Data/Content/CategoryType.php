@@ -236,7 +236,7 @@ EOD;
                         }
                     }
                 }
-                $insert[$this->app['db']->quoteIdentifier($key)] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
+                $insert[$key] = is_string($value) ? $this->app['utils']->sanitizeText($value) : $value;
             }
             $not_null = array('category_description', 'category_image', 'target_url');
             foreach ($not_null as $field) {
@@ -306,7 +306,7 @@ EOD;
             $enums = $this->app['db.utils']->getEnumValues(self::$table_name, 'category_type');
             $types = array();
             foreach ($enums as $enum) {
-                $types[$enum] = $enum;
+                $types[$enum] = $this->app['utils']->humanize($enum);
             }
             return $types;
         } catch (\Doctrine\DBAL\DBALException $e) {
