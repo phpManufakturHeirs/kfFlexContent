@@ -128,7 +128,11 @@
 {% endblock footer_jquery %}
     
 {% block footer %}
-  {% set iframe_add_height = 150 %}
+  {% if CMS_TYPE == 'LEPTON' %}
+    {% set iframe_add_height = 180 %}
+  {% else %}
+    {% set iframe_add_height = 150 %}
+  {% endif %}
   {{ parent() }}
   <script type="text/javascript">
     if (typeof 'jQuery' !== 'undefined') {
