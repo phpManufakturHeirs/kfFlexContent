@@ -1,0 +1,1 @@
+Redirect 301 %subdirectory%/modules/ckeditor4/ckeditor/plugins/%plugin%/dialog %manufaktur_url%/CKEditor/Source/plugins/%plugin%/dialog

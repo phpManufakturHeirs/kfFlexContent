@@ -417,6 +417,9 @@ class Update
         // install .htaccess files for the configured languages
         $Setup->createPermalinkDirectories($app);
 
+        // add CMS CKEditor plugins
+        $Setup->InstallCKEditorPlugins($app);
+
         // initialize Configuration for the update routines
         $this->Configuration = new Configuration($app);
         self::$config = $this->Configuration->getConfiguration();
@@ -434,6 +437,7 @@ class Update
         $this->release_030();
         $this->release_037();
         $this->release_038();
+
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

@@ -133,6 +133,54 @@ class Setup
     }
 
     /**
+     * Install the CKEditor Plugins for flexContent in the parent CMS
+     *
+     * @param Application $app
+     * @throws \Exception
+     */
+    public function InstallCKEditorPlugins(Application $app)
+    {
+        if ((CMS_TYPE === 'BlackCat') && $app['filesystem']->exists(CMS_PATH.'/modules/ckeditor4')) {
+            // add buttons for flexContent Articles and #Hashtags
+            $plugins = array('flexcontentlink', 'hashtaglink');
+            $cms_plugin_path = CMS_PATH.'/modules/ckeditor4/ckeditor/plugins/';
+            $subdirectory = parse_url(CMS_URL, PHP_URL_PATH);
+            foreach ($plugins as $plugin) {
+                if ($app['filesystem']->exists($cms_plugin_path.$plugin)) {
+                    // remove existing plugin
+                    $app['filesystem']->remove($cms_plugin_path.$plugin);
+                }
+                // mirror the plugin from kitFramework to CMS
+                $app['filesystem']->mirror(MANUFAKTUR_PATH.'/CKEditor/Source/plugins/'.$plugin, $cms_plugin_path.$plugin);
+                // prepare the .htaccess file to correct the plugin route
+                $htaccess = file_get_contents(MANUFAKTUR_PATH.'/flexContent/Data/Setup/CKEditor/.htaccess');
+                $htaccess = str_ireplace(
+                    array('%plugin%', '%subdirectory%', '%manufaktur_url%'),
+                    array($plugin, $subdirectory, MANUFAKTUR_URL), $htaccess);
+                // write the .htaccess file
+                file_put_contents($cms_plugin_path.$plugin.'/.htaccess', $htaccess);
+                if ($app['db.utils']->tableExists(CMS_TABLE_PREFIX.'mod_wysiwyg_admin_v2')) {
+                    // register plugin at CMS WYSIWYG Admin
+                    try {
+                        $SQL = "SELECT `set_value` FROM `".CMS_TABLE_PREFIX."mod_wysiwyg_admin_v2` WHERE ".
+                            "`editor`='ckeditor4' AND `set_name`='plugins'";
+                        $result = $app['db']->fetchColumn($SQL);
+                        $cke_plugins = explode(',', $result);
+                        if (!in_array($plugin, $cke_plugins)) {
+                            $cke_plugins[] = $plugin;
+                            $app['db']->update(CMS_TABLE_PREFIX.'mod_wysiwyg_admin_v2',
+                                array('set_value' => implode(',', $cke_plugins)),
+                                array('editor' => 'ckeditor4', 'set_name' => 'plugins'));
+                        }
+                    } catch (\Doctrine\DBAL\DBALException $e) {
+                        throw new \Exception($e);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Execute all steps needed to setup the Content application
      *
      * @param Application $app
@@ -193,6 +241,9 @@ class Setup
 
             // install .htaccess files for the configured languages
             $this->createPermalinkDirectories($app);
+
+            // install CMS CKEditor plugins
+            $this->InstallCKEditorPlugins($app);
 
             return $app['translator']->trans('Successfull installed the extension %extension%.',
                 array('%extension%' => 'flexContent'));
