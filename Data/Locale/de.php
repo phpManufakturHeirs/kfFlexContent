@@ -99,6 +99,8 @@ return array(
     => 'Einen neuen RSS Kanal erstellen',
   'Create a new tag'
     => 'Einen neuen Hashtag erstellen',
+  'Create article'
+    => 'Artikel anlegen',
   'Create or edit a flexContent article'
     => 'Erstellen oder Bearbeiten Sie einen flexContent Artikel',
   'Create or edit categories'
@@ -121,6 +123,8 @@ return array(
     => 'dieses Schlagwort aus der Datenbank entfernen',
   'delete this tag type'
     => 'diesen Hashtag löschen',
+  'Edit article'
+    => 'Artikel bearbeiten',
   'Event date from'
     => 'Beginn der Veranstaltung',
   'Event date to'
