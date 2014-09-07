@@ -59,17 +59,17 @@ class Admin extends Alert
                         'name' => 'list',
                         'text' => $this->app['translator']->trans('List'),
                         'hint' => $this->app['translator']->trans('List of all flexContent articles'),
-                        'link' => FRAMEWORK_URL.'/flexcontent/editor/list'.self::$usage_param,
+                        'link' => FRAMEWORK_URL.'/flexcontent/editor/list',
                         'active' => ($active == 'list')
                     );
                     break;
                 case 'edit':
                     $toolbar[$tab] = array(
                         'name' => 'edit',
-                        'text' => $this->app['translator']->trans('Edit'),
+                        'text' => ($active === 'edit') ? $this->app['translator']->trans('Edit article') : $this->app['translator']->trans('Create article'),
                         'hint' => $this->app['translator']->trans('Create or edit a flexContent article'),
-                        'link' => FRAMEWORK_URL.'/flexcontent/editor/edit'.self::$usage_param,
-                        'active' => ($active == 'edit')
+                        'link' => FRAMEWORK_URL.'/flexcontent/editor/edit',
+                        'active' => ($active === 'edit')
                     );
                     break;
                 case 'tags':
@@ -77,7 +77,7 @@ class Admin extends Alert
                         'name' => 'tags',
                         'text' => $this->app['translator']->trans('Hashtags'),
                         'hint' => $this->app['translator']->trans('Create or edit hashtags'),
-                        'link' => FRAMEWORK_URL.'/flexcontent/editor/buzzword/list'.self::$usage_param,
+                        'link' => FRAMEWORK_URL.'/flexcontent/editor/buzzword/list',
                         'active' => ($active == 'tags')
                     );
                     break;
@@ -86,7 +86,7 @@ class Admin extends Alert
                         'name' => 'categories',
                         'text' => $this->app['translator']->trans('Categories'),
                         'hint' => $this->app['translator']->trans('Create or edit categories'),
-                        'link' => FRAMEWORK_URL.'/flexcontent/editor/category/list'.self::$usage_param,
+                        'link' => FRAMEWORK_URL.'/flexcontent/editor/category/list',
                         'active' => ($active == 'categories')
                     );
                     break;
@@ -95,7 +95,7 @@ class Admin extends Alert
                         'name' => 'rss',
                         'text' => $this->app['translator']->trans('RSS'),
                         'hint' => $this->app['translator']->trans('Organize RSS Feeds for the flexContent articles'),
-                        'link' => FRAMEWORK_URL.'/flexcontent/editor/rss/channel/list'.self::$usage_param,
+                        'link' => FRAMEWORK_URL.'/flexcontent/editor/rss/channel/list',
                         'active' => ($active == 'rss')
                     );
                     break;
@@ -104,7 +104,7 @@ class Admin extends Alert
                         'name' => 'import',
                         'text' => $this->app['translator']->trans('Import'),
                         'hint' => $this->app['translator']->trans('Import WYSIWYG and Blog contents'),
-                        'link' => FRAMEWORK_URL.'/flexcontent/editor/import/list'.self::$usage_param,
+                        'link' => FRAMEWORK_URL.'/flexcontent/editor/import/list',
                         'active' => ($active == 'import')
                     );
                     break;
@@ -113,7 +113,7 @@ class Admin extends Alert
                         'name' => 'about',
                         'text' => $this->app['translator']->trans('About'),
                         'hint' => $this->app['translator']->trans('Information about the flexContent extension'),
-                        'link' => FRAMEWORK_URL.'/flexcontent/editor/about'.self::$usage_param,
+                        'link' => FRAMEWORK_URL.'/flexcontent/editor/about',
                         'active' => ($active == 'about')
                     );
                     break;

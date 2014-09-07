@@ -1,8 +1,9 @@
 {% block toolbar %}
   <ul class="nav nav-tabs">
+    {% set default_link = FRAMEWORK_URL ~ '/flexcontent/editor/about' %}
     {% for item in toolbar %}
       <li{% if item.active %} class="active"{% endif %}>
-        <a href="{{ item.link }}" title="{{ item.hint|trans }}">
+        <a href="{{ item.link ~ '?usage=' ~ usage }}" title="{{ item.hint|trans }}">
           {%if item.name == 'list' %}
             <i class="fa fa-list"></i>
           {% elseif item.name == 'edit' %}
@@ -23,6 +24,14 @@
           {% endif %}
         </a>
       </li>
+      {% if item.active %}
+        {% set default_link = item.link %}
+      {% endif %}
     {% endfor %}
+    {% if usage is defined and usage != 'framework' %}
+      <li>
+        <a class="kitframework-icon" href="{{ default_link }}" title="{{ 'Open the %extension% extension in kitFramework'|trans({'%extension%':'flexContent'}) }}" target="_blank"><i class="fa fa-puzzle-piece"></i></a>
+      </li>
+    {% endif %}
   </ul>
 {% endblock toolbar %}
