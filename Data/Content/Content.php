@@ -45,6 +45,7 @@ class Content
         `content_id` INT(11) NOT NULL AUTO_INCREMENT,
         `language` VARCHAR(2) NOT NULL DEFAULT 'EN',
         `title` VARCHAR(512) NOT NULL DEFAULT '',
+        `page_title` VARCHAR(512) NOT NULL DEFAULT '',
         `description` VARCHAR(512) NOT NULL DEFAULT '',
         `keywords` VARCHAR(512) NOT NULL DEFAULT '',
         `permalink` VARCHAR(255) NOT NULL DEFAULT '',

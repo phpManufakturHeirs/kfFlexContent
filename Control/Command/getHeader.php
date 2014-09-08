@@ -23,7 +23,7 @@ class getHeader
             return $app->json(array('status' => "The flexContent ID $content_id does not exists!"), 404);
         }
         return $app->json(array(
-            'title' => $content['title'],
+            'title' => $content['page_title'],
             'description' => $content['description'],
             'keywords' => $content['keywords']));
     }

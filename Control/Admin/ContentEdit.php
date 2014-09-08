@@ -164,15 +164,23 @@ class ContentEdit extends Admin
         ))
         ->add('title', 'text', array(
             'data' => isset($data['title']) ? $data['title'] : '',
-            'required' => self::$config['content']['field']['title']['required']
+            'required' => self::$config['content']['field']['title']['required'],
+            'label' => 'Headline'
+        ))
+        ->add('page_title', 'text', array(
+            'data' => isset($data['page_title']) ? $data['page_title'] : '',
+            'required' => self::$config['content']['field']['page_title']['required'],
+            'label' => 'SEO: Page title'
         ))
         ->add('description', 'textarea', array(
             'data' => isset($data['description']) ? $data['description'] : '',
-            'required' => self::$config['content']['field']['description']['required']
+            'required' => self::$config['content']['field']['description']['required'],
+            'label' => 'SEO: Description'
         ))
         ->add('keywords', 'textarea', array(
             'data' => isset($data['keywords']) ? $data['keywords'] : '',
-            'required' => self::$config['content']['field']['keywords']['required']
+            'required' => self::$config['content']['field']['keywords']['required'],
+            'label' => 'SEO: Keywords'
         ))
         ->add('publish_from', 'text', array(
             'required' => self::$config['content']['field']['publish_from']['required'],
@@ -340,12 +348,27 @@ class ContentEdit extends Admin
                     case 'title':
                         if (!$property['required']) {
                             // the title must be always set!
-                            $this->setAlert('The title is always needed and con not switched off, please check the configuration!',
+                            $this->setAlert('The headline is always needed and can not switched off, please check the configuration!',
                                 array(), self::ALERT_TYPE_WARNING);
                         }
                         if ((strlen($content[$name]) < $property['length']['minimum']) ||
-                        (strlen($content[$name]) > $property['length']['maximum'])) {
-                            $this->setAlert('The title should have a length between %minimum% and %maximum% characters (actual: %length%).',
+                            (strlen($content[$name]) > $property['length']['maximum'])) {
+                            $this->setAlert('The headline should have a length between %minimum% and %maximum% characters (actual: %length%).',
+                                array('%minimum%' => $property['length']['minimum'],
+                                    '%maximum%' => $property['length']['maximum'], '%length%' => strlen($content[$name])),
+                                self::ALERT_TYPE_WARNING);
+                            $checked = false;
+                        }
+                        $data[$name] = !is_null($content[$name]) ? $content[$name] : '';
+                        break;
+                    case 'page_title':
+                        if (is_null($content[$name]) || empty($content[$name])) {
+                            // set the page title from the headline!
+                            $content[$name] = $data['title'];
+                        }
+                        if ((strlen($content[$name]) < $property['length']['minimum']) ||
+                            (strlen($content[$name]) > $property['length']['maximum'])) {
+                            $this->setAlert('The page title should have a length between %minimum% and %maximum% characters (actual: %length%).',
                                 array('%minimum%' => $property['length']['minimum'],
                                     '%maximum%' => $property['length']['maximum'], '%length%' => strlen($content[$name])),
                                 self::ALERT_TYPE_WARNING);

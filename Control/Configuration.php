@@ -114,6 +114,13 @@ class Configuration
                     'language' => array(
                         'required' => true
                     ),
+                    'page_title' => array(
+                        'required' => false,
+                        'length' => array(
+                            'minimum' => 10,
+                            'maximum' => 128
+                        )
+                    ),
                     'description' => array(
                         'required' => false,
                         'length' => array(

@@ -401,6 +401,41 @@ class Update
     }
 
     /**
+     * Release 0.42
+     */
+    protected function release_042()
+    {
+        if (!$this->app['db.utils']->columnExists(FRAMEWORK_TABLE_PREFIX.'flexcontent_content', 'page_title')) {
+            // add column category_type
+            $SQL = "ALTER TABLE `".FRAMEWORK_TABLE_PREFIX."flexcontent_content` ADD ".
+                "`page_title` VARCHAR(512) NOT NULL DEFAULT '' AFTER `title`";
+            $this->app['db']->query($SQL);
+            $this->app['monolog']->addInfo('[flexContent Update] Add field `page_title` to table `flexcontent_content`');
+            try {
+                // now loop through all records and copy `title` to `page_title`
+                $SQL = "SELECT `content_id`, `title` FROM `".FRAMEWORK_TABLE_PREFIX."flexcontent_content`";
+                $results = $this->app['db']->fetchAll($SQL);
+                if (is_array($results)) {
+                    foreach ($results as $result) {
+                        $this->app['db']->update(FRAMEWORK_TABLE_PREFIX.'flexcontent_content',
+                            array('page_title' => $result['title']),array('content_id' => $result['content_id']));
+                    }
+                    $this->app['monolog']->addInfo('[flexContent Update] Set `page_title` for all records from `title`');
+                }
+            } catch (\Doctrine\DBAL\DBALException $e) {
+                throw new \Exception($e);
+            }
+        }
+
+        if (!isset(self::$config['content']['field']['page_title'])) {
+            $default = $this->Configuration->getDefaultConfigArray();
+            self::$config['content']['field']['page_title'] = $default['content']['field']['page_title'];
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+    }
+
+    /**
      * Execute the update for flexContent
      *
      * @param Application $app
@@ -437,7 +472,7 @@ class Update
         $this->release_030();
         $this->release_037();
         $this->release_038();
-
+        $this->release_042();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));

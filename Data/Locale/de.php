@@ -163,6 +163,8 @@ return array(
     => 'flexContent Server Information für <em>%server_name%</em>',
   'Hashtags'
     => 'Schlagwörter',
+  'Headline'
+    => 'Schlagzeile',
   'Hidden'
     => 'Versteckt',
   'If you are providing multiple RSS Channels you can also define a category'
@@ -211,6 +213,8 @@ return array(
     => 'Organisieren Sie RSS Feeds für die flexContent Artikel',
   'Overview'
     => 'Übersicht',
+  'Page title'
+    => 'Seitentitel',
   'Permalink'
     => 'Permanenter Link',
   'Permalink url'
@@ -273,9 +277,9 @@ return array(
     => 'Aus der Liste entfernen',
   'Remove image'
     => 'Bild entfernen',
-  'RSS'
-    => 'RSS',
   'Rss'
+    => 'RSS',
+  'RSS'
     => 'RSS',
   'RSS Channel Image'
     => 'Abbildung',
@@ -295,6 +299,12 @@ return array(
     => 'Bild auswählen',
   'Select the categories which are assigned to this RSS Channel'
     => 'Wählen Sie die Kategorien aus, die diesem RSS Kanal zugeordnet werden sollen.',
+  'SEO: Description'
+    => 'SEO: Description',
+  'SEO: Keywords'
+    => 'SEO: Keywords',
+  'SEO: Page title'
+    => 'SEO: Page title',
   'Server Request failed, returned status code: %status%'
     => 'Die Server Anfrage ist fehlgeschlagen, zurückgegebener Status: %status%',
   'Show the actual articles in a overview'
@@ -325,10 +335,10 @@ return array(
     => 'Hashtag (#hashtag)',
   'Tag description'
     => 'Beschreibung',
-  'Tag ID'
-    => 'ID',
   'Tag id'
     => 'Tag ID',
+  'Tag ID'
+    => 'ID',
   'Tag image'
     => 'Abbildung',
   'Tag name'
@@ -337,9 +347,9 @@ return array(
     => 'Permanenter Link',
   'tag_name'
     => 'Bezeichner',
-  'Target url'
-    => 'Ziel URL',
   'Target URL'
+    => 'Ziel URL',
+  'Target url'
     => 'Ziel URL',
   'Teaser'
     => 'Anreisser',
@@ -383,12 +393,18 @@ return array(
     => 'Es existiert kein flexContent Datensatz mit der <strong>ID %id%</strong> für die Sprache <strong>%language%</strong>!',
   'The flexContent record with the ID %id% does not exists!'
     => 'Es existiert kein flexContent Datensatz mit der ID %id%!',
+  'The headline is always needed and can not switched off, please check the configuration!'
+    => 'Die Schlagzeile wird immer benötigt und kann nicht in den Einstellungen ausgeschaltet werden. Bitte prüfen Sie die Konfiguration!',
+  'The headline should have a length between %minimum% and %maximum% characters (actual: %length%).'
+    => 'Die Schlagzeile sollte eine Länge zwischen %minimum% und %maximum% Zeichen haben, zur Zeit sind es %length% Zeichen.',
   'The image %image% was successfull inserted.'
     => 'Das Bild %image% wurde dem Datensatz hinzugefügt.',
   'The image was successfull removed.'
     => 'Das Bild wurde entfernt.',
   'The list of RSS Channels for flexContent is empty, please create the first RSS Channel!'
     => 'Es existieren noch keine RSS Kanäle, erstellen Sie den ersten RSS Kanal!',
+  'The page title should have a length between %minimum% and %maximum% characters (actual: %length%).'
+    => 'Der Seitentitel sollte eine Länge zwischen %minimum% und %maximum% Zeichen haben, zur Zeit sind es %length% Zeichen.',
   'The parameter action[%action%] is not supported for remote connections!'
     => 'Der Parameter action[%action%] wird für entfernte Verbindungen nicht unterstützt!',
   'The permalink <b>%permalink%</b> does not exists!'
@@ -439,10 +455,6 @@ return array(
     => 'Der Hashtag mit der <strong >ID %id%</strong> existiert nicht für die Sprache <strong>%language%</strong>!',
   'The target URL assigned to this permanent link does not exists!'
     => 'Die Ziel URL die diesem Permanentlink zugeordnet ist, existiert nicht!',
-  'The title is always needed and con not switched off, please check the configuration!'
-    => 'Die Überschrift wird immer benötigt und kann nicht in den Einstellungen ausgeschaltet werden. Bitte prüfen Sie die Konfiguration!',
-  'The title should have a length between %minimum% and %maximum% characters (actual: %length%).'
-    => 'Der Titel sollte eine Länge zwischen %minimum% und %maximum% Zeichen haben, zur Zeit sind es %length% Zeichen.',
   'There a no tags available for a listing!'
     => 'Es sind keine Schlagworte für eine Auflistung verfügbar!',
   'There are more records using this tag, are you sure do you want to remove it?'
