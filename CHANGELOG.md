@@ -6,6 +6,14 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.42** - 2014-09-08
+
+* fixed: wrong release date
+* fixed: automatic iFrame height for LEPTON CMS
+* install CKEditor plugins for flexContent Article and flexContent #hashtags at BlackCat
+* changed toolbar handling in backend
+* Split the `title` field into `headline` and `page_title` to improve the SEO handling
+
 **0.41** - 2014-09-05
 
 * fixed NOT NULL at insert new record (Category Type)

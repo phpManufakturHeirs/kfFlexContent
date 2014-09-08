@@ -434,7 +434,6 @@ class ContentEdit extends Admin
                                 $data[$name] = !is_null($content[$name]) ? $content[$name] : '';
                             }
                         }
-
                         break;
                     case 'permalink':
                         if (!$property['required']) {

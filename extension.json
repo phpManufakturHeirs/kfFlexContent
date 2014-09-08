@@ -22,8 +22,8 @@
     "about":"\/flexcontent\/about"
   },
   "release":{
-    "number":"0.41",
-    "date":"2014-09-05",
+    "number":"0.42",
+    "date":"2014-09-08",
     "status":"beta"
   },
   "description":{
@@ -56,10 +56,10 @@
                 "release":"0.28"
             },
             "CommandCollection":{
-                "release":"0.38"
+                "release":"0.39"
             },
             "MediaBrowser":{
-                "release":"0.29"
+                "release":"0.30"
             }
         }
     }
