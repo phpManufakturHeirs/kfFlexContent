@@ -51,7 +51,8 @@ class CategoryType
         `category_type` ENUM ('DEFAULT','EVENT','FAQ') NOT NULL DEFAULT 'DEFAULT',
         `target_url` TEXT NOT NULL,
         `timestamp` TIMESTAMP,
-        PRIMARY KEY (`category_id`)
+        PRIMARY KEY (`category_id`),
+        UNIQUE KEY (`category_name`)
         )
     COMMENT='The category types used by the flexContent records'
     ENGINE=InnoDB

@@ -48,7 +48,8 @@ class TagType
         `tag_description` TEXT NOT NULL,
         `tag_image` TEXT NOT NULL,
         `timestamp` TIMESTAMP,
-        PRIMARY KEY (`tag_id`)
+        PRIMARY KEY (`tag_id`),
+        UNIQUE KEY (`tag_name`)
     )
     COMMENT='The tag type definition table for flexContent'
     ENGINE=InnoDB

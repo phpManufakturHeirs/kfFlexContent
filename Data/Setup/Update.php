@@ -436,6 +436,32 @@ class Update
     }
 
     /**
+     * Release 0.43
+     *
+     * @throws \Exception
+     */
+    protected function release_043()
+    {
+        try {
+            $check = $this->app['db']->fetchAssoc("SHOW COLUMNS FROM `".FRAMEWORK_TABLE_PREFIX."flexcontent_tag_type` LIKE 'tag_name'");
+            if (isset($check['Key']) && empty($check['Key'])) {
+                $SQL = "ALTER TABLE `".FRAMEWORK_TABLE_PREFIX."flexcontent_tag_type` ADD UNIQUE INDEX (`tag_name`)";
+                $this->app['db']->query($SQL);
+                $this->app['monolog']->addInfo('[flexContent Update] Add unique indexfor `tag_name` in table `flexcontent_tag_type`');
+            }
+
+            $check = $this->app['db']->fetchAssoc("SHOW COLUMNS FROM `".FRAMEWORK_TABLE_PREFIX."flexcontent_category_type` LIKE 'category_name'");
+            if (isset($check['Key']) && empty($check['Key'])) {
+                $SQL = "ALTER TABLE `".FRAMEWORK_TABLE_PREFIX."flexcontent_category_type` ADD UNIQUE INDEX (`category_name`)";
+                $this->app['db']->query($SQL);
+                $this->app['monolog']->addInfo('[flexContent Update] Add unique indexfor `category_name` in table `flexcontent_category_type`');
+            }
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
      * Execute the update for flexContent
      *
      * @param Application $app
@@ -473,6 +499,7 @@ class Update
         $this->release_037();
         $this->release_038();
         $this->release_042();
+        $this->release_043();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));
