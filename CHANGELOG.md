@@ -6,6 +6,14 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.43** - 2014-09-14
+
+* added UNIQUE KEY for `category_name` and `tag_name`
+* small fix for `|humanize` filter
+* updated `@link` references
+* updated info URL
+* added URL for the changelog in CMS Tool
+
 **0.42** - 2014-09-08
 
 * fixed: wrong release date

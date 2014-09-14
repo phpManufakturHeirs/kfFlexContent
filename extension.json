@@ -22,8 +22,8 @@
     "about":"\/flexcontent\/about"
   },
   "release":{
-    "number":"0.42",
-    "date":"2014-09-08",
+    "number":"0.43",
+    "date":"2014-09-14",
     "status":"beta",
     "changelog":"https:\/\/github.com\/phpManufaktur\/kfFlexContent\/blob\/master\/CHANGELOG.md"
   },
@@ -48,16 +48,16 @@
     "extension":{
         "phpmanufaktur":{
             "Basic":{
-                "release":"1.0.10"
+                "release":"1.0.12"
             },
             "Library":{
                 "release":"0.37"
             },
             "CKEditor":{
-                "release":"0.28"
+                "release":"0.30"
             },
             "CommandCollection":{
-                "release":"0.39"
+                "release":"0.40"
             },
             "MediaBrowser":{
                 "release":"0.30"
