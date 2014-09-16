@@ -900,6 +900,19 @@ class ContentEdit extends Admin
                 }
             }
         }
+        else {
+            // remove all associated tags
+            $checks = $this->TagData->selectByContentID(self::$content_id);
+            if (is_array($checks)) {
+                foreach ($checks as $check) {
+                    // delete this #hashtag
+                    $this->TagData->delete($check['id']);
+                    $tag_name = $this->TagTypeData->selectNameByID($check['tag_id']);
+                    $this->setAlert('The tag %tag% is no longer associated with this content.',
+                        array('%tag%' => $tag_name), self::ALERT_TYPE_SUCCESS);
+                }
+            }
+        }
     }
 
     /**
