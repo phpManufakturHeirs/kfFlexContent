@@ -6,6 +6,11 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.44** - 2014-09-18
+
+* fixed: #9 - can not delete the last hashtag which is assigned to a content
+* enable setting of `$subdirectory` and `$CMS_PATH` for usage with the BASIC migration tool
+
 **0.43** - 2014-09-14
 
 * added UNIQUE KEY for `category_name` and `tag_name`
