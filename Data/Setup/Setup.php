@@ -78,6 +78,8 @@ class Setup
      *
      * @param Application $app
      * @param array $config load config only if needed!
+     * @param string $subdirectory calculate subdirectory only if needed
+     * @param string $CMS_PATH use instead of constant CMS_PATH
      * @throws \Exception
      */
     public function createPermalinkDirectories(Application $app, $config=null, $subdirectory=null, $CMS_PATH=null)
