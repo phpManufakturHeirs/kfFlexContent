@@ -36,16 +36,20 @@ class Setup
      *
      * @param Application $app
      * @param array $config load config only if needed!
+     * @param string $subdirectory calculate subdirectory only if needed
      * @throws \Exception
      */
-    public function createPermalinkRoutes(Application $app, $config=null)
+    public function createPermalinkRoutes(Application $app, $config=null, $subdirectory=null)
     {
         if (is_null($config)) {
             $Configuration = new Configuration($app);
             $config = $Configuration->getConfiguration();
         }
 
-        $subdirectory = parse_url(CMS_URL, PHP_URL_PATH);
+        if (is_null($subdirectory)) {
+            // get the subdirectory from the CMS_URL
+            $subdirectory = parse_url(CMS_URL, PHP_URL_PATH);
+        }
 
         // always remove an existing include
         $app['filesystem']->remove(MANUFAKTUR_PATH.'/flexContent/bootstrap.include.inc');
@@ -76,14 +80,22 @@ class Setup
      * @param array $config load config only if needed!
      * @throws \Exception
      */
-    public function createPermalinkDirectories(Application $app, $config=null)
+    public function createPermalinkDirectories(Application $app, $config=null, $subdirectory=null, $CMS_PATH=null)
     {
         if (is_null($config)) {
             $Configuration = new Configuration($app);
             $config = $Configuration->getConfiguration();
         }
 
-        $subdirectory = parse_url(CMS_URL, PHP_URL_PATH);
+        if (is_null($subdirectory)) {
+            // get the subdirectory from the CMS URL
+            $subdirectory = parse_url(CMS_URL, PHP_URL_PATH);
+        }
+
+        if (is_null($CMS_PATH)) {
+            // need the CMS path
+            $CMS_PATH = CMS_PATH;
+        }
 
         if ($config['content']['language']['select']) {
             // create directories for all supported languages
@@ -104,13 +116,13 @@ class Setup
             $path = $config['content']['permalink']['directory'];
             $path = str_ireplace('{language}', strtolower($language['code']), $path);
 
-            $app['filesystem']->mkdir(CMS_PATH.$path);
+            $app['filesystem']->mkdir($CMS_PATH.$path);
             if (false === ($include = file_get_contents(MANUFAKTUR_PATH.'/flexContent/Data/Setup/PermaLink/.htaccess'))) {
                 throw new \Exception('Missing /flexContent/Data/Setup/PermaLink/.htaccess!');
             }
             $include = str_replace(array('%subdirectory%'), array($subdirectory), $include);
 
-            if (false === (file_put_contents(CMS_PATH.$path.'/.htaccess', $include))) {
+            if (false === (file_put_contents($CMS_PATH.$path.'/.htaccess', $include))) {
                 throw new \Exception("Can't create $path/.htaccess!");
             }
             $app['monolog']->addDebug('Create '.'/'.strtolower($language['code']).$config['content']['permalink']['directory'].'/.htaccess');
@@ -118,13 +130,13 @@ class Setup
             $rss_path = $config['rss']['permalink']['directory'];
             $rss_path = str_ireplace('{language}', strtolower($language['code']), $rss_path);
 
-            $app['filesystem']->mkdir(CMS_PATH.$rss_path);
+            $app['filesystem']->mkdir($CMS_PATH.$rss_path);
             if (false === ($include = file_get_contents(MANUFAKTUR_PATH.'/flexContent/Data/Setup/PermaLink/.htaccess'))) {
                 throw new \Exception('Missing /flexContent/Data/Setup/PermaLink/.htaccess!');
             }
             $include = str_replace(array('%subdirectory%'), array($subdirectory), $include);
 
-            if (false === (file_put_contents(CMS_PATH.$rss_path.'/.htaccess', $include))) {
+            if (false === (file_put_contents($CMS_PATH.$rss_path.'/.htaccess', $include))) {
                 throw new \Exception("Can't create $rss_path/.htaccess!");
             }
             $app['monolog']->addDebug('Create '.'/'.strtolower($language['code']).$config['rss']['permalink']['directory'].'/.htaccess');
