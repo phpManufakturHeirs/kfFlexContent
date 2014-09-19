@@ -268,15 +268,6 @@ class Update
             $this->Configuration->saveConfiguration();
         }
 
-        $keys = array('view', 'category', 'tag', 'list', 'list_simple', 'faq');
-        foreach ($keys as $key) {
-            if (!isset(self::$config['kitcommand']['parameter']['action'][$key]['check_jquery'])) {
-                self::$config['kitcommand']['parameter']['action'][$key]['check_jquery'] = true;
-                $this->Configuration->setConfiguration(self::$config);
-                $this->Configuration->saveConfiguration();
-            }
-        }
-
         $keys = array('list', 'list_simple');
         foreach ($keys as $key) {
             if (!isset(self::$config['kitcommand']['parameter']['action'][$key]['paging'])) {
@@ -484,6 +475,17 @@ class Update
             $SQL = "ALTER TABLE `".FRAMEWORK_TABLE_PREFIX."flexcontent_category_type` CHANGE `category_type` `category_type` ENUM ('DEFAULT','EVENT','FAQ','GLOSSARY') NOT NULL DEFAULT 'DEFAULT'";
             $this->app['db']->query($SQL);
             $this->app['monolog']->addInfo('[flexContent Update] Add ENUM value GLOSSARY to field `category_type` in table `flexcontent_category_type`');
+        }
+
+        $check_keys = array('view', 'category', 'tag', 'list', 'list_simple', 'faq');
+        foreach ($check_keys as $key) {
+            if (isset(self::$config['kitcommand']['parameter']['action'][$key]['check_jquery'])) {
+                self::$config['kitcommand']['parameter']['action'][$key]['load_jquery'] =
+                    self::$config['kitcommand']['parameter']['action'][$key]['check_jquery'];
+                unset(self::$config['kitcommand']['parameter']['action'][$key]['check_jquery']);
+                $this->Configuration->setConfiguration(self::$config);
+                $this->Configuration->saveConfiguration();
+            }
         }
     }
 

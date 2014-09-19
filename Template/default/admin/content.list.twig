@@ -32,15 +32,15 @@
     
     {{ alert }}
         
-    <div class="row">
-      <div class="col-md-4">
+    <div class="row list-navigation">
+      <div class="col-md-4 create-article">
         <a class="btn btn-default" role="button" href="{{ FRAMEWORK_URL ~ route.create }}">{{ 'Create a new article'|trans }}</a>&nbsp;
         {% set kitcommand = '~~ flexContent action[list] ~~' %}
         <a id="copycommand" class="btn btn-default" role="button" href="#" data-clipboard-text="{{ kitcommand }}">~~</a>
       </div>
-      <div class="col-md-4">     
+      <div class="col-md-4 switch-category">&nbsp;     
       </div>
-      <div class="col-md-4 text-right">
+      <div class="col-md-4 search-article">
         <form action="{{ FRAMEWORK_URL ~ route.search }}" class="search-box" role="form" method="post">
           <div class="input-group search-content">
             <input class="form-control input-default" type="text" name="search" />

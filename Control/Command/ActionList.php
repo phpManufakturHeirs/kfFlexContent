@@ -171,7 +171,7 @@ class ActionList extends Basic
 
         $params = array();
         $params['library'] = null;
-        if (self::$parameter['check_jquery']) {
+        if (self::$parameter['load_jquery']) {
             if (self::$config['kitcommand']['libraries']['enabled'] &&
                 !empty(self::$config['kitcommand']['libraries']['jquery'])) {
                 // load all predefined jQuery files for flexContent
@@ -243,10 +243,15 @@ class ActionList extends Basic
             $default_parameter = self::$config['kitcommand']['parameter']['action']['list'];
         }
 
-        // check wether to use the flexcontent.css or not
+        // load flexcontent.css?
         self::$parameter['load_css'] = (isset(self::$parameter['load_css']) && ((self::$parameter['load_css'] == 0) || (strtolower(self::$parameter['load_css']) == 'false'))) ? false : $default_parameter['load_css'];
-        // disable the jquery check?
-        self::$parameter['check_jquery'] = (isset(self::$parameter['check_jquery']) && ((self::$parameter['check_jquery'] == 0) || (strtolower(self::$parameter['check_jquery']) == 'false'))) ? false : $default_parameter['check_jquery'];
+        // load jquery?
+        self::$parameter['load_jquery'] = (isset(self::$parameter['load_jquery']) && ((self::$parameter['load_jquery'] == 0) || (strtolower(self::$parameter['load_jquery']) == 'false'))) ? false : $default_parameter['load_jquery'];
+
+        if (isset(self::$parameter['check_jquery'])) {
+            $this->setAlert('The parameter <var>check_jquery[]</var> is no longer available, use <var>load_jquery[]</var> instead.',
+                array(), self::ALERT_TYPE_WARNING);
+        }
 
         // set the title level - default 1 = <h1>
         self::$parameter['title_level'] = (isset(self::$parameter['title_level']) && is_numeric(self::$parameter['title_level'])) ? self::$parameter['title_level'] : $default_parameter['title_level'];

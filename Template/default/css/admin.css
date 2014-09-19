@@ -20,11 +20,6 @@ a.kitframework-icon {
   color: #da251d !important;
 }
 
-@media (max-width: 767px) {
-  label {
-    text-align: left;
-  }
-}
 label.required:after {
   content: '*';
   color: #da251d;
@@ -170,4 +165,18 @@ form.search-box {
 }
 .tooltip-inner {
   max-width: 350px;
+}
+
+.list-navigation .search-box {
+  
+}
+
+@media (max-width: 767px) {
+  label {
+    text-align: left;
+  }
+  form.search-box {
+    width: 100%;
+    float: none;
+  }
 }
