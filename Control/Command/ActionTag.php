@@ -151,7 +151,7 @@ class ActionTag extends Basic
     {
         self::$parameter['limit'] = isset(self::$parameter['limit']) ? (int) self::$parameter['limit'] : null;
         self::$parameter['order_by'] = isset(self::$parameter['order_by']) ? strtolower(self::$parameter['order_by']) : 'tag_count';
-        self::$parameter['order_direction'] = (isset(self::$parameter['order_direction']) && in_array(strtoupper(self::$parameter['order_direction'], array('ASC', 'DESC')))) ? strtoupper(self::$parameter['order_direction']) : null;
+        self::$parameter['order_direction'] = (isset(self::$parameter['order_direction']) && in_array(strtoupper(self::$parameter['order_direction']), array('ASC', 'DESC'))) ? strtoupper(self::$parameter['order_direction']) : null;
         self::$parameter['mode'] = isset(self::$parameter['mode']) ? strtolower(self::$parameter['mode']) : 'enumeration';
         self::$parameter['size_grid'] = (isset(self::$parameter['size_grid']) && is_integer(self::$parameter['size_grid'])) ? intval(self::$parameter['size_grid']) : 8;
         self::$parameter['size_factor'] = (isset(self::$parameter['size_factor']) && is_integer(self::$parameter['size_factor'])) ? intval(self::$parameter['size_factor']) : 0;
