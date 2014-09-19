@@ -54,46 +54,6 @@ class ActionTag extends Basic
     }
 
     /**
-     * (non-PHPdoc)
-     * @see \phpManufaktur\Basic\Control\Pattern\Alert::promptAlert()
-     */
- /*   public function promptAlert()
-    {
-        if (!isset(self::$parameter['load_css'])) {
-            self::$parameter['load_css'] = self::$config['kitcommand']['parameter']['action']['tag']['load_css'];
-        }
-        if (!isset(self::$parameter['check_jquery'])) {
-            self::$parameter['check_jquery'] = self::$config['kitcommand']['parameter']['action']['tag']['check_jquery'];
-        }
-        $result = $this->app['twig']->render($this->app['utils']->getTemplateFile(
-            '@phpManufaktur/flexContent/Template', 'command/alert.twig',
-            $this->getPreferredTemplateStyle()),
-            array(
-                'basic' => $this->getBasicSettings(),
-                'parameter' => self::$parameter
-            ));
-
-        $params = array();
-        if (self::$parameter['check_jquery']) {
-            $params['library'] = 'jquery/jquery/latest/jquery.min.js,bootstrap/latest/js/bootstrap.min.js';
-        }
-        if (self::$parameter['load_css']) {
-            if (isset($params['library'])) {
-                $params['library'] .= ',bootstrap/latest/css/bootstrap.min.css';
-            }
-            else {
-                $params['library'] = 'bootstrap/latest/css/bootstrap.min.css';
-            }
-            $params['css'] = 'flexContent,css/flexcontent.min.css,'.$this->getPreferredTemplateStyle();
-        }
-        $params['robots'] = 'noindex,follow';
-        return $this->app->json(array(
-            'parameter' => $params,
-            'response' => $result
-        ));
-    }
-*/
-    /**
      * Collect the information for the given tag for an overview
      *
      * @return \phpManufaktur\Basic\Control\Pattern\rendered
@@ -111,7 +71,8 @@ class ActionTag extends Basic
         $this->Tools->linkTags($tag_type['tag_description'], self::$language);
 
         if (false == ($contents = $this->ContentData->selectContentsByTagID(self::$parameter['tag_id'],
-            self::$parameter['content_status'], self::$parameter['content_limit']))) {
+            self::$parameter['content_status'], self::$parameter['content_limit'],
+            self::$parameter['order_by'], self::$parameter['order_direction'], self::$parameter['content_exclude']))) {
             $this->setAlert('The tag %tag_name% does not contain any active contents',
                 array('%tag_name%' => $tag_type['tag_name']), self::ALERT_TYPE_WARNING,
                 array(__METHOD__, __LINE__));
@@ -260,8 +221,26 @@ class ActionTag extends Basic
 
         self::$parameter['height'] = isset(self::$parameter['height']) ? intval(self::$parameter['height']) : 400;
 
+        if (isset(self::$parameter['tag_ids']) && !empty(self::$parameter['tag_ids'])) {
+            if (strpos(self::$parameter['tag_ids'], ',')) {
+                $explode = explode(',', self::$parameter['tag_ids']);
+                $tag_ids = array();
+                foreach ($explode as $item) {
+                    $tag_ids[] = intval($item);
+                }
+                self::$parameter['tag_ids'] = $tag_ids;
+            }
+            else {
+                self::$parameter['tag_ids'] = array(intval(self::$parameter['tag_ids']));
+            }
+        }
+        else {
+            self::$parameter['tag_ids'] = null;
+        }
+
         if (false !== ($tags = $this->TagData->selectTags(
-            self::$language, self::$parameter['limit'], self::$parameter['order_by'], self::$parameter['order_direction']))) {
+            self::$language, self::$parameter['limit'], self::$parameter['order_by'], self::$parameter['order_direction'],
+            self::$parameter['tag_ids']))) {
 
             switch (self::$parameter['mode']) {
                 case 'cloud':
@@ -417,8 +396,31 @@ class ActionTag extends Basic
             self::$parameter['content_status'] = $default_parameter['content_status'];
         }
 
+        // order by
+        self::$parameter['order_by'] = (isset(self::$parameter['order_by'])) ? strtolower(self::$parameter['order_by']) : null;
+        // order direction
+        self::$parameter['order_direction'] = (isset(self::$parameter['order_direction'])) ? strtoupper(self::$parameter['order_direction']) : 'ASC';
+
         // limit for the content items
         self::$parameter['content_limit'] = (isset(self::$parameter['content_limit'])) ? intval(self::$parameter['content_limit']) : $default_parameter['content_limit'];
+
+        // exclude specified content IDs?
+        if (isset(self::$parameter['content_exclude']) && !empty(self::$parameter['content_exclude'])) {
+            if (strpos(self::$parameter['content_exclude'], ',')) {
+                $explode = explode(',', self::$parameter['content_exclude']);
+                $contents = array();
+                foreach ($explode as $item) {
+                    $contents[] = intval($item);
+                }
+                self::$parameter['content_exclude'] = $contents;
+            }
+            else {
+                self::$parameter['content_exclude'] = array(intval(self::$parameter['content_exclude']));
+            }
+        }
+        else {
+            self::$parameter['content_exclude'] = null;
+        }
 
         // show the content image?
         self::$parameter['content_image'] = (isset(self::$parameter['content_image']) && ((self::$parameter['content_image'] == 0) || (strtolower(self::$parameter['content_image']) == 'false'))) ? false : $default_parameter['content_image'];
@@ -437,14 +439,8 @@ class ActionTag extends Basic
         // show content description?
         self::$parameter['content_description'] = (isset(self::$parameter['content_description']) && ((self::$parameter['content_description'] == 0) || (strtolower(self::$parameter['content_description']) == 'false'))) ? false : $default_parameter['content_description'];
 
-        // show content teaser?
-        //self::$parameter['content_teaser'] = (isset(self::$parameter['content_teaser']) && ((self::$parameter['content_teaser'] == 0) || (strtolower(self::$parameter['content_teaser']) == 'false'))) ? false : $default_parameter['content_teaser'];
-
         // show content description?
         self::$parameter['content_description'] = (isset(self::$parameter['content_description']) && ((self::$parameter['content_description'] == 0) || (strtolower(self::$parameter['content_description']) == 'false'))) ? false : $default_parameter['content_description'];
-
-        // show content content?
-        //self::$parameter['content_content'] = (isset(self::$parameter['content_content']) && ((self::$parameter['content_content'] == 1) || (strtolower(self::$parameter['content_content']) == 'true'))) ? true : $default_parameter['content_content'];
 
         self::$parameter['content_view'] = (isset(self::$parameter['content_view'])) ? strtolower(self::$parameter['content_view']) : $default_parameter['content_view'];
 
