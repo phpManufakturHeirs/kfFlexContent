@@ -139,7 +139,16 @@ class ActionList extends Basic
         }
 
         if (!is_array($contents) || empty($contents)) {
-            $this->setAlert('This list does not contain any contents!');
+            if (self::$parameter['hide_if_empty']) {
+                // return an empty result (hide)
+                return $this->app->json(array(
+                    'parameter' => null,
+                    'response' => ''
+                ));
+            }
+            else {
+                $this->setAlert('This list does not contain any contents!');
+            }
         }
 
         if (self::$parameter['type'] == 'default') {
@@ -386,6 +395,9 @@ class ActionList extends Basic
 
         // use paging?
         self::$parameter['paging'] = (isset(self::$parameter['paging']) && is_numeric(self::$parameter['paging'])) ? (int) self::$parameter['paging'] : $default_parameter['paging'];
+
+        // hide empty result?
+        self::$parameter['hide_if_empty'] = (isset(self::$parameter['hide_if_empty']) && (empty(self::$parameter['hide_if_empty']) || (strtolower(self::$parameter['hide_if_empty']) === 'true'))) ? true : false;
 
         return $this->showList();
     }

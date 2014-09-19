@@ -73,9 +73,17 @@ class ActionTag extends Basic
         if (false == ($contents = $this->ContentData->selectContentsByTagID(self::$parameter['tag_id'],
             self::$parameter['content_status'], self::$parameter['content_limit'],
             self::$parameter['order_by'], self::$parameter['order_direction'], self::$parameter['content_exclude']))) {
-            $this->setAlert('The tag %tag_name% does not contain any active contents',
-                array('%tag_name%' => $tag_type['tag_name']), self::ALERT_TYPE_WARNING,
-                array(__METHOD__, __LINE__));
+            if (self::$parameter['hide_if_empty']) {
+                 return $this->app->json(array(
+                    'parameter' => null,
+                    'response' => ''
+                ));
+            }
+            else {
+                $this->setAlert('The tag %tag_name% does not contain any active contents',
+                    array('%tag_name%' => $tag_type['tag_name']), self::ALERT_TYPE_WARNING,
+                    array(__METHOD__, __LINE__));
+            }
         }
 
         for ($i=0; $i < sizeof($contents); $i++) {
@@ -464,6 +472,9 @@ class ActionTag extends Basic
         self::$parameter['content_date'] = (isset(self::$parameter['content_date']) && ((self::$parameter['content_date'] == 0) || (strtolower(self::$parameter['content_date']) == 'false'))) ? false : $default_parameter['content_date'];
 
         self::$parameter['type'] = (isset(self::$parameter['type'])) ? strtolower(self::$parameter['type']) : 'contents';
+
+        // hide empty result?
+        self::$parameter['hide_if_empty'] = (isset(self::$parameter['hide_if_empty']) && (empty(self::$parameter['hide_if_empty']) || (strtolower(self::$parameter['hide_if_empty']) === 'true'))) ? true : false;
 
         if (self::$parameter['type'] !== 'contents') {
             return $this->getTagListing();

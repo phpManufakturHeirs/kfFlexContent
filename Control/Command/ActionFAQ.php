@@ -131,10 +131,19 @@ class ActionFAQ extends Basic
                     }
                 }
                 else {
-                    // this category has no active contents
-                    $this->setAlert('The Category %category_name% does not contain any active contents',
-                        array('%category_name%' => self::$parameter['category_id']), self::ALERT_TYPE_WARNING);
-                    return $this->promptAlert();
+                    if (self::$parameter['hide_if_empty']) {
+                        // hide the FAQ if nothing is available
+                        return $this->app->json(array(
+                            'parameter' => null,
+                            'response' => ''
+                        ));
+                    }
+                    else {
+                        // this category has no active contents
+                        $this->setAlert('The Category %category_name% does not contain any active contents',
+                            array('%category_name%' => self::$parameter['category_id']), self::ALERT_TYPE_WARNING);
+                        return $this->promptAlert();
+                    }
                 }
             }
 
@@ -336,6 +345,9 @@ class ActionFAQ extends Basic
         self::$parameter['content_image_max_height'] = (isset(self::$parameter['category_image_max_height']) && is_numeric(self::$parameter['category_image_max_height'])) ? self::$parameter['category_image_max_height'] : $default_parameter['category_image_max_height'];
         // show rating?
         self::$parameter['content_rating'] = (isset(self::$parameter['content_rating']) && ((self::$parameter['content_rating'] == 1) || (strtolower(self::$parameter['content_rating']) == 'true'))) ? true : $default_parameter['content_rating']['enabled'];
+
+        // hide empty result?
+        self::$parameter['hide_if_empty'] = (isset(self::$parameter['hide_if_empty']) && (empty(self::$parameter['hide_if_empty']) || (strtolower(self::$parameter['hide_if_empty']) === 'true'))) ? true : false;
 
         if (!empty(self::$parameter['faq_ids']) || (self::$parameter['category_id'] > 0)) {
             return $this->showFAQ();

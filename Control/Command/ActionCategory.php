@@ -95,9 +95,18 @@ class ActionCategory extends Basic
             if (false === ($contents = $this->ContentData->selectContentsByCategoryID(self::$parameter['category_id'],
                 self::$parameter['content_status'], self::$parameter['content_limit'], self::$parameter['order_by'],
                 self::$parameter['order_direction'], self::$parameter['content_exclude']))) {
-                $this->setAlert('The Category %category_name% does not contain any active contents',
-                    array('%category_name%' => $response['category']['category_name']), self::ALERT_TYPE_WARNING,
-                    array(__METHOD__, __LINE__));
+                if (self::$parameter['hide_if_empty']) {
+                    // hide the category content
+                    return $this->app->json(array(
+                        'parameter' => null,
+                        'response' => ''
+                    ));
+                }
+                else {
+                    $this->setAlert('The Category %category_name% does not contain any active contents',
+                        array('%category_name%' => $response['category']['category_name']), self::ALERT_TYPE_WARNING,
+                        array(__METHOD__, __LINE__));
+                }
             }
 
             if (is_array($contents)) {
@@ -323,6 +332,9 @@ class ActionCategory extends Basic
         else {
             self::$parameter['content_exclude'] = null;
         }
+
+        // hide empty result?
+        self::$parameter['hide_if_empty'] = (isset(self::$parameter['hide_if_empty']) && (empty(self::$parameter['hide_if_empty']) || (strtolower(self::$parameter['hide_if_empty']) === 'true'))) ? true : false;
 
         if (self::$parameter['category_id'] > 0) {
             // show the category
