@@ -48,7 +48,7 @@ class CategoryType
         `category_permalink` VARCHAR(255) NOT NULL DEFAULT '',
         `category_description` TEXT NOT NULL,
         `category_image` TEXT NOT NULL,
-        `category_type` ENUM ('DEFAULT','EVENT','FAQ') NOT NULL DEFAULT 'DEFAULT',
+        `category_type` ENUM ('DEFAULT','EVENT','FAQ','GLOSSARY') NOT NULL DEFAULT 'DEFAULT',
         `target_url` TEXT NOT NULL,
         `timestamp` TIMESTAMP,
         PRIMARY KEY (`category_id`),

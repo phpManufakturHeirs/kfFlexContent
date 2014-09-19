@@ -478,6 +478,13 @@ class Update
                 $this->app['monolog']->addDebug('[flexContent Update] Removed file '.$remove);
             }
         }
+
+        if (false === ($this->app['db.utils']->enumValueExists(FRAMEWORK_TABLE_PREFIX.'flexcontent_category_type', 'category_type', 'GLOSSARY'))) {
+            // add PENDING to contact_status
+            $SQL = "ALTER TABLE `".FRAMEWORK_TABLE_PREFIX."flexcontent_category_type` CHANGE `category_type` `category_type` ENUM ('DEFAULT','EVENT','FAQ','GLOSSARY') NOT NULL DEFAULT 'DEFAULT'";
+            $this->app['db']->query($SQL);
+            $this->app['monolog']->addInfo('[flexContent Update] Add ENUM value GLOSSARY to field `category_type` in table `flexcontent_category_type`');
+        }
     }
 
     /**

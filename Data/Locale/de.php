@@ -17,6 +17,8 @@ if ('á' != "\xc3\xa1") {
 }
 
 return array(
+    'Glossary'
+        => 'Glossar',
   '- new entry -'
     => '- neuer Datensatz -',
   '[flexContent] Successfull installed flexContent as CMS Page Section'
@@ -499,5 +501,5 @@ return array(
     => 'Sie müssen eine <strong>Server URL</strong> für die entfernte Verbindung in der <em>config.flexcontent.json</em> festlegen!',
   'You must specify the <strong>token</strong> for the remote connection in the config.flexcontent.json!'
     => 'Sie müssen eine <strong>Kennung</strong> (token) für die entfernte Verbindung in der <em>config.flexcontent.json</em> festlegen!',
-  
+
 );
