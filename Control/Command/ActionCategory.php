@@ -93,7 +93,8 @@ class ActionCategory extends Basic
             $this->Tools->linkTags($response['category']['category_description'], self::$language);
 
             if (false === ($contents = $this->ContentData->selectContentsByCategoryID(self::$parameter['category_id'],
-                self::$parameter['content_status'], self::$parameter['content_limit']))) {
+                self::$parameter['content_status'], self::$parameter['content_limit'], self::$parameter['order_by'],
+                self::$parameter['order_direction'], self::$parameter['content_exclude']))) {
                 $this->setAlert('The Category %category_name% does not contain any active contents',
                     array('%category_name%' => $response['category']['category_name']), self::ALERT_TYPE_WARNING,
                     array(__METHOD__, __LINE__));
@@ -248,6 +249,11 @@ class ActionCategory extends Basic
             self::$parameter['content_status'] = $default_parameter['content_status'];
         }
 
+        // order by
+        self::$parameter['order_by'] = (isset(self::$parameter['order_by'])) ? strtolower(self::$parameter['order_by']) : 'publish_from';
+        // order direction
+        self::$parameter['order_direction'] = (isset(self::$parameter['order_direction'])) ? strtoupper(self::$parameter['order_direction']) : 'DESC';
+
         // limit for the content items
         self::$parameter['content_limit'] = (isset(self::$parameter['content_limit'])) ? intval(self::$parameter['content_limit']) : $default_parameter['content_limit'];
 
@@ -300,6 +306,23 @@ class ActionCategory extends Basic
         // show content date?
         self::$parameter['content_date'] = (isset(self::$parameter['content_date']) && ((self::$parameter['content_date'] == 0) || (strtolower(self::$parameter['content_date']) == 'false'))) ? false : $default_parameter['content_date'];
 
+        // exclude specified content IDs?
+        if (isset(self::$parameter['content_exclude']) && !empty(self::$parameter['content_exclude'])) {
+            if (strpos(self::$parameter['content_exclude'], ',')) {
+                $explode = explode(',', self::$parameter['content_exclude']);
+                $contents = array();
+                foreach ($explode as $item) {
+                    $contents[] = intval($item);
+                }
+                self::$parameter['content_exclude'] = $contents;
+            }
+            else {
+                self::$parameter['content_exclude'] = array(intval(self::$parameter['content_exclude']));
+            }
+        }
+        else {
+            self::$parameter['content_exclude'] = null;
+        }
 
         if (self::$parameter['category_id'] > 0) {
             // show the category
