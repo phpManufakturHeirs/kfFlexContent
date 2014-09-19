@@ -80,6 +80,10 @@ class ActionFAQ extends Basic
             if (!empty(self::$parameter['faq_ids'])) {
                 // get the FAQs by the given content IDs
                 foreach (self::$parameter['faq_ids'] as $id) {
+                    if (!is_null(self::$parameter['content_exclude']) && in_array($id, self::$parameter['content_exclude'])) {
+                        // exclude this content ID
+                        continue;
+                    }
                     if (false === ($content = $this->ContentData->select($id, self::$language))) {
                         $this->setAlert('The flexContent record with the <strong>ID %id%</strong> does not exists for the language <strong>%language%</strong>!',
                             array('%id%' => $id, '%language%' => self::$language),
@@ -108,7 +112,8 @@ class ActionFAQ extends Basic
                         self::$parameter['content_status'],
                         self::$parameter['content_limit'],
                         self::$parameter['order_by'],
-                        self::$parameter['order_direction']))) {
+                        self::$parameter['order_direction'],
+                        self::$parameter['content_exclude']))) {
                     foreach ($contents as $content) {
                         // create links for the tags
                         $this->Tools->linkTags($content['teaser'], self::$language);
@@ -274,6 +279,24 @@ class ActionFAQ extends Basic
 
         // exists a limit?
         self::$parameter['content_limit'] = (isset(self::$parameter['content_limit']) && is_numeric(self::$parameter['content_limit'])) ? intval(self::$parameter['content_limit']) : $default_parameter['content_limit'];
+
+        // exclude specified content IDs?
+        if (isset(self::$parameter['content_exclude']) && !empty(self::$parameter['content_exclude'])) {
+            if (strpos(self::$parameter['content_exclude'], ',')) {
+                $explode = explode(',', self::$parameter['content_exclude']);
+                $contents = array();
+                foreach ($explode as $item) {
+                    $contents[] = intval($item);
+                }
+                self::$parameter['content_exclude'] = $contents;
+            }
+            else {
+                self::$parameter['content_exclude'] = array(intval(self::$parameter['content_exclude']));
+            }
+        }
+        else {
+            self::$parameter['content_exclude'] = null;
+        }
 
         // expose content items?
         self::$parameter['content_exposed'] = 0; // disabled for FAQ!
