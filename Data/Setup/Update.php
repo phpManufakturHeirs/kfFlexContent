@@ -447,17 +447,36 @@ class Update
             if (isset($check['Key']) && empty($check['Key'])) {
                 $SQL = "ALTER TABLE `".FRAMEWORK_TABLE_PREFIX."flexcontent_tag_type` ADD UNIQUE INDEX (`tag_name`)";
                 $this->app['db']->query($SQL);
-                $this->app['monolog']->addInfo('[flexContent Update] Add unique indexfor `tag_name` in table `flexcontent_tag_type`');
+                $this->app['monolog']->addInfo('[flexContent Update] Add unique index for `tag_name` in table `flexcontent_tag_type`');
             }
 
             $check = $this->app['db']->fetchAssoc("SHOW COLUMNS FROM `".FRAMEWORK_TABLE_PREFIX."flexcontent_category_type` LIKE 'category_name'");
             if (isset($check['Key']) && empty($check['Key'])) {
                 $SQL = "ALTER TABLE `".FRAMEWORK_TABLE_PREFIX."flexcontent_category_type` ADD UNIQUE INDEX (`category_name`)";
                 $this->app['db']->query($SQL);
-                $this->app['monolog']->addInfo('[flexContent Update] Add unique indexfor `category_name` in table `flexcontent_category_type`');
+                $this->app['monolog']->addInfo('[flexContent Update] Add unique index for `category_name` in table `flexcontent_category_type`');
             }
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Release 0.45
+     */
+    protected function release_045()
+    {
+        // remove no longer needed files (missing in previous update)
+        $removes = array(
+            MANUFAKTUR_PATH.'/flexContent/Template/default/command/command.footer.twig',
+            MANUFAKTUR_PATH.'/flexContent/Template/default/command/command.header.twig'
+        );
+
+        foreach ($removes as $remove) {
+            if ($this->app['filesystem']->exists($remove)) {
+                $this->app['filesystem']->remove($remove);
+                $this->app['monolog']->addDebug('[flexContent Update] Removed file '.$remove);
+            }
         }
     }
 
@@ -500,6 +519,7 @@ class Update
         $this->release_038();
         $this->release_042();
         $this->release_043();
+        $this->release_045();
 
         return $app['translator']->trans('Successfull updated the extension %extension%.',
             array('%extension%' => 'flexContent'));
