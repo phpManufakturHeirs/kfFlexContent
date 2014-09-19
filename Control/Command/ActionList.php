@@ -85,7 +85,8 @@ class ActionList extends Basic
         $type = (strtoupper(self::$parameter['type']) == 'EVENT') ? 'EVENT' : 'DEFAULT';
         $contents = $this->ContentData->selectContentList(self::$language, self::$parameter['content_limit'],
             self::$parameter['categories'], self::$parameter['categories_exclude'], self::$parameter['content_status'],
-            self::$parameter['order_by'], self::$parameter['order_direction'], $type, $paging_from, self::$parameter['paging']);
+            self::$parameter['order_by'], self::$parameter['order_direction'], $type, $paging_from,
+            self::$parameter['paging'], self::$parameter['content_exclude']);
 
         if (is_array($contents)) {
             // count the available contents
@@ -321,6 +322,24 @@ class ActionList extends Basic
         }
         else {
             self::$parameter['content_exposed'] = 0;
+        }
+
+        // exclude specified content IDs?
+        if (isset(self::$parameter['content_exclude']) && !empty(self::$parameter['content_exclude'])) {
+            if (strpos(self::$parameter['content_exclude'], ',')) {
+                $explode = explode(',', self::$parameter['content_exclude']);
+                $contents = array();
+                foreach ($explode as $item) {
+                    $contents[] = intval($item);
+                }
+                self::$parameter['content_exclude'] = $contents;
+            }
+            else {
+                self::$parameter['content_exclude'] = array(intval(self::$parameter['content_exclude']));
+            }
+        }
+        else {
+            self::$parameter['content_exclude'] = null;
         }
 
         // show the content image?
