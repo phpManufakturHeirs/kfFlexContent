@@ -320,10 +320,13 @@ EOD;
      *
      * @param string $locale
      * @param integer $limit
+     * @param string $order_by default 'tag_count'
+     * @param string $order_direction default null
+     * @param array $tag_ids default null
      * @throws \Exception
      * @return Ambigous <boolean, array>
      */
-    public function selectTags($locale='EN', $limit=null, $order_by='tag_count', $order_direction=null)
+    public function selectTags($locale='EN', $limit=null, $order_by='tag_count', $order_direction=null, $tag_ids=null)
     {
         try {
             if (in_array(strtolower($order_by), array('tag_count', 'tag_name'))) {
@@ -333,6 +336,9 @@ EOD;
                         break;
                     case 'tag_name':
                         $order_by = 'tag_name';
+                        break;
+                    case 'null':
+                        $order_by = 'null';
                         break;
                     case 'tag_count':
                     default:
@@ -349,13 +355,28 @@ EOD;
             else {
                 $order_direction = 'ASC';
             }
+
             $SQL = "SELECT tags.id, tags.tag_id, tags_2.tag_count, language, tag_name, tag_permalink, tag_description, tag_image ".
                 "FROM `".self::$table_name."` tags ".
                 "JOIN (SELECT tag_id, COUNT(*) AS tag_count FROM `".self::$table_name."` GROUP BY tag_id) tags_2 ON (tags_2.tag_id = tags.tag_id) ".
                 "LEFT JOIN `".FRAMEWORK_TABLE_PREFIX.'flexcontent_tag_type'."` type ON type.tag_id = tags.tag_id ".
-                "WHERE language = '$locale' ".
-                "GROUP BY `tag_id` ".
-                "ORDER BY $order_by $order_direction";
+                "WHERE language = '$locale' ";
+
+            if (!is_null($tag_ids) && is_array($tag_ids) && !empty($tag_ids)) {
+                $in_tags = "('".implode("','", $tag_ids)."')";
+                $SQL .= "AND `tags`.`tag_id` IN $in_tags ";
+            }
+
+            $SQL .= "GROUP BY `tag_id`";
+
+            if (($order_by === 'null') && !is_null($tag_ids) && is_array($tag_ids) && !empty($tag_ids)) {
+                $in_tags = implode(',', $tag_ids);
+                $SQL .= " ORDER BY FIELD(`tags`.`tag_id`, $in_tags)";
+            }
+            elseif (!empty($order_by)) {
+                $SQL .= " ORDER BY $order_by $order_direction";
+            }
+
             if (!is_null($limit)) {
                 $SQL .= " LIMIT $limit";
             }
