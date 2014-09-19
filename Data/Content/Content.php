@@ -588,26 +588,35 @@ EOD;
      * @param integer $category_id
      * @param array $status default = PUBLISHED, BREAKING
      * @param number $limit default = 100
+     * @param string $order_by default 'publish_from'
+     * @param string $order_direction default 'DESC'
+     * @param array $exclude_ids default null
      * @throws \Exception
      * @return Ambigous <boolean, array>
      */
-    public function selectContentsByCategoryID($category_id, $status=array('PUBLISHED','BREAKING'), $limit=100, $order_by='publish_from', $order_direction='DESC')
+    public function selectContentsByCategoryID($category_id, $status=array('PUBLISHED','BREAKING'),
+        $limit=100, $order_by='publish_from', $order_direction='DESC', $exclude_ids=null)
     {
         try {
             $content_table = self::$table_name;
             $category_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
             $in_status = "('".implode("','", $status)."')";
+
+            $SQL = "SELECT * FROM `$content_table` ".
+                "LEFT JOIN `$category_table` ON `$category_table`.`content_id`=`$content_table`.`content_id` WHERE ";
+
+            if (!is_null($exclude_ids) && is_array($exclude_ids) && !empty($exclude_ids)) {
+                $in_exclude = "('".implode("','", $exclude_ids)."')";
+                $SQL .= "`$content_table`.`content_id` NOT IN $in_exclude AND ";
+            }
+
             if (in_array($order_by, array('publish_from','breaking_to','archive_from','timestamp'))) {
-                $SQL = "SELECT * FROM `$content_table` ".
-                    "LEFT JOIN `$category_table` ON `$category_table`.`content_id`=`$content_table`.`content_id` ".
-                    "WHERE `category_id`=$category_id AND `status` IN $in_status ORDER BY ".
+                $SQL .= "`category_id`=$category_id AND `status` IN $in_status ORDER BY ".
                     "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), ".
                     "`$order_by` $order_direction LIMIT $limit";
             }
             else {
-                $SQL = "SELECT * FROM `$content_table` ".
-                    "LEFT JOIN `$category_table` ON `$category_table`.`content_id`=`$content_table`.`content_id` ".
-                    "WHERE `category_id`=$category_id AND `status` IN $in_status ORDER BY ".
+                $SQL .= "`category_id`=$category_id AND `status` IN $in_status ORDER BY ".
                     "`$content_table`.`$order_by` $order_direction LIMIT $limit";
             }
 
@@ -627,12 +636,16 @@ EOD;
      * Select content by the given TAG ID, depending by status
      *
      * @param integer $tag_id
-     * @param integer $status
-     * @param number $limit
+     * @param array $status default 'PUBLISHED', 'BREAKING'
+     * @param number $limit default 100
+     * @param string $order_by default null
+     * @param string $order_direction default null
+     * @param integer $excluded_ids default null
      * @throws \Exception
      * @return Ambigous <boolean, array>
      */
-    public function selectContentsByTagID($tag_id, $status=array('PUBLISHED','BREAKING'), $limit=100)
+    public function selectContentsByTagID($tag_id, $status=array('PUBLISHED','BREAKING'),
+        $limit=100, $order_by=null, $order_direction='ASC', $excluded_ids=null)
     {
         try {
             $content_table = self::$table_name;
@@ -640,9 +653,28 @@ EOD;
             $in_status = "('".implode("','", $status)."')";
             $SQL = "SELECT * FROM `$content_table` ".
                 "LEFT JOIN `$tag_table` ON `$tag_table`.`content_id`=`$content_table`.`content_id` ".
-                "WHERE `tag_id`=$tag_id AND `status` IN $in_status ORDER BY `position` ASC, ".
-                "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), `publish_from` DESC ".
-                "LIMIT $limit";
+                "WHERE `tag_id`=$tag_id AND `status` IN $in_status ";
+
+            if (!is_null($excluded_ids)) {
+                $in_excludes = "('".implode("','", $excluded_ids)."')";
+                $SQL .= " AND `$content_table`.`content_id` NOT IN $in_excludes ";
+            }
+
+            if (!is_null($order_by)) {
+                if (in_array($order_by, array('publish_from','breaking_to','archive_from','timestamp'))) {
+                    $SQL .= "ORDER BY FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED') $order_direction, ".
+                        "`$content_table`.`$order_by` $order_direction ";
+                }
+                else {
+                    $SQL .= "ORDER BY `$content_table`.`$order_by` $order_direction ";
+                }
+            }
+            else {
+                $SQL .= "ORDER BY `position` ASC, ".
+                    "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), `publish_from` DESC ";
+            }
+
+            $SQL .= "LIMIT $limit";
             $results = $this->app['db']->fetchAll($SQL);
             $contents = array();
             if (is_array($results)) {
@@ -716,13 +748,17 @@ EOD;
      * @param array $categories_exclude don't query this categories
      * @param array $status status of contents to list
      * @param string $order_by given field(s), separated by comma
-     * @param string $order_direction default 'DESC'
+     * @param string $order_direction default 'DESC',
+     * @param string $category_type default 'DEFAULT'
+     * @param integer $paging_from default 0
+     * @param integer $paging_limit default 0
+     * @param array $exclude_ids default null
      * @return boolean|array
      */
     public function selectContentList($language, $limit=100, $categories=array(),
         $categories_exclude=array(), $status=array('PUBLISHED','BREAKING','HIDDEN','ARCHIVED'),
         $order_by='publish_from', $order_direction='DESC', $category_type='DEFAULT',
-        $paging_from=0, $paging_limit=0)
+        $paging_from=0, $paging_limit=0, $exclude_ids=null)
     {
         $content_table = self::$table_name;
         $category_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
@@ -734,6 +770,12 @@ EOD;
             "LEFT JOIN `$category_table` ON `$category_table`.`content_id`=`$content_table`.`content_id` ".
             "LEFT JOIN `$category_type_table` ON `$category_type_table`.`category_id`=`$category_table`.`category_id` ".
             "WHERE `$content_table`.`language`='$language' ";
+
+        if (!is_null($exclude_ids) && is_array($exclude_ids) && !empty($exclude_ids)) {
+            // exclude the given content IDs
+            $in_exclude = "('".implode("','", $exclude_ids)."')";
+            $SQL .= "AND `$content_table`.`content_id` NOT IN $in_exclude ";
+        }
 
         if (!empty($categories)) {
             $cats = "('".implode("','", $categories)."')";
@@ -750,8 +792,15 @@ EOD;
 
         // and the rest - GROUP BY prevents duplicate entries!
         $order_table = (in_array($order_by, $this->getColumns())) ? $content_table : $category_table;
-        $SQL .= "AND `status` IN $in_status GROUP BY `$content_table`.`content_id` ORDER BY ".
-            "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), `$order_table`.`$order_by` $order_direction ";
+        $SQL .= "AND `status` IN $in_status GROUP BY `$content_table`.`content_id` ORDER BY ";
+
+        if (in_array($order_by, array('publish_from','breaking_to','archive_from','timestamp'))) {
+            $SQL .= "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED') $order_direction, ".
+                "`$order_table`.`$order_by` $order_direction ";
+        }
+        else {
+            $SQL .= "`$order_table`.`$order_by` $order_direction ";
+        }
 
         if (($paging_from == 0) && ($paging_limit == 0)) {
             $SQL .= "LIMIT $limit";
