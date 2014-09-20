@@ -38,7 +38,9 @@ class Admin extends Alert
         self::$usage_param = (self::$usage != 'framework') ? '?usage='.self::$usage : '';
         // set the locale from the CMS locale
         if (self::$usage != 'framework') {
-            $app['translator']->setLocale($this->app['session']->get('CMS_LOCALE', 'en'));
+            if (null !== ($locale = $this->app['session']->get('CMS_LOCALE'))) {
+                $app['translator']->setLocale($locale);
+            }
         }
         $Configuration = new Configuration($app);
         self::$config = $Configuration->getConfiguration();
