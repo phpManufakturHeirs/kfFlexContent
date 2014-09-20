@@ -328,4 +328,22 @@ EOD;
         return $this->CategoryType->selectCategoryIDbyPermaLink($permalink);
     }
 
+    /**
+     * Check if the given category ID is the primary category for the content ID
+     *
+     * @param integer $category_id
+     * @param integer $content_id
+     * @throws \Exception
+     * @return boolean
+     */
+    public function isPrimaryCategory($category_id, $content_id)
+    {
+        try {
+            $SQL = "SELECT `is_primary` FROM `".self::$table_name."` WHERE `category_id`=$category_id AND `content_id`=$content_id";
+            $result = $this->app['db']->fetchColumn($SQL);
+            return ($result == 1);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
 }

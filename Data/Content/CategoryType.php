@@ -136,6 +136,7 @@ EOD;
             $results = $this->app['db']->fetchAll($SQL);
 
             $CategoryData = new Category($this->app);
+            $ContentData = new Content($this->app);
 
             $categories = array();
             foreach ($results as $result) {
@@ -143,7 +144,16 @@ EOD;
                 foreach ($columns as $column) {
                     if ($column == 'used_by_content_id') {
                         // get all flexContent ID's which are using this CATEGORY
-                        $category['used_by_content_id'] = $CategoryData->selectByCategoryID($result['category_id']);
+                        $content_ids = $CategoryData->selectByCategoryID($result['category_id']);
+                        $items = array();
+                        foreach ($content_ids as $content_id) {
+                            $items[] = array(
+                                'content_id' => $content_id,
+                                'title' => $ContentData->selectTitleByID($content_id),
+                                'is_primary' => $CategoryData->isPrimaryCategory($result['category_id'], $content_id)
+                            );
+                        }
+                        $category['used_by_content_id'] = $items;
                     }
                     else {
                         foreach ($result as $key => $value) {
@@ -278,13 +288,19 @@ EOD;
     /**
      * Get the categories for a SELECT in form.factory / Twig
      *
+     * @param string $language
      * @throws \Exception
      * @return multitype:NULL
      */
-    public function getListForSelect($language)
+    public function getListForSelect($language=null)
     {
         try {
-            $SQL = "SELECT `category_id`, `category_name` FROM `".self::$table_name."` WHERE `language`='$language' ORDER BY `category_name` ASC";
+            $SQL = "SELECT `category_id`, `category_name` FROM `".self::$table_name."` ";
+            if (!is_null($language)) {
+                $SQL .= "WHERE `language`='$language' ";
+            }
+            $SQL .= "ORDER BY `category_name` ASC";
+
             $results = $this->app['db']->fetchAll($SQL);
             $categories = array();
             foreach ($results as $category) {
@@ -443,4 +459,24 @@ EOD;
         }
     }
 
+    public function selectCategoriesByType($category_type)
+    {
+        try {
+            $SQL = "SELECT * FROM `".self::$table_name."` WHERE `category_type`='$category_type'";
+            $results = $this->app['db']->fetchAll($SQL);
+            $categories = array();
+            if (is_array($results)) {
+                foreach ($results as $result) {
+                    $category = array();
+                    foreach ($result as $key => $value) {
+                        $category[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                    }
+                    $categories[] = $category;
+                }
+            }
+            return (!empty($categories)) ? $categories : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
 }

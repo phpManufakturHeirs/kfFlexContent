@@ -318,10 +318,13 @@ EOD;
      * @param array $select_status tags, i.e. array('UNPUBLISHED','PUBLISHED')
      * @param array $order_by fields to order by
      * @param string $order_direction 'ASC' (default) or 'DESC'
+     * @param array $columns the columns to select
+     * @param integer $category_id the category ID to select, default null
      * @throws \Exception
      * @return array selected records
      */
-    public function selectList($limit_from, $rows_per_page, $select_status=null, $order_by=null, $order_direction='ASC', $columns)
+    public function selectList($limit_from, $rows_per_page, $select_status=null,
+        $order_by=null, $order_direction='ASC', $columns, $category_id=null)
     {
         try {
             $content = self::$table_name;
@@ -332,6 +335,10 @@ EOD;
                 "LEFT JOIN `$category` ON `$category`.`content_id`=`$content`.`content_id` ".
                 "LEFT JOIN `$category_type` ON `$category_type`.`category_id`=`$category`.`category_id` ".
                 "WHERE `$category`.`is_primary`=1";
+
+            if (!is_null($category_id)) {
+                $SQL .= " AND `$category`.`category_id`=$category_id";
+            }
 
             if (is_array($select_status) && !empty($select_status)) {
                 $SQL .= " AND ";
@@ -395,12 +402,28 @@ EOD;
      * @throws \Exception
      * @return integer number of records
      */
-    public function count($status=null)
+    public function count($status=null, $category_id=null)
     {
         try {
-            $SQL = "SELECT COUNT(*) FROM `".self::$table_name."`";
+            $category_table = FRAMEWORK_TABLE_PREFIX.'flexcontent_category';
+            $content_table = self::$table_name;
+
+            if (is_null($category_id)) {
+                $SQL = "SELECT COUNT(*) FROM `$content_table`";
+            }
+            else {
+                $SQL = "SELECT COUNT(`$content_table`.`content_id`) FROM `$content_table` ".
+                    "LEFT JOIN `$category_table` ON `$category_table`.`content_id`=`$content_table`.`content_id` ".
+                    "WHERE `category_id`=$category_id";
+            }
+
             if (is_array($status) && !empty($status)) {
-                $SQL .= " WHERE ";
+                if (is_null($category_id)) {
+                    $SQL .= " WHERE ";
+                }
+                else {
+                    $SQL .= " AND ";
+                }
                 $use_status = false;
                 if (is_array($status) && !empty($status)) {
                     $use_status = true;
@@ -996,6 +1019,23 @@ EOD;
             $SQL = "UPDATE `".self::$table_name."` SET `status`='ARCHIVED'  WHERE `status` IN ('PUBLISHED','BREAKING','HIDDEN') ".
                 "AND `archive_from` < '$now'";
             $this->app['db']->query($SQL);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Select the title for the given content ID
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     */
+    public function selectTitleByID($content_id)
+    {
+        try {
+            $SQL = "SELECT `title` FROM `".self::$table_name."` WHERE `content_id`=$content_id";
+            $title = $this->app['db']->fetchColumn($SQL);
+            return $this->app['utils']->unsanitizeText($title);
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }

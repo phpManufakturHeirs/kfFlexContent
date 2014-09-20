@@ -107,8 +107,8 @@
                     {% elseif (column == 'used_by_content_id') %}
                       <td class="{{ column }}">
                         {% set separator = '' %}
-                        {% for content_id in value %}
-                          {{ separator }}<a href="{{ FRAMEWORK_URL ~ route.edit_content|replace({'{content_id}':content_id}) }}">{{ '%05d'|format(content_id) }}</a>
+                        {% for content in value %}
+                          {{ separator }}<a href="{{ FRAMEWORK_URL ~ route.edit_content|replace({'{content_id}':content.content_id}) }}" title="{{ content.title }}">{% if content.is_primary %}<strong>{{ '%05d'|format(content.content_id) }}</strong>{% else %}{{ '%05d'|format(content.content_id) }}{% endif %}</a>
                           {% set separator = ', ' %}
                         {% endfor %}
                       </td>
