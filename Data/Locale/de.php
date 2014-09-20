@@ -120,7 +120,7 @@ return array(
   'DATA_UNCHANGED'
     => 'keine Änderung des importierten Inhalt',
   'delete this category type'
-    => 'diese Kategorie löschen',
+    => 'diese Kategorie löschen - <strong>Vorsicht</strong>: dieser Kategorie zugewiesene Artikel werden ebenfalls gelöscht!',
   'Delete this tag from database'
     => 'dieses Schlagwort aus der Datenbank entfernen',
   'delete this tag type'

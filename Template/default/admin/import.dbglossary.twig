@@ -1,0 +1,43 @@
+{#
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de/flexContent
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2013 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+#}
+{% if usage == 'framework' %}
+  {% set template_namespace = '@phpManufaktur/Basic/Template' %}
+  {% set template_file = 'framework/body.twig' %}
+{% else %}
+  {% set template_namespace = '@phpManufaktur/flexContent/Template' %}
+  {% set template_file = 'admin/body.twig' %}
+{% endif %}
+{% extends getTemplateFile(template_namespace, template_file) %}
+{% block title %}{{ 'flexContent - Import control list'|trans }}{% endblock %}
+{% block stylesheet %}
+  {{ parent() }}
+  {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css') %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css' }}" media="screen, projection" />
+  {% else %}
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/admin.min.css' }}" media="screen, projection" />
+  {% endif %}
+{% endblock stylesheet %}
+  
+{% block content %}
+  <div class="container{% if usage != 'framework'%}-fluid{% endif %}">
+    
+    {% if app.translator.locale == 'de' %}
+      {# GERMAN translation #}
+      <h1>Import von dbGlossary CSV Daten</h1>
+    {% else %}
+      {# ENGLISH translation #}
+      <h1>Import CSV data from dbGlossary</h1>
+    {% endif %}
+    
+    {{ alert }}
+    
+    
+  </div>
+{% endblock %}

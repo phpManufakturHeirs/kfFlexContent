@@ -45,6 +45,15 @@ if (!in_array('ROLE_FLEXCONTENT_EDITOR', $entry_points)) {
                 'path' => '/extension/phpmanufaktur/phpManufaktur/flexContent/extension.jpg',
                 'url' => MANUFAKTUR_URL.'/flexContent/extension.jpg'
             )
+        ),
+        array(
+            'route' => '/flexcontent/editor/import/dbglossary',
+            'name' => 'flexContent Import',
+            'info' => $app['translator']->trans('Import CSV file from previous dbGlossary installation'),
+            'icon' => array(
+                'path' => '/extension/phpmanufaktur/phpManufaktur/flexContent/extension.jpg',
+                'url' => MANUFAKTUR_URL.'/flexContent/extension.jpg'
+            )
         )
     );
     $app['security.role_entry_points'] = $entry_points;
@@ -146,6 +155,8 @@ $app->get('/flexcontent/editor/list/page/{page}',
     'phpManufaktur\flexContent\Control\Admin\ContentList::ControllerList');
 $app->match('/flexcontent/editor/list/search',
     'phpManufaktur\flexContent\Control\Admin\ContentList::ControllerListSearch');
+$app->post('/flexcontent/editor/list/category',
+    'phpManufaktur\flexContent\Control\Admin\ContentList::ControllerListCategory');
 
 // #hashtag functions
 $app->get('/flexcontent/editor/buzzword/autocomplete',
@@ -202,6 +213,9 @@ $app->get('/flexcontent/editor/import/id/{import_id}',
     'phpManufaktur\flexContent\Control\Admin\Import\ImportDialog::ControllerImport');
 $app->post('/flexcontent/editor/import/execute',
     'phpManufaktur\flexContent\Control\Admin\Import\ImportDialog::ControllerExecute');
+
+$app->get('/flexcontent/editor/import/dbglossary',
+    'phpManufaktur\flexContent\Control\Admin\Import\dbGlossary::Controller');
 
 // RSS functions
 $app->get('/flexcontent/editor/rss/channel/list',
