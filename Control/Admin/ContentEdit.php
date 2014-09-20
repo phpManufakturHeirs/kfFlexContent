@@ -163,17 +163,17 @@ class ContentEdit extends Admin
             'data' => self::$language,
         ))
         ->add('title', 'text', array(
-            'data' => isset($data['title']) ? $data['title'] : '',
+            'data' => isset($data['title']) ? $this->app['utils']->sanitizeText($data['title']) : '',
             'required' => self::$config['content']['field']['title']['required'],
             'label' => 'Headline'
         ))
         ->add('page_title', 'text', array(
-            'data' => isset($data['page_title']) ? $data['page_title'] : '',
+            'data' => isset($data['page_title']) ? $this->app['utils']->sanitizeText($data['page_title']) : '',
             'required' => self::$config['content']['field']['page_title']['required'],
             'label' => 'SEO: Page title'
         ))
         ->add('description', 'textarea', array(
-            'data' => isset($data['description']) ? $data['description'] : '',
+            'data' => isset($data['description']) ? $this->app['utils']->sanitizeText($data['description']) : '',
             'required' => self::$config['content']['field']['description']['required'],
             'label' => 'SEO: Description'
         ))
