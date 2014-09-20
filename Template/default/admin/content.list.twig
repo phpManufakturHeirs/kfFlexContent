@@ -38,14 +38,23 @@
         {% set kitcommand = '~~ flexContent action[list] ~~' %}
         <a id="copycommand" class="btn btn-default" role="button" href="#" data-clipboard-text="{{ kitcommand }}">~~</a>
       </div>
-      <div class="col-md-4 switch-category">&nbsp;     
+      <div class="col-md-4 switch-category">
+        <form action="{{ FRAMEWORK_URL ~ route.category }}" class="category-select" role="form" method="post">
+          <div class="input-group">
+            {{ form_widget(category_form.category) }}
+            <span class="input-group-btn">
+               <button class="btn btn-default" type="submit" title="{{ 'Click to select articles from category'|trans }}"><span class="glyphicon glyphicon-ok"></span></button>
+            </span>
+          </div>   
+          {{ form_rest(category_form) }}
+        </form>
       </div>
       <div class="col-md-4 search-article">
         <form action="{{ FRAMEWORK_URL ~ route.search }}" class="search-box" role="form" method="post">
           <div class="input-group search-content">
             <input class="form-control input-default" type="text" name="search" />
             <span class="input-group-btn">
-              <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-search"></span></button>
+              <button class="btn btn-default" type="submit" title="{{ 'Click to start search'|trans }}"><span class="glyphicon glyphicon-search"></span></button>
             </span>
           </div>
         </form>

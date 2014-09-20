@@ -156,10 +156,6 @@ select#form_secondary_categories {
   border-left: 1px dotted #a9a9a9; /*#7E9DD6;*/ 
 }
 
-form.search-box {
-  width: 200px;
-  float: right;
-}
 .search-content {
   width: 200px;
 }
@@ -167,8 +163,16 @@ form.search-box {
   max-width: 350px;
 }
 
-.list-navigation .search-box {
-  
+.create-article {
+  padding-top: 10px;
+}
+form.category-select {
+  width: 300px;
+  margin-top: 10px;
+}
+form.search-box {
+  width: 200px;
+  margin-top: 10px;
 }
 
 @media (max-width: 767px) {
@@ -176,7 +180,22 @@ form.search-box {
     text-align: left;
   }
   form.search-box {
-    width: 100%;
     float: none;
+  }
+}
+@media (min-width: 768px) {
+  form.search-box {
+    float: none;
+  }
+}
+
+@media (min-width: 992px) {
+  form.search-box {
+    float: right;
+  }
+}
+@media (min-width: 1200px) {
+  form.search-box {
+    float: right;
   }
 }

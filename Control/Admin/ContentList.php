@@ -13,10 +13,14 @@ namespace phpManufaktur\flexContent\Control\Admin;
 
 use Silex\Application;
 use phpManufaktur\flexContent\Data\Content\Content as ContentData;
+use phpManufaktur\flexContent\Data\Content\CategoryType as CategoryTypeData;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ContentList extends Admin
 {
     protected $ContentData = null;
+    protected $CategoryTypeData = null;
     protected static $route = null;
     protected static $columns = null;
     protected static $rows_per_page = null;
@@ -27,6 +31,8 @@ class ContentList extends Admin
     protected static $max_pages = null;
     protected static $ellipsis = null;
 
+    const SESSION_CATEGORY_ID = 'FLEXCONTENT_ACTIVE_CATEGORY_ID';
+
     /**
      * (non-PHPdoc)
      * @see \phpManufaktur\flexContent\Control\Backend\Backend::initialize()
@@ -36,6 +42,7 @@ class ContentList extends Admin
         parent::initialize($app);
 
         $this->ContentData = new ContentData($app);
+        $this->CategoryTypeData = new CategoryTypeData($app);
 
         try {
             // search for the config file in the template directory
@@ -63,7 +70,8 @@ class ContentList extends Admin
             'pagination' => '/flexcontent/editor/list/page/{page}?order={order}&direction={direction}&usage='.self::$usage,
             'edit' => '/flexcontent/editor/edit/id/{content_id}?usage='.self::$usage,
             'search' => '/flexcontent/editor/list/search?usage='.self::$usage,
-            'create' => '/flexcontent/editor/edit?usage='.self::$usage
+            'create' => '/flexcontent/editor/edit?usage='.self::$usage,
+            'category' => '/flexcontent/editor/list/category?usage='.self::$usage
         );
     }
 
@@ -86,12 +94,14 @@ class ContentList extends Admin
      * @param integer reference $max_pages
      * @param array $order_by
      * @param string $order_direction
+     * @param integer $category_id default null
      * @return null|array list of the selected flexContents
      */
-    protected function getList(&$list_page, $rows_per_page, $select_status=null, &$max_pages=null, $order_by=null, $order_direction='ASC')
+    protected function getList(&$list_page, $rows_per_page, $select_status=null,
+        &$max_pages=null, $order_by=null, $order_direction='ASC', $category_id=null)
     {
         // count rows
-        $count_rows = $this->ContentData->count($select_status);
+        $count_rows = $this->ContentData->count($select_status, $category_id);
 
         if ($count_rows < 1) {
             // nothing to do ...
@@ -107,7 +117,29 @@ class ContentList extends Admin
         }
         $limit_from = ($list_page * $rows_per_page) - $rows_per_page;
 
-        return $this->ContentData->selectList($limit_from, $rows_per_page, $select_status, $order_by, $order_direction, self::$columns);
+        return $this->ContentData->selectList($limit_from, $rows_per_page, $select_status,
+            $order_by, $order_direction, self::$columns, $category_id);
+    }
+
+    /**
+     * Get the form to select a category
+     *
+     * @param integer $category_id
+     */
+    protected function formCategorySelect($category_id=null)
+    {
+        return $this->app['form.factory']->createBuilder('form')
+            ->add('category', 'choice', array(
+                'choices' => $this->CategoryTypeData->getListForSelect(null),
+                'empty_value' => '- all categories -',
+                'expanded' => false,
+                'required' => false,
+                'data' => $category_id,
+                'attr' => array(
+                    'class' => 'form-control'
+                )
+            ))
+            ->getForm();
     }
 
     /**
@@ -126,7 +158,10 @@ class ContentList extends Admin
         $order_by = explode(',', $app['request']->get('order', implode(',', self::$order_by)));
         $order_direction = $app['request']->get('direction', self::$order_direction);
 
-        $contents = $this->getList(self::$current_page, self::$rows_per_page, self::$select_status, self::$max_pages, $order_by, $order_direction);
+        $contents = $this->getList(self::$current_page, self::$rows_per_page, self::$select_status,
+            self::$max_pages, $order_by, $order_direction, $app['session']->get(self::SESSION_CATEGORY_ID));
+
+        $categoryForm = $this->formCategorySelect($app['session']->get(self::SESSION_CATEGORY_ID));
 
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'admin/content.list.twig'),
@@ -142,10 +177,16 @@ class ContentList extends Admin
                 'order_direction' => strtolower($order_direction),
                 'last_page' => self::$max_pages,
                 'ellipsis' => self::$ellipsis,
-                'config' => self::$config
+                'config' => self::$config,
+                'category_form' => $categoryForm->createView()
             ));
     }
 
+    /**
+     * Controller to search any content
+     *
+     * @param Application $app
+     */
     public function ControllerListSearch(Application $app)
     {
         $this->initialize($app);
@@ -188,5 +229,36 @@ class ContentList extends Admin
                 'search' => $search,
                 'config' => self::$config
             ));
+    }
+
+    public function ControllerListCategory(Application $app)
+    {
+        $this->initialize($app);
+
+        $form = $this->formCategorySelect();
+        // get the requested data
+        $form->bind($this->app['request']);
+
+        if ($form->isValid()) {
+            // the form is valid
+            $data = $form->getData();
+            if (!is_null($data['category'])) {
+                $app['session']->set(self::SESSION_CATEGORY_ID, $data['category']);
+            }
+            else {
+                $app['session']->remove(self::SESSION_CATEGORY_ID);
+            }
+        }
+        else {
+            // general error (timeout, CSFR ...)
+            $this->setAlert('The form is not valid, please check your input and try again!', array(),
+                self::ALERT_TYPE_DANGER, true, array('form_errors' => $form->getErrorsAsString(),
+                    'method' => __METHOD__, 'line' => __LINE__));
+        }
+
+        $subRequest = Request::create('/flexcontent/editor/list', 'GET', array(
+            'usage' => self::$usage
+        ));
+        return $app->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
     }
 }
