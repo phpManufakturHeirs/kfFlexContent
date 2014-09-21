@@ -4,7 +4,7 @@
  * kitFramework::flexContent
  *
  * @author Team phpManufaktur <team@phpmanufaktur.de>
- * @link https://kit2.phpmanufaktur.de/flexContent
+ * @link https://kit2.phpmanufaktur.de
  * @copyright 2014 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
  * @license MIT License (MIT) http://www.opensource.org/licenses/MIT
  *
@@ -17,8 +17,8 @@ if ('á' != "\xc3\xa1") {
 }
 
 return array(
-    'Glossary'
-        => 'Glossar',
+  '- all categories -'
+    => '- alle Kategorien -',
   '- new entry -'
     => '- neuer Datensatz -',
   '[flexContent] Successfull installed flexContent as CMS Page Section'
@@ -81,6 +81,10 @@ return array(
     => 'Webmaster',
   'Check kitcommand'
     => 'kitCommand prüfen',
+  'Click to select articles from category'
+    => 'Anklicken um Artikel aus dieser Kategorie auszuwählen',
+  'Click to start search'
+    => 'Anklicken um die Suche auszuführen',
   'Connection is not authenticated, please check name and token!'
     => 'Die Verbindung ist nicht autorisiert, bitte prüfen Sie den Namen und die Kennung (Token)',
   'Content'
@@ -111,6 +115,8 @@ return array(
     => 'Erstellen oder Bearbeiten Sie #Hashtags',
   'Created the new tag %tag% and attached it to this content.'
     => 'Der Hashtag <b>%tag%</b> wurde erstellt und diesem flexContent Inhalt zugeordnet.',
+  'Csv file'
+    => 'CSV Datei',
   'Data handling'
     => 'Datenbearbeitung',
   'DATA_CLEAN_UP'
@@ -119,8 +125,10 @@ return array(
     => 'entfernt alle HTML Formatierungen und importiert den Inhalt als blanken Text',
   'DATA_UNCHANGED'
     => 'keine Änderung des importierten Inhalt',
+  'dbGlossary CSV file'
+    => 'dbGlossary CSV Datei',
   'delete this category type'
-    => 'diese Kategorie löschen - <strong>Vorsicht</strong>: dieser Kategorie zugewiesene Artikel werden ebenfalls gelöscht!',
+    => 'diese Kategorie löschen - <strong>Vorsicht</strong>: Artikel die diese Kategorie <strong>primär</strong> nutzen werden ebenfalls gelöscht!',
   'Delete this tag from database'
     => 'dieses Schlagwort aus der Datenbank entfernen',
   'delete this tag type'
@@ -161,8 +169,12 @@ return array(
     => 'flexContent - Import Kontrollliste',
   'flexContent - Tag types'
     => 'flexContent - Schlagwort Typen',
+  'flexContent category'
+    => 'flexContent Kategorie',
   'flexContent Server Info for <em>%server_name%</em>'
     => 'flexContent Server Information für <em>%server_name%</em>',
+  'Glossary'
+    => 'Glossar',
   'Hashtags'
     => 'Schlagwörter',
   'Headline'
@@ -175,6 +187,8 @@ return array(
     => 'Artikel ignorieren',
   'Import again'
     => 'Import wiederholen',
+  'Import CSV file from previous dbGlossary installation'
+    => 'CSV Datei aus einer früheren dbGlossary Installation importieren',
   'Import id'
     => 'ID',
   'Import now'
@@ -229,6 +243,8 @@ return array(
     => 'Bitte überprüfen Sie die <strong>Server URL</strong> für die entfernte Verbindung, momentan ist diese nicht gültig!',
   'Please check the status, the value %value% is invalid!'
     => 'Bitte überprüfen Sie den Status, der Wert %value% ist ungültig!',
+  'Please create a flexContent category of type <var>GLOSSARY</var> before you import CSV data from dbGlossary.'
+    => 'Bitte legen Sie eine <em>flexContent</em> Kategorie vom Typ <var>Glossar</var> an, bevor Sie CSV Daten aus <em>dbGlossary</em> übernehmen.',
   'Please define between %minimum% and %maximum% keywords, actual: %count%'
     => 'Bitte definieren Sie zwischen %minimum% und %maximum% Schlüsselwörter, aktuell sind es: %count%.',
   'Please define keywords for the content'
@@ -279,9 +295,9 @@ return array(
     => 'Aus der Liste entfernen',
   'Remove image'
     => 'Bild entfernen',
-  'Rss'
-    => 'RSS',
   'RSS'
+    => 'RSS',
+  'Rss'
     => 'RSS',
   'RSS Channel Image'
     => 'Abbildung',
@@ -349,9 +365,9 @@ return array(
     => 'Permanenter Link',
   'tag_name'
     => 'Bezeichner',
-  'Target URL'
-    => 'Ziel URL',
   'Target url'
+    => 'Ziel URL',
+  'Target URL'
     => 'Ziel URL',
   'Teaser'
     => 'Anreisser',
@@ -409,6 +425,8 @@ return array(
     => 'Der Seitentitel sollte eine Länge zwischen %minimum% und %maximum% Zeichen haben, zur Zeit sind es %length% Zeichen.',
   'The parameter action[%action%] is not supported for remote connections!'
     => 'Der Parameter action[%action%] wird für entfernte Verbindungen nicht unterstützt!',
+  'The parameter <var>check_jquery[]</var> is no longer available, use <var>load_jquery[]</var> instead.'
+    => 'Der Parameter <var>check_jquery[]</var> ist nicht mehr verfügbar, bitte nutzen Sie stattdessen <var>load_jquery[]</var>.',
   'The permalink <b>%permalink%</b> does not exists!'
     => 'Der PermanentLink <b>%permalink%</b> existiert nicht!',
   'The permalink %permalink% is already in use by the category type record %id%, please select another one!'
@@ -479,6 +497,8 @@ return array(
     => 'Diese Auswahl enthält keine Einträge!',
   'To make use of the <strong>remote</strong> feature you must define a <strong>remote</strong> section in the config.flexcontent.json!'
     => 'Um das <strong>remote</strong> Feature nutzen zu können, müssen Sie zunächst einen <strong>remote</strong> Abschnitt in der <em>config.flexcontent.json</em> definieren.',
+  'To use a category of type <var>EVENT</var> you need to install the kitFramework extension <strong>Contact</strong> first.'
+    => 'Um eine Kategorie vom Typ <var>Veranstaltung</var> verwenden zu können, müssen Sie zunächst die kitFramework Erweiterung <strong>Contact</strong> installieren.',
   'Unpublished'
     => 'Unveröffentlicht',
   'Updated the category type %category%'
@@ -501,5 +521,4 @@ return array(
     => 'Sie müssen eine <strong>Server URL</strong> für die entfernte Verbindung in der <em>config.flexcontent.json</em> festlegen!',
   'You must specify the <strong>token</strong> for the remote connection in the config.flexcontent.json!'
     => 'Sie müssen eine <strong>Kennung</strong> (token) für die entfernte Verbindung in der <em>config.flexcontent.json</em> festlegen!',
-
 );
