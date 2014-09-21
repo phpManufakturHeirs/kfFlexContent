@@ -17,12 +17,16 @@ use phpManufaktur\flexContent\Data\Content\CategoryType as CategoryTypeData;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use phpManufaktur\flexContent\Data\Import\WYSIWYG;
+use phpManufaktur\flexContent\Data\Content\Category as CategoryData;
+use phpManufaktur\flexContent\Data\Content\Content as ContentData;
 
 class ContentCategory extends Admin
 {
 
     protected static $category_id = null;
     protected $CategoryTypeData = null;
+    protected $CategoryData = null;
+    protected $ContentData = null;
     protected $CMSPage = null;
     protected $WYSIWYG = null;
 
@@ -44,6 +48,8 @@ class ContentCategory extends Admin
         parent::initialize($app);
 
         $this->CategoryTypeData = new CategoryTypeData($app);
+        $this->CategoryData = new CategoryData($app);
+        $this->ContentData = new ContentData($app);
         $this->CMSPage = new Page($app);
         $this->WYSIWYG = new WYSIWYG($app);
 
@@ -245,9 +251,14 @@ class ContentCategory extends Admin
 
             if (isset($category['delete']) && ($category['delete'] == 1)) {
                 // delete this tag type
+                $content_ids = $this->CategoryData->selectByCategoryID(self::$category_id, true);
+                foreach ($content_ids as $content_id) {
+                    $this->ContentData->delete($content_id);
+                }
                 $this->CategoryTypeData->delete(self::$category_id);
                 $this->setAlert('The category type %category% was successfull deleted.',
                     array('%category%' => $category['category_name']), self::ALERT_TYPE_SUCCESS);
+                $this->app['session']->remove(self::SESSION_CATEGORY_ID);
                 return true;
             }
 

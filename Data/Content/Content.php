@@ -103,6 +103,21 @@ EOD;
     }
 
     /**
+     * Delete the content with the given content ID
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     */
+    public function delete($content_id)
+    {
+        try {
+            $this->app['db']->delete(self::$table_name, array('content_id' => $content_id));
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
      * Get the RSS Status Values as associated array usage in form
      *
      * @return array
@@ -337,7 +352,13 @@ EOD;
                 "WHERE `$category`.`is_primary`=1";
 
             if (!is_null($category_id)) {
-                $SQL .= " AND `$category`.`category_id`=$category_id";
+                if (is_array($category_id)) {
+                    $in_categories = '('.implode(',', $category_id).')';
+                    $SQL .= " AND `$category`.`category_id` IN $in_categories";
+                }
+                else {
+                    $SQL .= " AND `$category`.`category_id`=$category_id";
+                }
             }
 
             if (is_array($select_status) && !empty($select_status)) {
@@ -413,8 +434,14 @@ EOD;
             }
             else {
                 $SQL = "SELECT COUNT(`$content_table`.`content_id`) FROM `$content_table` ".
-                    "LEFT JOIN `$category_table` ON `$category_table`.`content_id`=`$content_table`.`content_id` ".
-                    "WHERE `category_id`=$category_id";
+                    "LEFT JOIN `$category_table` ON `$category_table`.`content_id`=`$content_table`.`content_id` WHERE ";
+                if (is_array($category_id)) {
+                    $in_categories = '('.implode(',', $category_id).')';
+                    $SQL .= "`category_id` IN $in_categories";
+                }
+                else {
+                    $SQL .= "`category_id`=$category_id";
+                }
             }
 
             if (is_array($status) && !empty($status)) {

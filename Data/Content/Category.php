@@ -114,6 +114,21 @@ EOD;
     }
 
     /**
+     * Delete Categories by the given Category TYPE ID
+     *
+     * @param integer $category_id
+     * @throws \Exception
+     */
+    public function deleteByCategoryID($category_id)
+    {
+        try {
+            $this->app['db']->delete(self::$table_name, array('category_id' => $category_id));
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
      * Delete ID by the given CONTENT ID and CATEGORY ID
      *
      * @param integer $content_id
@@ -136,13 +151,18 @@ EOD;
      * Select the flexContent IDs which are using the given CATEGORY ID
      *
      * @param integer $category_id
+     * @param boolean $primary_only default false
      * @throws \Exception
      * @return array with content IDs
      */
-    public function selectByCategoryID($category_id)
+    public function selectByCategoryID($category_id, $primary_only=false)
     {
         try {
-            $SQL = "SELECT `content_id` FROM `".self::$table_name."` WHERE `category_id`='$category_id' ORDER BY `content_id` ASC";
+            $SQL = "SELECT `content_id` FROM `".self::$table_name."` WHERE `category_id`='$category_id' ";
+            if ($primary_only) {
+                $SQL .= "AND `is_primary`=1 ";
+            }
+            $SQL .= "ORDER BY `content_id` ASC";
             $results = $this->app['db']->fetchAll($SQL);
             $ids = array();
             foreach ($results as $result) {
