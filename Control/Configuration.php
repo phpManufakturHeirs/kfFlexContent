@@ -102,6 +102,11 @@ class Configuration
                 ),
                 'default' => 'about'
             ),
+            'list' => array(
+                'category' => array(
+                    'default' => 'DEFAULT' // possible: null, DEFAULT, EVENT, FAQ, GLOSSARY or category ID
+                )
+            ),
             'content' => array(
                 'field' => array(
                     'title' => array(

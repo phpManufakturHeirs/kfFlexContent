@@ -494,6 +494,13 @@ class Update
             $Glossary = new Glossary($this->app);
             $Glossary->createTable();
         }
+
+        if (!isset(self::$config['list'])) {
+            $default = $this->Configuration->getDefaultConfigArray();
+            self::$config['list'] = $default['list'];
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
     }
 
     /**

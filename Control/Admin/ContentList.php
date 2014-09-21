@@ -31,7 +31,7 @@ class ContentList extends Admin
     protected static $max_pages = null;
     protected static $ellipsis = null;
 
-    const SESSION_CATEGORY_ID = 'FLEXCONTENT_ACTIVE_CATEGORY_ID';
+
 
     /**
      * (non-PHPdoc)
@@ -128,13 +128,52 @@ class ContentList extends Admin
      */
     protected function formCategorySelect($category_id=null)
     {
+
+        $event_categories = $this->CategoryTypeData->selectCategoriesByType('EVENT');
+        $faq_categories = $this->CategoryTypeData->selectCategoriesByType('FAQ');
+        $glossary_categories = $this->CategoryTypeData->selectCategoriesByType('GLOSSARY');
+
+        $choices = array();
+        $choices['ALL'] = '- all categories -';
+        if ((is_array($event_categories) && count($event_categories) > 0) ||
+            (is_array($faq_categories) && count($faq_categories) > 0) ||
+            (is_array($glossary_categories) && count($glossary_categories) > 0)) {
+            $choices['DEFAULT'] = '- Articles only -';
+            if (is_array($event_categories) && count($event_categories) > 0) {
+                $choices['EVENT'] = '- Event items only -';
+            }
+            if (is_array($faq_categories) && count($faq_categories) > 0) {
+                $choices['FAQ'] = '- FAQ items only -';
+            }
+            if (is_array($glossary_categories) && count($glossary_categories) > 0) {
+                $choices['GLOSSARY'] = '- Glossary items only -';
+            }
+        }
+        $categories = $this->CategoryTypeData->getListForSelect(null);
+        foreach ($categories as $key => $value) {
+            $choices[$key] = $value;
+        }
+
+        $current = null;
+        if (!is_null($category_id)) {
+            if (is_array($category_id)) {
+                // use the first category to get the category type
+                $type = $this->CategoryTypeData->select($category_id[0]);
+                $current = $type['category_type'];
+            }
+            else {
+                // specific category selected
+                $current = $category_id;
+            }
+        }
+
         return $this->app['form.factory']->createBuilder('form')
             ->add('category', 'choice', array(
-                'choices' => $this->CategoryTypeData->getListForSelect(null),
-                'empty_value' => '- all categories -',
+                'choices' => $choices,
+                'empty_value' => false, //'- all categories -',
                 'expanded' => false,
                 'required' => false,
-                'data' => $category_id,
+                'data' => $current,
                 'attr' => array(
                     'class' => 'form-control'
                 )
@@ -154,14 +193,22 @@ class ContentList extends Admin
         if (!is_null($page)) {
             $this->setCurrentPage($page);
         }
+//$this->app['session']->remove(self::SESSION_CATEGORY_ID);
+        if (null === $app['session']->get(self::SESSION_CATEGORY_ID)) {
+             $app['session']->set(self::SESSION_CATEGORY_ID,
+                 $this->validateCategoryValue(self::$config['list']['category']['default']));
+        }
+        if (($category_id = $app['session']->get(self::SESSION_CATEGORY_ID)) < 1) {
+            $category_id = null;
+        }
 
         $order_by = explode(',', $app['request']->get('order', implode(',', self::$order_by)));
         $order_direction = $app['request']->get('direction', self::$order_direction);
 
         $contents = $this->getList(self::$current_page, self::$rows_per_page, self::$select_status,
-            self::$max_pages, $order_by, $order_direction, $app['session']->get(self::SESSION_CATEGORY_ID));
+            self::$max_pages, $order_by, $order_direction, $category_id);
 
-        $categoryForm = $this->formCategorySelect($app['session']->get(self::SESSION_CATEGORY_ID));
+        $categoryForm = $this->formCategorySelect($category_id);
 
         return $this->app['twig']->render($this->app['utils']->getTemplateFile(
             '@phpManufaktur/flexContent/Template', 'admin/content.list.twig'),
@@ -231,6 +278,38 @@ class ContentList extends Admin
             ));
     }
 
+    /**
+     * Validate the category value for usage with the SESSION
+     *
+     * @param mixed $value
+     * @return number|array
+     */
+    protected function validateCategoryValue($value)
+    {
+        switch ($value) {
+            case 'ALL':
+                return -1;
+            case 'DEFAULT':
+            case 'EVENT':
+            case 'FAQ':
+            case 'GLOSSARY':
+                $items = $this->CategoryTypeData->selectCategoriesByType($value);
+                $categories = array();
+                foreach ($items as $item) {
+                    $categories[] = $item['category_id'];
+                }
+                return $categories;
+            default:
+                return $value;
+        }
+    }
+
+    /**
+     * Controller for the category selection
+     *
+     * @param Application $app
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
     public function ControllerListCategory(Application $app)
     {
         $this->initialize($app);
@@ -243,10 +322,10 @@ class ContentList extends Admin
             // the form is valid
             $data = $form->getData();
             if (!is_null($data['category'])) {
-                $app['session']->set(self::SESSION_CATEGORY_ID, $data['category']);
+                $app['session']->set(self::SESSION_CATEGORY_ID, $this->validateCategoryValue($data['category']));
             }
             else {
-                $app['session']->remove(self::SESSION_CATEGORY_ID);
+                $app['session']->set(self::SESSION_CATEGORY_ID, 'ALL');  //remove(self::SESSION_CATEGORY_ID);
             }
         }
         else {

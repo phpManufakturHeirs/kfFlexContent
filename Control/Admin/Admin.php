@@ -24,6 +24,8 @@ class Admin extends Alert
     protected static $usage_param = null;
     protected static $config = null;
 
+    const SESSION_CATEGORY_ID = 'FLEXCONTENT_ACTIVE_CATEGORY_ID';
+
     /**
      * Initialize the class with the needed parameters
      *
