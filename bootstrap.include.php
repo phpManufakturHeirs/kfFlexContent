@@ -216,6 +216,8 @@ $app->post('/flexcontent/editor/import/execute',
 
 $app->get('/flexcontent/editor/import/dbglossary',
     'phpManufaktur\flexContent\Control\Admin\Import\dbGlossary::Controller');
+$app->post('/flexcontent/editor/import/dbglossary/execute',
+    'phpManufaktur\flexContent\Control\Admin\Import\dbGlossary::ControllerExecute');
 
 // RSS functions
 $app->get('/flexcontent/editor/rss/channel/list',

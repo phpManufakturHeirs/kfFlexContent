@@ -20,6 +20,7 @@ use phpManufaktur\flexContent\Data\Content\RSSViewCounter;
 use phpManufaktur\flexContent\Data\Content\RSSViewStatistic;
 use phpManufaktur\flexContent\Data\Content\Event;
 use Symfony\Component\Finder\Finder;
+use phpManufaktur\flexContent\Data\Content\Glossary;
 
 class Update
 {
@@ -486,6 +487,12 @@ class Update
                 $this->Configuration->setConfiguration(self::$config);
                 $this->Configuration->saveConfiguration();
             }
+        }
+
+        if (false === $this->app['db.utils']->tableExists(FRAMEWORK_TABLE_PREFIX.'flexcontent_glossary')) {
+            // create the Glossary extension table
+            $Glossary = new Glossary($this->app);
+            $Glossary->createTable();
         }
     }
 

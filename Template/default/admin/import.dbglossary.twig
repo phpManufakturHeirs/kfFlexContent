@@ -19,10 +19,11 @@
 {% block stylesheet %}
   {{ parent() }}
   {% if fileExists(MANUFAKTUR_PATH ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css') %}
-    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css' }}" media="screen, projection" />
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/' ~ FRAMEWORK_TEMPLATES.0 ~ '/css/admin.min.css' }}" />
   {% else %}
-    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/admin.min.css' }}" media="screen, projection" />
+    <link rel="stylesheet" type="text/css" href="{{ MANUFAKTUR_URL ~ '/flexContent/Template/default/css/admin.min.css' }}" />
   {% endif %}
+  <link rel="stylesheet" type="text/css" href="{{ LIBRARY_URL ~ '/jasny-bootstrap/latest/css/jasny-bootstrap.min.css' }}" />
 {% endblock stylesheet %}
   
 {% block content %}
@@ -31,13 +32,61 @@
     {% if app.translator.locale == 'de' %}
       {# GERMAN translation #}
       <h1>Import von dbGlossary CSV Daten</h1>
+      {% if alert|length == 0 %}
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <p>Sie können Daten aus <em>dbGlossary</em> in <em>flexContent</em> übernehmen.</p>
+            <p>Exportieren Sie in <em>dbGlossary</em> die gewünschten Einträge als <var>CSV</var> Datei, legen Sie in <em>flexContent</em> eine Kategorie vom Typ <var>Glossar</var> an und übernehmen Sie die Daten mit Hilfe dieses Dialog.</p>
+          </div>
+        </div>
+      {% endif %}
     {% else %}
       {# ENGLISH translation #}
       <h1>Import CSV data from dbGlossary</h1>
+      
+      {% if alert|length == 0 %}
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <p>You can import your <em>dbGlossary</em> data into <em>flexContent</em>.</p>
+            <p>In <em>dbGlossary</em> export the data you want to use as <var>CSV</var> file, in <em>flexContent</em> create a category of type <var>Glossary</var> and import the data with this dialog.</p>
+          </div>
+        </div>
+      {% endif %}
     {% endif %}
     
     {{ alert }}
     
+    {% if alert|length == 0 %}
+      <form class="form-horizontal" action="{{ FRAMEWORK_URL ~ '/flexcontent/editor/import/dbglossary/execute?usage=' ~ usage }}" method="post" {{ form_enctype(form) }} role="form">
+        <div class="form-group">
+          <label class="col-sm-3 control-label">{{ 'dbGlossary CSV file'|trans }}</label>
+          <div class="col-md-5 col-sm-6">
+            <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+              <div class="form-control" data-trigger="fileinput"><i class="glyphicon glyphicon-file fileinput-exists"></i> <span class="fileinput-filename"></span></div>
+              <span class="input-group-addon btn btn-default btn-file"><span class="fileinput-new">{{ 'Select file'|trans }}</span><span class="fileinput-exists">{{ 'Change'|trans }}</span>{{ form_widget(form.csv_file) }}</span>
+              <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">{{ 'Remove'|trans }}</a>
+            </div>
+          </div>
+        </div>  
+        <div class="form-group">
+          <label class="col-sm-3 control-label">{{ 'flexContent category'|trans }}</label>
+          <div class="col-md-5 col-sm-6">
+            {{ form_widget(form.category) }}
+          </div>
+        </div>    
+        {{ form_rest(form) }}
+        <div class="form-group">
+          <div class="col-sm-offset-3 col-md-5 col-sm-6">
+            <button type="submit" class="btn btn-default form-control">{{ 'Start import'|trans }}</button>
+          </div>
+        </div>
+      </form>  
+    {% endif %}
     
   </div>
 {% endblock %}
+
+{% block footer_jquery %}
+  {{ parent() }}
+  <script src="{{ LIBRARY_URL }}/jasny-bootstrap/latest/js/jasny-bootstrap.min.js"></script>
+{% endblock footer_jquery %}
