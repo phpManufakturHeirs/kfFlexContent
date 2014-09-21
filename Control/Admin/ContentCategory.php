@@ -251,6 +251,12 @@ class ContentCategory extends Admin
                 return true;
             }
 
+            if (($category['category_type'] === 'EVENT') && !$this->app->offsetExists('contact')) {
+                $this->setAlert('To use a category of type <var>EVENT</var> you need to install the kitFramework extension <strong>Contact</strong> first.',
+                    array(), self::ALERT_TYPE_INFO);
+                return false;
+            }
+
             if (empty($category['category_name'])) {
                 $this->setAlert('Please type in a name for the category type.', array(), self::ALERT_TYPE_WARNING);
                 return false;
