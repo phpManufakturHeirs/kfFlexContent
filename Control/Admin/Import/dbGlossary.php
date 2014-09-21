@@ -108,8 +108,10 @@ class dbGlossary extends Alert
     {
         $cats = $this->DataCategoryType->selectCategoriesByType('GLOSSARY');
         $categories = array();
-        foreach ($cats as $cat) {
-            $categories[$cat['category_id']] = $cat['category_name'];
+        if (is_array($cats)) {
+            foreach ($cats as $cat) {
+                $categories[$cat['category_id']] = $cat['category_name'];
+            }
         }
 
         return $this->app['form.factory']->createBuilder('form')
@@ -205,7 +207,7 @@ class dbGlossary extends Alert
         $added_glossary_item = array();
 
         foreach ($importCSV as $import) {
-            if ($import['gl_type'] === 5) {
+            if ($import['gl_type'] == 5) {
                 $skipped_glossary_redirect[$import['gl_item']] = $import['gl_explain'];
                 $this->app['monolog']->addDebug("[flexContent dbGlossary Import] Skipped dbGlossary redirect {$import['gl_item']} => {$import['gl_explain']}");
                 continue;

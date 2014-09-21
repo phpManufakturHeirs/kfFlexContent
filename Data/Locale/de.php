@@ -19,6 +19,14 @@ if ('á' != "\xc3\xa1") {
 return array(
   '- all categories -'
     => '- alle Kategorien -',
+  '- Articles only -'
+    => '- nur Artikel -',
+  '- Event items only -'
+    => '- nur Veranstaltungen -',
+  '- FAQ items only -'
+    => '- nur FAQ Einträge -',
+  '- Glossary items only -'
+    => '- nur Glossar Einträge -',
   '- new entry -'
     => '- neuer Datensatz -',
   '[flexContent] Successfull installed flexContent as CMS Page Section'
@@ -175,6 +183,8 @@ return array(
     => 'flexContent Server Information für <em>%server_name%</em>',
   'Glossary'
     => 'Glossar',
+  'Got no file handle for <var>%file%</var>.'
+    => 'Erhielt keinen Zugriff auf <var>%file%</var>.',
   'Hashtags'
     => 'Schlagwörter',
   'Headline'
@@ -221,6 +231,10 @@ return array(
     => 'Kein aktiver Inhalt verfügbar!',
   'No category available for the language %language%, please create a category first!'
     => 'Es existiert keine Kategorie für die Sprache %language%, bitte erstellen Sie zunächst eine Kategorie!',
+  '<p>No <em>dbGlossary</em> items imported.</p><p>Skipped <em>dbGlossary redirects</em>: %skipped_redirect% items,<br>Skipped already existing items: %skipped_existing%,<br>Skipped due <em>permanent link</em> conflict: %skipped_permanentlink%.</p><p>Check protocol for detailed information.</p>'
+    => '<p>Es wurden keine <em>dbGlossary</em> Einträge importiert.</p><p>Übersprungene <em>dbGlossary Weiterleitungen</em>:%skipped_redirect%,<br>Bereits existierende Einträge übersprungen: %skipped_existing%,<br>Überprungen wegen <em>Permanent Link</em> Konflikten: %skipped_permanentlink%.</p><p>Prüfen Sie das Protokoll für detailierte Informationen.</p>',
+  'Oooops, can not evaluate the mime type of the uploaded file, abort submission.'
+    => 'Hoppla, kann den MIME Typ der übertragenen Datei nicht ermitteln, Import abgebrochen.',
   'Oooops, got a server response, but don\'t know how to handle it: %response%'
     => 'Hoppla, habe eine Server Antwort erhalten, weiß aber nicht wie diese zu handhaben ist: %response%',
   'Organize and present contents in a flexible way'
@@ -295,9 +309,9 @@ return array(
     => 'Aus der Liste entfernen',
   'Remove image'
     => 'Bild entfernen',
-  'RSS'
-    => 'RSS',
   'Rss'
+    => 'RSS',
+  'RSS'
     => 'RSS',
   'RSS Channel Image'
     => 'Abbildung',
@@ -341,6 +355,8 @@ return array(
     => 'Entschuldigung, der RSS Kanal %title% ist momentan nicht verfügbar!',
   'Succesfull updated the flexContent record with the ID %id%'
     => 'Der flexContent Datensatz mit der ID %id% wurde aktualisiert.',
+  '<p>Successful imported <strong>%items%</strong> <em>dbGlossary</em> items.</p><p>Skipped <em>dbGlossary redirects</em>: %skipped_redirect% items,<br>Skipped already existing items: %skipped_existing%,<br>Skipped due <em>permanent link</em> conflict: %skipped_permanentlink%.</p><p>Check protocol for detailed information.</p>'
+    => '<p>Es wurden insgesamt <strong>%items%</strong> <em>dbGlossary</em> Einträge importiert.</p><p>Übersprungene <em>dbGlossary Weiterleitungen</em>:%skipped_redirect%,<br>Bereits existierende Einträge übersprungen: %skipped_existing%,<br>Überprungen wegen <em>Permanent Link</em> Konflikten: %skipped_permanentlink%.</p><p>Prüfen Sie das Protokoll für detailierte Informationen.</p>',
   'Successfull create the new category type %category%.'
     => 'Die Kategorie <b>%category%</b> wurde erfolgreich erstellt.',
   'Successfull create the new RSS Channel %title%.'
@@ -499,6 +515,8 @@ return array(
     => 'Um das <strong>remote</strong> Feature nutzen zu können, müssen Sie zunächst einen <strong>remote</strong> Abschnitt in der <em>config.flexcontent.json</em> definieren.',
   'To use a category of type <var>EVENT</var> you need to install the kitFramework extension <strong>Contact</strong> first.'
     => 'Um eine Kategorie vom Typ <var>Veranstaltung</var> verwenden zu können, müssen Sie zunächst die kitFramework Erweiterung <strong>Contact</strong> installieren.',
+  'Unexpected structure of the dbGlossary CSV file!'
+    => 'Unerwartete Struktur der übermittelten dbGlossary CSV Datei!',
   'Unpublished'
     => 'Unveröffentlicht',
   'Updated the category type %category%'
