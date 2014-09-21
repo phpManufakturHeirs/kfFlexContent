@@ -62,7 +62,7 @@ class CategoryType
 EOD;
         try {
             $this->app['db']->query($SQL);
-            $this->app['monolog']->addInfo("Created table 'flexcontent_category_type'", array(__METHOD__, __LINE__));
+            $this->app['monolog']->addInfo('Created table '.$table, array(__METHOD__, __LINE__));
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }
