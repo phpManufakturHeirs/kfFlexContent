@@ -1,0 +1,39 @@
+{
+  "command":"filter:Glossary",
+  "vendor": {
+    "name":"phpManufaktur",
+    "url":"https://kit2.phpmanufaktur.de"
+    },
+  "name": {
+    "en":"Glossary",
+    "de":"Glossary"
+  },
+  "description": {
+    "en":"This filter allow the auto-linking for all flexContent entries which are embedded with two double-at signs.",
+    "de":"Dieser Filter ermöglicht die automatische Verlinkung von flexContent Einträgen, die mit zwei doppelten @ Zeichen gekennzeichnet sind."
+  },
+  "help": {
+    "en": {
+      "link":"https://gist.github.com/077bfd17ef08c0f39e3a.git",
+      "gist_id":"077bfd17ef08c0f39e3a",
+      "file": {
+        "help":"kitfilter_glossary_en.md"
+      }
+    }
+  },
+  "info": {
+    "en": {
+      "link":"https://kit2.phpmanufaktur.de"
+    }
+  },
+  "issues": {
+    "en": {
+      "link":"https://github.com/phpManufaktur/kfFlexContent/issues"
+    }
+  },
+  "support": {
+    "en": {
+      "link":"https://support.phpmanufaktur.de"
+    }
+  }
+}

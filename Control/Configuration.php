@@ -551,7 +551,28 @@ class Configuration
             ),
             'glossary' => array(
                 'filter' => array(
-                    'enabled' => true
+                    'enabled' => true,
+                    'replacement' => array(
+                        'not_exists' => array(
+                            'title' => "There exists no Glossary entry for '{search}'!",
+                            'html' => '<span class="glossary not-exists" title="{title}">{text}</span>'
+                        ),
+                        'inactive' => array(
+                            'html' => '<span class="glossary inactive">{text}</span>'
+                        ),
+                        'link' => array(
+                            'html' => '<a class="glossary link" href="{url}" target="{target}">{replacement}</a>'
+                        ),
+                        'abbreviation' => array(
+                            'html' => '<abbr class="glossary abbreviation" title="{explain}">{text}</abbr>'
+                        ),
+                        'acronym' => array(
+                            'html' => '<abbr class="glossary acronym" title="{explain}">{text}</abbr>'
+                        ),
+                        'keyword' => array(
+                            'html' => '<span class="glossary keyword" title="{explain}">{text}</span>'
+                        )
+                    )
                 )
             ),
             'search' => array(

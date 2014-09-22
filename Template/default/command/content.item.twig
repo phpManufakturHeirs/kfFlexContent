@@ -9,16 +9,16 @@
     {% endif %}   
     {# add the margin, padding and border of img-thumbnail to the min-width! #}
     <div class="pull-left media-object" style="width:{{ parameter.content_image_small_max_width }}px;min-height:{{ parameter.content_image_small_max_height+30 }}px;padding: 0 30px 30px 0;">
-      <a href="{{ url }}" target="{{ target }}">
+      {% if url|length > 0 %}<a href="{{ url }}" target="{{ target }}">{% endif %}
         <img class="img-responsive img-thumbnail" src="{{ img_url }}" alt="{{ content.title }}" title="{{ content.title }}" />
-      </a>
+      {% if url|length > 0 %}</a>{% endif %}
     </div>
   {% endif %}
   <div class="media-body">
     {% if parameter.content_title %}
-      <a href="{{ url }}" target="{{ target }}">
+      {% if url|length > 0 %}<a href="{{ url }}" target="{{ target }}">{% endif %}
         <h{{ parameter.title_level+2|default('3') }} class="media-heading">{{ content.title|default('') }}</h{{ parameter.title_level+2|default('3') }}>
-      </a>
+      {% if url|length > 0 %}</a>{% endif %}
     {% endif %}
     {% if content.event_date_from is defined %}
       <div class="event-info">
@@ -37,9 +37,11 @@
       {% else %}
         {{ content.content }}
       {% endif %}
-      <div class="go-ahead">
-        <a href="{{ url }}" target="{{ target }}">{{ 'read more'|trans }} ...</a>
-      </div>
+      {% if url|length > 0 %}
+        <div class="go-ahead">
+          <a href="{{ url }}" target="{{ target }}">{{ 'read more'|trans }} ...</a>
+        </div>
+      {% endif %}
       {% if parameter.content_tags and content.tags|length > 0 %}
         <div class="content-tags">
           {% for tag in content.tags %}

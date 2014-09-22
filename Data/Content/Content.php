@@ -674,11 +674,15 @@ EOD;
             if (in_array($order_by, array('publish_from','breaking_to','archive_from','timestamp'))) {
                 $SQL .= "`category_id`=$category_id AND `status` IN $in_status ORDER BY ".
                     "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED'), ".
-                    "`$order_by` $order_direction LIMIT $limit";
+                    "`$order_by` $order_direction";
             }
             else {
                 $SQL .= "`category_id`=$category_id AND `status` IN $in_status ORDER BY ".
-                    "`$content_table`.`$order_by` $order_direction LIMIT $limit";
+                    "`$content_table`.`$order_by` $order_direction";
+            }
+
+            if (!is_null($limit)) {
+                $SQL .= " LIMIT $limit";
             }
 
             $results = $this->app['db']->fetchAll($SQL);
@@ -857,17 +861,17 @@ EOD;
 
         if (in_array($order_by, array('publish_from','breaking_to','archive_from','timestamp'))) {
             $SQL .= "FIELD (`status`,'BREAKING','PUBLISHED','HIDDEN','ARCHIVED','UNPUBLISHED','DELETED') $order_direction, ".
-                "`$order_table`.`$order_by` $order_direction ";
+                "`$order_table`.`$order_by` $order_direction";
         }
         else {
-            $SQL .= "`$order_table`.`$order_by` $order_direction ";
+            $SQL .= "`$order_table`.`$order_by` $order_direction";
         }
 
-        if (($paging_from == 0) && ($paging_limit == 0)) {
-            $SQL .= "LIMIT $limit";
+        if (!is_null($limit) && ($paging_from == 0) && ($paging_limit == 0)) {
+            $SQL .= " LIMIT $limit";
         }
-        else {
-            $SQL .= "LIMIT $paging_from, $paging_limit";
+        elseif (!is_null($limit)) {
+            $SQL .= " LIMIT $paging_from, $paging_limit";
         }
         $results = $this->app['db']->fetchAll($SQL);
 

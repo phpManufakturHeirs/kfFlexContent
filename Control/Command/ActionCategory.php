@@ -270,7 +270,20 @@ class ActionCategory extends Basic
         self::$parameter['order_direction'] = (isset(self::$parameter['order_direction'])) ? strtoupper(self::$parameter['order_direction']) : 'DESC';
 
         // limit for the content items
-        self::$parameter['content_limit'] = (isset(self::$parameter['content_limit'])) ? intval(self::$parameter['content_limit']) : $default_parameter['content_limit'];
+        if (isset(self::$parameter['content_limit'])) {
+            if (false !== ($limit = filter_var(self::$parameter['content_limit'], FILTER_VALIDATE_INT))) {
+                self::$parameter['content_limit'] = $limit;
+            }
+            elseif (strtolower(self::$parameter['content_limit']) == 'null') {
+                self::$parameter['content_limit'] = null;
+            }
+            else {
+                self::$parameter['content_limit'] = $default_parameter['content_limit'];
+            }
+        }
+        else {
+            self::$parameter['content_limit'] = $default_parameter['content_limit'];
+        }
 
         // expose content items?
         self::$parameter['content_exposed'] = (isset(self::$parameter['content_exposed'])) ? intval(self::$parameter['content_exposed']) : $default_parameter['content_exposed'];

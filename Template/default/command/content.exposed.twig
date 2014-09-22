@@ -14,9 +14,9 @@
         {% set img = image(content.teaser_image, parameter.content_image_max_width, parameter.content_image_max_height) %}
         {% set img_url = img.src %}
       {% endif %}
-      <a href="{{ url }}" target="{{ target }}">
+      {% if url|length > 0 %}<a href="{{ url }}" target="{{ target }}">{% endif %}
         <img class="img-responsive img-rounded" src="{{ img_url }}" alt="{{ content.title }}" title="{{ content.title }}" />
-      </a>
+      {% if url|length > 0 %}</a>{% endif %}
     {% endif %}
     <div class="caption">
       {% if parameter.content_categories %}
@@ -30,9 +30,9 @@
         </div>
       {% endif %}
       {% if parameter.content_title %}
-        <a href="{{ url }}" target="{{ target }}">
+        {% if url|length > 0 %}<a href="{{ url }}" target="{{ target }}">{% endif %}
           <h{{ parameter.title_level+1|default('2') }}>{{ content.title|default('') }}</h{{ parameter.title_level+1|default('1') }}>
-        </a>
+        {% if url|length > 0 %}</a>{% endif %}
       {% endif %}
       {% if content.event_date_from is defined %}
         <div class="event-info">
@@ -56,9 +56,11 @@
         {% else %}
           {{ content.content }}
         {% endif %}
-        <div class="go-ahead">
-          <a href="{{ url }}" target="{{ target }}">{{ 'read more'|trans }} ...</a>
-        </div>
+        {% if url|length > 0 %}
+          <div class="go-ahead">
+            <a href="{{ url }}" target="{{ target }}">{{ 'read more'|trans }} ...</a>
+          </div>
+        {% endif %}
       {% endif %}
       {% if parameter.content_tags and content.tags|length > 0 %}
         <div class="content-tags">

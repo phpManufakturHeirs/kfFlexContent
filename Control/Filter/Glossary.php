@@ -13,6 +13,7 @@ namespace phpManufaktur\flexContent\Control\Filter;
 
 use Silex\Application;
 use phpManufaktur\flexContent\Control\Configuration;
+use phpManufaktur\flexContent\Data\Content\Glossary as GlossaryData;
 
 class Glossary
 {
@@ -21,6 +22,7 @@ class Glossary
     protected static $content = null;
     protected static $filter_expression = null;
     protected static $config = null;
+    protected $GlossaryData = null;
 
     /**
      * Initialize the Glossary filter
@@ -54,6 +56,8 @@ class Glossary
 
         $Configuration = new Configuration($app);
         self::$config = $Configuration->getConfiguration();
+
+        $this->GlossaryData = new GlossaryData($app);
     }
 
     /**
@@ -83,14 +87,73 @@ class Glossary
                 $search = trim($search);
             }
             else {
-                $text = filter_string;
+                $text = $filter_string;
                 $search = strtolower($filter_string);
             }
+            $search = $this->app['utils']->specialCharsToAsciiChars($search, true);
 
-//echo $filter_string;
-            self::$content = str_replace($filter_expression, $filter_string, self::$content);
+            if (false !== ($content_id = $this->GlossaryData->existsUnique($search))) {
+
+                if (false !== ($glossary = $this->GlossaryData->selectContentIdForFilter($content_id))) {
+                    if (!in_array($glossary['status'], array('PUBLISHED', 'BREAKING'))) {
+                        // can't show this explanation
+                        $replacement = str_replace('{text}', $text,
+                            self::$config['glossary']['filter']['replacement']['inactive']['html']);
+                        self::$content = str_replace($filter_expression, $replacement, self::$content);
+                    }
+                    else {
+                        switch ($glossary['glossary_type']) {
+                            case 'ABBREVIATION':
+                                $template = self::$config['glossary']['filter']['replacement']['abbreviation']['html'];
+                                break;
+                            case 'ACRONYM':
+                                $template = self::$config['glossary']['filter']['replacement']['acronym']['html'];
+                                break;
+                            case 'KEYWORD':
+                                $template = self::$config['glossary']['filter']['replacement']['keyword']['html'];
+                                break;
+                            default:
+                                $template = null;
+                                $this->app['monolog']->addDebug("[filter:Glossary] Unknown glossary type {$glossary['glossary_type']} for flexContent ID $content_id.");
+                                break;
+                        }
+                        if (!is_null($template)) {
+                            // create the term
+                            $replacement = str_replace(array('{text}', '{explain}'),
+                                array($text, strip_tags($glossary['teaser'])), $template);
+                            if (!empty($glossary['redirect_url'])) {
+                                // add a redirect URL to the term
+                                $replacement = str_replace(array('{url}', '{target}', '{replacement}'),
+                                    array($glossary['redirect_url'], $glossary['redirect_target'], $replacement),
+                                    self::$config['glossary']['filter']['replacement']['link']['html']);
+                            }
+                            elseif (!empty($glossary['content'])) {
+                                // add a permanent link to the term
+                                 $permalink_base_url = CMS_URL.str_ireplace('{language}', strtolower($glossary['language']), self::$config['content']['permalink']['directory']);
+                                 $replacement = str_replace(array('{url}', '{target}', '{replacement}'),
+                                    array($permalink_base_url.'/'.$glossary['permalink'], '_self', $replacement),
+                                    self::$config['glossary']['filter']['replacement']['link']['html']);
+                            }
+                            self::$content = str_replace($filter_expression, $replacement, self::$content);
+                        }
+                    }
+                }
+
+            }
+            else {
+                // there exists no entry - indicate the entry
+                $replacement = str_replace(
+                    array('{title}', '{text}'),
+                    array(
+                        $this->app['translator']->trans(self::$config['glossary']['filter']['replacement']['not_exists']['title'],
+                            array('{search}' => $search)),
+                        $text
+                    ),
+                    self::$config['glossary']['filter']['replacement']['not_exists']['html']);
+                self::$content = str_replace($filter_expression, $replacement, self::$content);
+            }
         }
-
+        // return the parsed content
         return self::$content;
     }
 

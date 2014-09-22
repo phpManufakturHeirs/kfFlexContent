@@ -324,7 +324,21 @@ class ActionList extends Basic
 
 
         // limit for the content items
-        self::$parameter['content_limit'] = (isset(self::$parameter['content_limit'])) ? intval(self::$parameter['content_limit']) : $default_parameter['content_limit'];
+        if (isset(self::$parameter['content_limit'])) {
+            if (false !== ($limit = filter_var(self::$parameter['content_limit'], FILTER_VALIDATE_INT))) {
+                self::$parameter['content_limit'] = $limit;
+            }
+            elseif (strtolower(self::$parameter['content_limit']) == 'null') {
+                self::$parameter['content_limit'] = null;
+            }
+            else {
+                self::$parameter['content_limit'] = $default_parameter['content_limit'];
+            }
+        }
+        else {
+            self::$parameter['content_limit'] = $default_parameter['content_limit'];
+        }
+
 
         if (self::$parameter['type'] == 'default') {
             // expose content items?

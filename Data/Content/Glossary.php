@@ -17,6 +17,7 @@ class Glossary
 {
     protected $app = null;
     protected static $table_name = null;
+    protected $ContentData = null;
 
     /**
      * Constructor
@@ -27,7 +28,6 @@ class Glossary
     {
         $this->app = $app;
         self::$table_name = FRAMEWORK_TABLE_PREFIX.'flexcontent_glossary';
-        $this->EventData = new Event($app);
     }
 
     /**
@@ -174,6 +174,46 @@ EOD;
             $SQL = "SELECT * FROM `".self::$table_name."` WHERE `content_id`='$content_id'";
             $glossary = $this->app['db']->fetchAssoc($SQL);
             return (is_array($glossary) && isset($glossary['glossary_id'])) ? $glossary : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Replace placeholders with the real CMS and framework URLs
+     *
+     * @param string reference $content
+     * @return string
+     */
+    protected function replacePlaceholderWithURL(&$content)
+    {
+        $search = array('{flexContent:FRAMEWORK_URL}','{flexContent:CMS_MEDIA_URL}', '{flexContent:CMS_URL}');
+        $replace = array(FRAMEWORK_URL, CMS_MEDIA_URL, CMS_URL);
+        $content = str_replace($search, $replace, $content);
+        return $content;
+    }
+
+    public function selectContentIdForFilter($content_id)
+    {
+        try {
+            $glossary = self::$table_name;
+            $content = FRAMEWORK_TABLE_PREFIX.'flexcontent_content';
+
+            $SQL = "SELECT `status`, `title`, `glossary_type`, `teaser`, `content`, `redirect_url`, ".
+                "`redirect_target`, `$content`.`language`, `permalink` FROM `$content` ".
+                "LEFT JOIN `$glossary` ON `$glossary`.`content_id`=`$content`.`content_id` ".
+                "WHERE `$content`.`content_id`=$content_id";
+            $result = $this->app['db']->fetchAssoc($SQL);
+            $glossary_item = array();
+            if (is_array($result)) {
+                foreach ($result as $key => $value) {
+                    if ($key == 'teaser') {
+                        $value = $this->replacePlaceholderWithURL($value);
+                    }
+                    $glossary_item[$key] = is_string($value) ? $this->app['utils']->unsanitizeText($value) : $value;
+                }
+            }
+            return (!empty($glossary_item)) ? $glossary_item : false;
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }

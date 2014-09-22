@@ -1,0 +1,35 @@
+/*
+  flexContent
+
+  @author Team phpManufaktur <team@phpmanufaktur.de>
+  @link https://kit2.phpmanufaktur.de/flexContent
+  @link https://github.com/phpManufaktur/kitFramework/wiki
+  @copyright 2014 Ralf Hertsch <ralf.hertsch@phpmanufaktur.de>
+  @license MIT License (MIT) http://www.opensource.org/licenses/MIT
+*/
+
+.glossary.not-exists {
+  color: #363636;
+  background-color: #ffe4b5;
+  padding: 2px;
+}
+
+.glossary.inactive {
+  color: #c6c6c6;
+  background-color: transparent;
+  font-style: italic;
+}
+
+.glossary.acronym,
+.glossary.abbreviation,
+.glossary.keyword {
+  cursor: help;
+  border-bottom: 1px dotted #da251d;
+}
+
+a.glossary.link .glossary.abbreviation,
+a.glossary.link .glossary.acronym,
+a.glossary.link .glossary.keyword {
+  cursor: default;
+  border: none;
+}
