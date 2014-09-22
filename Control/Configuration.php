@@ -194,6 +194,9 @@ class Configuration
                     'event_location' => array(
                         'required' => false,
                         'tags' => array()
+                    ),
+                    'glossary_type' => array(
+                        'required' => true
                     )
                 ),
                 'permalink' => array(
@@ -544,6 +547,11 @@ class Configuration
                             )
                         )
                     )
+                )
+            ),
+            'glossary' => array(
+                'filter' => array(
+                    'enabled' => true
                 )
             ),
             'search' => array(

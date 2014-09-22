@@ -23,6 +23,7 @@ use phpManufaktur\flexContent\Data\Content\CategoryType;
 use phpManufaktur\flexContent\Data\Import\WYSIWYG;
 use phpManufaktur\Basic\Data\CMS\Page;
 use phpManufaktur\flexContent\Data\Content\Event;
+use phpManufaktur\flexContent\Data\Content\Glossary as GlossaryData;
 
 class ContentEdit extends Admin
 {
@@ -35,6 +36,7 @@ class ContentEdit extends Admin
     protected $WYSIWYG = null;
     protected $CMSPage = null;
     protected $EventData = null;
+    protected $GlossaryData = null;
 
     protected static $language = null;
 
@@ -55,6 +57,7 @@ class ContentEdit extends Admin
         $this->WYSIWYG = new WYSIWYG($app);
         $this->CMSPage = new Page($app);
         $this->EventData = new Event($app);
+        $this->GlossaryData = new GlossaryData($app);
 
         self::$language = $this->app['request']->get('form[language]', self::$config['content']['language']['default'], true);
     }
@@ -111,6 +114,7 @@ class ContentEdit extends Admin
             $this->setAlert('No category available for the language %language%, please create a category first!',
                 array('%language%' => $this->app['translator']->trans(self::$language)), self::ALERT_TYPE_WARNING);
         }
+        $categories_second = $this->CategoryTypeData->getListForSelect(self::$language, true);
 
         // show the permalink URL
         $permalink_url = CMS_URL.str_ireplace('{language}', strtolower(self::$language), self::$config['content']['permalink']['directory']).'/';
@@ -155,6 +159,9 @@ class ContentEdit extends Admin
         ->add('event_date_to', 'hidden')
         ->add('event_organizer', 'hidden')
         ->add('event_location', 'hidden')
+
+        // add empty field for the optional category type GLOSSARY
+        ->add('glossary_type', 'hidden')
 
         ->add('content_id', 'hidden', array(
             'data' => isset($data['content_id']) ? $data['content_id'] : -1
@@ -246,7 +253,7 @@ class ContentEdit extends Admin
             'data' => $primary_category
         ))
         ->add('secondary_categories', 'choice', array(
-            'choices' => $categories,
+            'choices' => $categories_second,
             'empty_value' => '- please select -',
             'required' => false,
             'multiple' => true,
@@ -311,6 +318,19 @@ class ContentEdit extends Admin
 
         }
 
+        if ($category_type == 'GLOSSARY') {
+            // additional fields for the GLOSSARY handling
+
+            $form->remove('glossary_type');
+
+            $form->add('glossary_type', 'choice', array(
+               'choices' => $this->GlossaryData->getGlossaryTypeValuesForForm(),
+                'empty_value' => '- please select -',
+                'required' => self::$config['content']['field']['glossary_type']['required'],
+                'data' => isset($data['glossary_type']) ? $data['glossary_type'] : 'KEYWORD'
+            ));
+        }
+
         return $form->getForm();
     }
 
@@ -339,6 +359,9 @@ class ContentEdit extends Admin
 
             // only for event data
             $event = array();
+
+            // only for glossary data
+            $glossary = array();
 
             $checked = true;
 
@@ -646,6 +669,20 @@ class ContentEdit extends Admin
                             $checked = false;
                         }
                         break;
+                    case 'glossary_type':
+                        if (isset($content[$name])) {
+                            // ignore the property 'required'
+                            $unique = $this->app['utils']->specialCharsToAsciiChars($data['title'], true);
+                            if ((false !== ($id = $this->GlossaryData->existsUnique($unique))) &&
+                                ($id !== self::$content_id)) {
+                                $this->setAlert('The glossary item %title% already exists and is used by the flexContent ID %id%!',
+                                    array('%title%' => $data['title'], '%id%' => $id), self::ALERT_TYPE_WARNING);
+                                $checked = false;
+                            }
+                            $glossary[$name] = $content[$name];
+                            $glossary['glossary_unique'] = $unique;
+                        }
+                        break;
                 }
             }
 
@@ -654,6 +691,22 @@ class ContentEdit extends Admin
                 $this->setAlert('At least must it exists some text within the teaser or the content, at the moment the Teaser and the Content are empty!',
                             array(), self::ALERT_TYPE_WARNING);
                 $checked = false;
+            }
+
+            $category = $this->CategoryTypeData->select($content['primary_category']);
+            $primary_category_type = $category['category_type'];
+
+            if (empty($glossary) && ($primary_category_type == 'GLOSSARY')) {
+                // new glossary record
+                $unique = $this->app['utils']->specialCharsToAsciiChars($data['title'], true);
+                if ((false !== ($id = $this->GlossaryData->existsUnique($unique))) &&
+                    ($id !== self::$content_id)) {
+                    $this->setAlert('The glossary item %title% already exists and is used by the flexContent ID %id%!',
+                        array('%title%' => $data['title'], '%id%' => $id), self::ALERT_TYPE_WARNING);
+                    $checked = false;
+                }
+                $glossary['glossary_type'] = 'KEYWORD';
+                $glossary['glossary_unique'] = $unique;
             }
 
             if ($checked) {
@@ -704,6 +757,32 @@ class ContentEdit extends Admin
                         $this->EventData->updateContentID(self::$content_id, $event);
                     }
                 }
+
+                if (!empty($glossary)) {
+                    // glossary entry
+                    if ($primary_category_type != 'GLOSSARY') {
+                        // wrong category type!
+                        $this->GlossaryData->deleteContentID(self::$content_id);
+                    }
+                    else {
+                        $glossary['language'] = $data['language'];
+
+                        if ($this->GlossaryData->existsContentID(self::$content_id)) {
+                            // update an existing record
+                            $this->GlossaryData->updateContentID(self::$content_id, $glossary);
+                        }
+                        else {
+                            // insert a new glossary record
+                            $glossary['content_id'] = self::$content_id;
+                            $this->GlossaryData->insert($glossary);
+                        }
+                    }
+                }
+                elseif ($this->GlossaryData->existsContentID(self::$content_id)) {
+                    // remove this entry
+                    $this->GlossaryData->deleteContentID(self::$content_id);
+                }
+
 
                 return true;
             }

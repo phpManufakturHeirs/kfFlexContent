@@ -501,6 +501,20 @@ class Update
             $this->Configuration->setConfiguration(self::$config);
             $this->Configuration->saveConfiguration();
         }
+
+        if (!isset(self::$config['glossary'])) {
+            $default = $this->Configuration->getDefaultConfigArray();
+            self::$config['glossary'] = $default['glossary'];
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
+
+        if (!isset(self::$config['content']['field']['glossary_type'])) {
+            $default = $this->Configuration->getDefaultConfigArray();
+            self::$config['content']['field']['glossary_type'] = $default['content']['field']['glossary_type'];
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
     }
 
     /**

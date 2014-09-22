@@ -64,7 +64,9 @@
         {{ form_row(form.event_organizer) }}
         {{ form_row(form.event_location) }}
       {% endif %}
-      
+      {% if form.category_type.vars.value != 'GLOSSARY' %}
+        {{ form_row(form.glossary_type) }}
+      {% endif %}
       <div class="row">
         <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
           {# form contents at the left column #}
@@ -157,6 +159,14 @@
               <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
                 {{ form_label(form.event_location) }}
                 {{ form_widget(form.event_location, {'attr':{'class':'form-control input-sm'}}) }}
+              </div>
+            </div>
+          {% endif %}
+          {% if form.category_type.vars.value == 'GLOSSARY' %}
+            <div class="row">
+              <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                {{ form_label(form.glossary_type) }}
+                {{ form_widget(form.glossary_type, {'attr':{'class':'form-control input-sm'}}) }}
               </div>
             </div>
           {% endif %}

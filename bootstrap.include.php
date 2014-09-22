@@ -267,6 +267,14 @@ $app->get('/flexcontent/action',
     'phpManufaktur\flexContent\Control\Command\Action::controllerAction');
 
 /**
+ * Glossary filter
+ */
+$app->post('/filter/glossary',
+    // process the filter for the Glossary abbreviations, acronyms and keywords
+    'phpManufaktur\flexContent\Control\Filter\Glossary::Controller')
+    ->setOption('info', MANUFAKTUR_PATH.'/flexContent/filter.glossary.json');
+
+/**
  * RemoteServer
  */
 

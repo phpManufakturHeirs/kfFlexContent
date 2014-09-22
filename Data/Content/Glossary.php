@@ -79,6 +79,21 @@ EOD;
     }
 
     /**
+     * Get the glossary TYPEs as key => value pair for the usage in forms
+     *
+     * @return array
+     */
+    public function getGlossaryTypeValuesForForm()
+    {
+        $enums = $this->app['db.utils']->getEnumValues(self::$table_name, 'glossary_type');
+        $result = array();
+        foreach ($enums as $enum) {
+            $result[$enum] = $this->app['utils']->humanize($enum);
+        }
+        return $result;
+    }
+
+    /**
      * Check if the given Glossary Unique entry exists
      *
      * @param string $glossary_unique
@@ -91,6 +106,74 @@ EOD;
             $SQL = "SELECT `content_id` FROM `".self::$table_name."` WHERE `glossary_unique`='$glossary_unique'";
             $content_id = $this->app['db']->fetchColumn($SQL);
             return ($content_id > 0) ? $content_id : false;
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Check if the given content ID already exists
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return boolean
+     */
+    public function existsContentID($content_id)
+    {
+        try {
+            $SQL = "SELECT `content_id` FROM `".self::$table_name."` WHERE `content_id`=$content_id";
+            $content_id = $this->app['db']->fetchColumn($SQL);
+            return ($content_id > 0);
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Update an existing glossary record by the given content ID
+     *
+     * @param integer $content_id
+     * @param array $data
+     * @throws \Exception
+     */
+    public function updateContentID($content_id, $data)
+    {
+        try {
+            unset($data['timestamp']);
+            $this->app['db']->update(self::$table_name, $data, array('content_id' => $content_id));
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Delete the entry which is assigned to the given content ID
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     */
+    public function deleteContentID($content_id)
+    {
+        try {
+            $this->app['db']->delete(self::$table_name, array('content_id' => $content_id));
+        } catch (\Doctrine\DBAL\DBALException $e) {
+            throw new \Exception($e);
+        }
+    }
+
+    /**
+     * Select a record by the given content ID
+     *
+     * @param integer $content_id
+     * @throws \Exception
+     * @return Ambigous <boolean, array>
+     */
+    public function selectContentID($content_id)
+    {
+        try {
+            $SQL = "SELECT * FROM `".self::$table_name."` WHERE `content_id`='$content_id'";
+            $glossary = $this->app['db']->fetchAssoc($SQL);
+            return (is_array($glossary) && isset($glossary['glossary_id'])) ? $glossary : false;
         } catch (\Doctrine\DBAL\DBALException $e) {
             throw new \Exception($e);
         }

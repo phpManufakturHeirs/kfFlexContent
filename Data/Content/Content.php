@@ -18,6 +18,7 @@ class Content
 {
     protected $app = null;
     protected $EventData = null;
+    protected $GlossaryData = null;
     protected static $table_name = null;
 
     /**
@@ -30,6 +31,7 @@ class Content
         $this->app = $app;
         self::$table_name = FRAMEWORK_TABLE_PREFIX.'flexcontent_content';
         $this->EventData = new Event($app);
+        $this->GlossaryData = new Glossary($app);
     }
 
     /**
@@ -193,21 +195,30 @@ EOD;
                     $content[$key] = $this->replacePlaceholderWithURL($content[$key]);
                 }
                 // is this an EVENT?
-                if (($key == 'content_id') && ('EVENT' == $this->getContentType($value))) {
-                    if (false !== ($event = $this->EventData->selectContentID($value))) {
-                        // add the EVENT data to the content record
-                        foreach ($event as $event_key => $event_value) {
-                            if (in_array($event_key, array('event_date_from', 'event_date_to', 'event_id'))) {
-                                $content[$event_key] = $event_value;
-                            }
-                            elseif (in_array($event_key, array('event_organizer', 'event_location'))) {
-                                $content[$event_key]['contact_id'] = $event_value;
-                                $ContactData = new Contact($this->app);
-                                if (($event_value > 0) && (false !== ($contact = $ContactData->selectOverview($event_value)))) {
-                                    // add the contact overview
-                                    $content[$event_key] = $contact;
+                if ($key == 'content_id') {
+                    if ('EVENT' == $this->getContentType($value)) {
+                        if (false !== ($event = $this->EventData->selectContentID($value))) {
+                            // add the EVENT data to the content record
+                            foreach ($event as $event_key => $event_value) {
+                                if (in_array($event_key, array('event_date_from', 'event_date_to', 'event_id'))) {
+                                    $content[$event_key] = $event_value;
+                                }
+                                elseif (in_array($event_key, array('event_organizer', 'event_location'))) {
+                                    $content[$event_key]['contact_id'] = $event_value;
+                                    $ContactData = new Contact($this->app);
+                                    if (($event_value > 0) && (false !== ($contact = $ContactData->selectOverview($event_value)))) {
+                                        // add the contact overview
+                                        $content[$event_key] = $contact;
+                                    }
                                 }
                             }
+                        }
+                    }
+                    elseif ('GLOSSARY' == $this->getContentType($value)) {
+                        if (false !== ($glossary = $this->GlossaryData->selectContentID($value))) {
+                            // add the GLOSSARY data to the content record
+                            $content['glossary_type'] = $glossary['glossary_type'];
+                            $content['glossary_unique'] = $glossary['glossary_unique'];
                         }
                     }
                 }

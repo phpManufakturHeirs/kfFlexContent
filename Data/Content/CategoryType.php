@@ -288,16 +288,23 @@ EOD;
     /**
      * Get the categories for a SELECT in form.factory / Twig
      *
-     * @param string $language
+     * @param string $language default null
+     * @param boolean $main_only select only category type DEFAULT or EVENT
      * @throws \Exception
      * @return multitype:NULL
      */
-    public function getListForSelect($language=null)
+    public function getListForSelect($language=null, $main_only=false)
     {
         try {
             $SQL = "SELECT `category_id`, `category_name` FROM `".self::$table_name."` ";
             if (!is_null($language)) {
                 $SQL .= "WHERE `language`='$language' ";
+                if ($main_only) {
+                    $SQL .= "AND `category_type` IN ('DEFAULT','EVENT') ";
+                }
+            }
+            elseif ($main_only) {
+                $SQL .= "WHERE `category_type` IN ('DEFAULT','EVENT') ";
             }
             $SQL .= "ORDER BY `category_name` ASC";
 
