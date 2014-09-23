@@ -6,6 +6,18 @@ MIT License (MIT) - <http://www.opensource.org/licenses/MIT>
 
 kitFramework - <https://kit2.phpmanufaktur.de>
 
+**0.45** - 2014-09-23
+
+* removed no longer needed `*.twig` files (missed handling in a previous release)
+* missing handling for `order_by` and `order_direction`, add handling for `content_exclude`
+* add handling for `content_exclude[]` - you can now explicit exclude content ID's from a category or list view
+* new: parameter `hide_if_empty[]` hide content if nothing is available and don't prompt an alert
+* admin: category type list show used content ID's and content title as tooltip, using category as primary for a content is indicated by bold ID
+* fix: title, page title and description are now using sanitize (was missing)
+* admin: content list can now filtered by category or category type - selection is saved as session variable
+* Introduce Glossary function for flexContent
+* Add import of previous [dbGlossary](https://blog.phpmanufaktur.de/de/article/dbglossary-literatur-und-fussnoten-verwalten.php) `CSV` data into flexContent 
+
 **0.44** - 2014-09-18
 
 * fixed: #9 - can not delete the last hashtag which is assigned to a content
