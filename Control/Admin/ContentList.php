@@ -193,7 +193,7 @@ class ContentList extends Admin
         if (!is_null($page)) {
             $this->setCurrentPage($page);
         }
-//$this->app['session']->remove(self::SESSION_CATEGORY_ID);
+
         if (null === $app['session']->get(self::SESSION_CATEGORY_ID)) {
              $app['session']->set(self::SESSION_CATEGORY_ID,
                  $this->validateCategoryValue(self::$config['list']['category']['default']));
