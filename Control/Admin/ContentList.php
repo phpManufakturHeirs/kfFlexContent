@@ -286,6 +286,10 @@ class ContentList extends Admin
      */
     protected function validateCategoryValue($value)
     {
+        $value = strtoupper($value);
+        if ($value == 'ARTICLE') {
+            $value = 'DEFAULT';
+        }
         switch ($value) {
             case 'ALL':
                 return -1;
