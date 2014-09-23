@@ -27,6 +27,7 @@ class Update
     protected $app = null;
     protected $Configuration = null;
     protected static $config = null;
+    protected static $VERSION = null;
 
     /**
      * Release 0.17
@@ -515,6 +516,15 @@ class Update
             $this->Configuration->setConfiguration(self::$config);
             $this->Configuration->saveConfiguration();
         }
+
+        if (version_compare(self::$VERSION, '0.45', '<=')) {
+            // change the minimum title length to 2 for Glossary support
+            self::$config['content']['field']['title']['length']['minimum'] = 2;
+            // change the minimum page_title length to 2 for Glossary support
+            self::$config['content']['field']['page_title']['length']['minimum'] = 2;
+            $this->Configuration->setConfiguration(self::$config);
+            $this->Configuration->saveConfiguration();
+        }
     }
 
     /**
@@ -525,6 +535,9 @@ class Update
     public function Controller(Application $app)
     {
         $this->app = $app;
+
+        $version = file_get_contents(MANUFAKTUR_PATH.'/flexContent/VERSION');
+        self::$VERSION = trim($version);
 
         $Setup = new Setup();
 

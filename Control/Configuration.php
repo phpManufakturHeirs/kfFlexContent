@@ -104,7 +104,8 @@ class Configuration
             ),
             'list' => array(
                 'category' => array(
-                    'default' => 'DEFAULT' // possible: null, DEFAULT, EVENT, FAQ, GLOSSARY or category ID
+                    // possible: null, ARTICLE (alias for DEFAULT), DEFAULT, EVENT, FAQ, GLOSSARY or category ID
+                    'default' => 'ARTICLE'
                 )
             ),
             'content' => array(
@@ -112,7 +113,7 @@ class Configuration
                     'title' => array(
                         'required' => true,
                         'length' => array(
-                            'minimum' => 10,
+                            'minimum' => 2,
                             'maximum' => 128
                         )
                     ),
@@ -122,7 +123,7 @@ class Configuration
                     'page_title' => array(
                         'required' => false,
                         'length' => array(
-                            'minimum' => 10,
+                            'minimum' => 2,
                             'maximum' => 128
                         )
                     ),
