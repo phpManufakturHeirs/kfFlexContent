@@ -16,7 +16,7 @@ kitFramework - <https://kit2.phpmanufaktur.de>
 * fix: title, page title and description are now using sanitize (was missing)
 * admin: content list can now filtered by category or category type - selection is saved as session variable
 * Introduce Glossary function for flexContent
-* Add import of previous [dbGlossary](https://blog.phpmanufaktur.de/de/article/dbglossary-literatur-und-fussnoten-verwalten.php) `CSV` data into flexContent 
+* Add import of previous [dbGlossary](https://blog.phpmanufaktur.de/de/article/dbglossary-schlagworte-literaturliste.php) `CSV` data into flexContent 
 
 **0.44** - 2014-09-18
 
