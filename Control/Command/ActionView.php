@@ -136,6 +136,11 @@ class ActionView extends Basic
             $this->Tools->linkTags($content['teaser'], self::$language);
             $this->Tools->linkTags($content['content'], self::$language);
 
+            // replace CMS_URL
+            $this->Tools->replaceCmsUrl($content['content']);
+            $this->Tools->replaceCmsUrl($content['teaser']);
+            $this->Tools->replaceCmsUrl($content['description']);
+
             // get the categories for this content ID
             $content['categories'] = $this->CategoryData->selectCategoriesByContentID(self::$parameter['content_id']);
 

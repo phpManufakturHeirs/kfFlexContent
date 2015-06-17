@@ -39,6 +39,21 @@ class Tools
     }
 
     /**
+     *
+     * @access public
+     * @return
+     **/
+    public function replaceCmsUrl(&$content)
+    {
+        $content = str_replace(
+            array('{{ CMS_URL }}','%7B%7B%20CMS_URL%20%7D%7D'),
+            CMS_URL,
+            $content
+        );
+    }   // end function replaceCmsUrl()
+    
+
+    /**
      * Get the permanent link base URL for the given language
      *
      * @param string $language
